@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">LocationSharing</string>
+    <string name="facebook_app_id">585924418263922</string>
+    <string name="btn_logout_from_google">Sign out</string>
+</resources>

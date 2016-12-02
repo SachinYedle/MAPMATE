@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "441095881058",
+    "project_id": "firebase-locationsharing"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441095881058:android:bd04ada6d6c47d7e",
+        "android_client_info": {
+          "package_name": "com.example.admin1.locationsharing"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "441095881058-781t9m2gdqqk7grhlj1ffa1hlm1hm22l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.admin1.locationsharing",
+            "certificate_hash": "8AA41C1E83F192701D4C43A8E68C8169E969CF84"
+          }
+        },
+        {
+          "client_id": "441095881058-adjl4bl21uab4hemtra3r65uc486d3nv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPgo3ydIaO2Yh0VnS7lxgQwERJ0LlmWDc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
