@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/drawer_header_height"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingEnd="@dimen/drawer_header_padding"
+        android:paddingLeft="@dimen/drawer_header_padding"
+        android:paddingRight="@dimen/drawer_header_padding"
+        android:paddingStart="@dimen/drawer_header_padding">
+        <TextView
+            android:id="@+id/welcome_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/welcome"
+            android:textSize="@dimen/button_text_size" />
+
+        <TextView
+            android:id="@+id/drawer_user_name_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/font_size" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/selected_contact_recyclerview"/>
+    </LinearLayout>
+</LinearLayout>

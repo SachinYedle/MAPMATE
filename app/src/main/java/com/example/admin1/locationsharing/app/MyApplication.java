@@ -15,7 +15,6 @@ import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.db.dao.DaoMaster;
 import com.example.admin1.locationsharing.db.dao.DaoSession;
 import com.example.admin1.locationsharing.interfaces.PositiveClick;
-import com.example.admin1.locationsharing.services.UserDataService;
 import com.example.admin1.locationsharing.utils.Constants;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 import com.google.gson.Gson;
@@ -110,13 +109,6 @@ public class MyApplication extends Application {
         return daoMaster.newSession();
     }
 
-    public UserDataService getUserDataService(){
-
-        if(retrofit == null){
-            buildRetrofitClient();
-        }
-        return retrofit.create(UserDataService.class);
-    }
     private void buildRetrofitClient() {
         retrofit = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())

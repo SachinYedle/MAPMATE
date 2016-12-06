@@ -1,7 +1,7 @@
 package com.example.admin1.locationsharing.acitivities;
 
 import android.Manifest;
-import android.content.Intent;
+import android.support.v4.app.FragmentManager;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -21,10 +21,9 @@ import android.widget.Toast;
 
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.app.MyApplication;
-import com.example.admin1.locationsharing.db.dao.UserDataTable;
-import com.example.admin1.locationsharing.db.dao.operations.UserDataOperations;
+import com.example.admin1.locationsharing.fragments.ContactsFragment;
+import com.example.admin1.locationsharing.fragments.DrawerFragment;
 import com.example.admin1.locationsharing.interfaces.PositiveClick;
-import com.example.admin1.locationsharing.mappers.UserDataMapper;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
 import com.google.android.gms.common.ConnectionResult;
@@ -40,8 +39,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
-
-import java.util.List;
 
 public class MapActivity extends DrawerActivity implements GoogleApiClient.OnConnectionFailedListener,
         LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener {
@@ -71,6 +68,13 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         setDrawerLayout(MyApplication.getInstance().getCurrentActivityContext());
         sharedPreferencesData = new SharedPreferencesData(MyApplication.getInstance().getCurrentActivityContext());
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
+        DrawerFragment fragment = new DrawerFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.drawer_fragment_layout,fragment);
+        fragmentTransaction.addToBackStack("DrawerLayout");
+        fragmentTransaction.commit();
+
     }
     public void getMyLocation() {
 
@@ -108,6 +112,12 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.add:
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                ContactsFragment contactsFragment = new ContactsFragment();
+                fragmentTransaction.replace(R.id.map,contactsFragment);
+                fragmentTransaction.addToBackStack("contacts");
+                fragmentTransaction.commit();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -270,18 +280,5 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         };
         googleMap.setInfoWindowAdapter(infoWindowAdapter);
         return false;
-    }
-    public void getFriendsData(){
-        UserDataMapper userDataMapper = new UserDataMapper(MyApplication.getInstance().getCurrentActivityContext());
-        userDataMapper.getUserData();
-        List<UserDataTable> userData = UserDataOperations.getUserData(MyApplication.getInstance().getCurrentActivityContext());
-        for (int i = 0;i < userData.size(); i++){
-            Double latitude = Double.parseDouble(userData.get(i).getLatitude());
-            Double longitude = Double.parseDouble(userData.get(i).getLongitude());
-            LatLng latLng = new LatLng(latitude,longitude);
-            googleMap.addMarker(new MarkerOptions().position(latLng)
-                    .draggable(false));
-            CustomLog.d("Get friends Data:",""+latitude+" "+longitude);
-        }
     }
 }
