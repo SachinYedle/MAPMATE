@@ -1,15 +1,20 @@
 package com.example.admin1.locationsharing.app;
 
+import android.app.AlertDialog;
 import android.app.Application;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
 
 import com.example.admin1.locationsharing.BuildConfig;
+import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.db.dao.DaoMaster;
 import com.example.admin1.locationsharing.db.dao.DaoSession;
+import com.example.admin1.locationsharing.interfaces.PositiveClick;
 import com.example.admin1.locationsharing.services.UserDataService;
 import com.example.admin1.locationsharing.utils.Constants;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
@@ -33,12 +38,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MyApplication extends Application {
     private static SharedPreferencesData sharedPreferencesData;
     private Retrofit retrofit;
-    private SQLiteDatabase database;
-    private static DaoMaster daoMaster;
     private static Context applicationContext;
     private static MyApplication instance;
     private static Context context;
     private DaoMaster.DevOpenHelper devOpenHelper;
+    private ProgressDialog mProgressDialog;
+
 
     @Override
     public void onCreate() {
@@ -87,6 +92,9 @@ public class MyApplication extends Application {
     }
 
     public DaoSession getWritableDaoSession(Context context) {
+        if(devOpenHelper == null){
+            initializeDatabase(context);
+        }
         SQLiteDatabase database = devOpenHelper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(database);
         return daoMaster.newSession();
@@ -94,12 +102,19 @@ public class MyApplication extends Application {
 
     /** Returns the Redable Dao Session*/
     public DaoSession getReadableDaoSession(Context context){
+        if(devOpenHelper == null){
+            initializeDatabase(context);
+        }
         SQLiteDatabase database = devOpenHelper.getReadableDatabase();
         DaoMaster daoMaster = new DaoMaster(database);
         return daoMaster.newSession();
     }
 
     public UserDataService getUserDataService(){
+
+        if(retrofit == null){
+            buildRetrofitClient();
+        }
         return retrofit.create(UserDataService.class);
     }
     private void buildRetrofitClient() {
@@ -136,6 +151,128 @@ public class MyApplication extends Application {
             instance = new MyApplication();
         }
         return instance;
+    }
+
+    public void showProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
+        mProgressDialog = new ProgressDialog(getCurrentActivityContext(), R.style
+                .ProgressDialogStyle);
+        mProgressDialog.setMessage(getString(R.string.loading));
+        mProgressDialog.setCancelable(false);
+        if (!mProgressDialog.isShowing()) {
+            mProgressDialog.show();
+        }
+    }
+
+    /**
+     * Hides progress bar
+     */
+    public void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
+    }
+
+    /**
+     * Shows progress bar
+     */
+    public void showProgressDialog(String title, String description) {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
+        mProgressDialog = new ProgressDialog(getCurrentActivityContext(), R.style
+                .ProgressDialogStyle);
+        mProgressDialog.setTitle(title);
+        mProgressDialog.setMessage(description);
+        mProgressDialog.setCancelable(false);
+        if (!mProgressDialog.isShowing()) {
+            mProgressDialog.show();
+        }
+    }
+
+    public void showAlert(String alertMessage) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getCurrentActivityContext(), R
+                .style.AlertDialogStyle);
+        // Setting Dialog Title
+        alertDialog.setTitle(getString(R.string.alert));
+        // Setting Dialog Message
+        alertDialog.setMessage(alertMessage);
+        alertDialog.setCancelable(false);
+        // Setting Positive "Yes" Button
+        alertDialog.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener
+                () {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        alertDialog.show();
+    }
+
+
+    public void showAlertWithPositiveButton(String alertMessage, String positiveText,
+                                            PositiveClick positiveClick) {
+        showAlertWithPositiveButton(null, alertMessage, positiveText, positiveClick);
+    }
+
+
+    public void showAlertWithPositiveNegativeButton(String title, String alertMessage, String
+            negativeText, String positiveText, final PositiveClick positiveClick) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getCurrentActivityContext(), R
+                .style.AlertDialogStyle);
+        if (title != null) {
+            alertDialog.setTitle(title);
+        } else {
+            alertDialog.setTitle(getString(R.string.alert));
+        }
+        alertDialog.setMessage(alertMessage);
+        alertDialog.setCancelable(false);
+        alertDialog.setNegativeButton(negativeText, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        alertDialog.setPositiveButton(positiveText, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                positiveClick.onClick();
+            }
+        });
+        alertDialog.show();
+    }
+
+    /**
+     * @param title         (String) : text in title
+     * @param alertMessage  (String) : alertMessage
+     * @param positiveText  (String) : text in positive button
+     * @param positiveClick (PositiveClick) : positiveClick
+     */
+    public void showAlertWithPositiveButton(String title, String alertMessage, String positiveText,
+                                            final PositiveClick positiveClick) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getCurrentActivityContext
+                (), R.style.AlertDialogStyle);
+        if (title != null) {
+            alertDialog.setTitle(title);
+        } else {
+            alertDialog.setTitle(getString(R.string.alert));
+        }
+        alertDialog.setMessage(alertMessage);
+        alertDialog.setCancelable(false);
+        if (!positiveText.equals(getString(R.string.ok))) {
+            alertDialog.setNegativeButton(getString(R.string.ok), new DialogInterface
+                    .OnClickListener
+                    () {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+        }
+        alertDialog.setPositiveButton(positiveText, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                positiveClick.onClick();
+            }
+        });
+        alertDialog.show();
     }
 
 

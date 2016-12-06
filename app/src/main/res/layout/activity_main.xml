@@ -5,8 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.admin1.locationsharing.acitivities.MainActivity">
+    tools:context=".acitivities.MainActivity">
 
+    <include layout="@layout/toolbar_layout"/>
 
     <EditText
         android:layout_width="wrap_content"

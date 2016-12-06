@@ -1,7 +1,6 @@
 package com.example.admin1.locationsharing.acitivities;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -9,23 +8,25 @@ import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.app.MyApplication;
-import com.example.admin1.locationsharing.db.dao.DaoSession;
 import com.example.admin1.locationsharing.db.dao.UserDataTable;
-import com.example.admin1.locationsharing.db.dao.UserDataTableDao;
 import com.example.admin1.locationsharing.db.dao.operations.UserDataOperations;
+import com.example.admin1.locationsharing.interfaces.PositiveClick;
 import com.example.admin1.locationsharing.mappers.UserDataMapper;
-import com.example.admin1.locationsharing.pojo.UserData;
+import com.example.admin1.locationsharing.utils.CustomLog;
+import com.example.admin1.locationsharing.utils.Navigator;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -42,7 +43,7 @@ import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 
 import java.util.List;
 
-public class MapActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,
+public class MapActivity extends DrawerActivity implements GoogleApiClient.OnConnectionFailedListener,
         LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener {
 
     private GoogleApiClient googleApiClient;
@@ -58,13 +59,19 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         MyApplication.getInstance().setCurrentActivityContext(this);
-
-        sharedPreferencesData = new SharedPreferencesData(MapActivity.this);
-        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        initializeVariables();
         getMyLocation();
-        getFriendsData();
     }
 
+
+    public void initializeVariables(){
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setDrawerLayout(MyApplication.getInstance().getCurrentActivityContext());
+        sharedPreferencesData = new SharedPreferencesData(MyApplication.getInstance().getCurrentActivityContext());
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+    }
     public void getMyLocation() {
 
         checkPermission();
@@ -80,7 +87,7 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.On
         googleMap = mgoogleMap;
                 if (googleMap == null)
                 googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                if (ActivityCompat.checkSelfPermission(MapActivity.this,
+                if (ActivityCompat.checkSelfPermission(MyApplication.getInstance().getCurrentActivityContext(),
                         android.Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
                     buildGoogleApiClient();
@@ -89,6 +96,23 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.On
             }
         });
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.toolbar_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.add:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     protected void onStart() {
@@ -168,31 +192,22 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.On
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             return true;
         } else {
-            showGPSDisabledAlertToUser();
+            showGPSDisabledAlert();
         }
         return false;
     }
 
-    private void showGPSDisabledAlertToUser() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("GPS is disabled in your device. Would you like to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("Goto Settings Page To Enable GPS",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                Intent callGPSSettingIntent = new Intent(
-                                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                startActivity(callGPSSettingIntent);
-                            }
-                        });
-        alertDialogBuilder.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-        AlertDialog alert = alertDialogBuilder.create();
-        alert.show();
+    private void showGPSDisabledAlert() {
+        PositiveClick positiveClick = new PositiveClick() {
+            @Override
+            public void onClick() {
+                Navigator.navgateToSettings();
+            }
+        };
+        MyApplication.getInstance().showAlertWithPositiveNegativeButton(getString(R.string
+                .enable_gps_header), getString(R.string
+                .enable_gps_message), getString(R.string.cancel), getString(R.string
+                .enable_gps), positiveClick);
     }
 
     public void buildGoogleApiClient() {
@@ -217,8 +232,10 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.On
 
     @Override
     public void onLocationChanged(Location mlocation) {
-        location = mlocation;
+        MyApplication.getInstance().showProgressDialog(getString(R.string
+                .getting_friends_location), getString(R.string.please_wait));
 
+        location = mlocation;
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         googleMap.addMarker(new MarkerOptions().position(latLng)
                 .draggable(false));
@@ -227,6 +244,7 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.On
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(11));
 
+        MyApplication.getInstance().hideProgressDialog();
         if (googleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
         }
@@ -236,11 +254,12 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.On
         GoogleMap.InfoWindowAdapter infoWindowAdapter = new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
-                return null;
+               return null;
             }
 
             @Override
             public View getInfoContents(Marker marker) {
+                CustomLog.d("OnMarkerClick","marker click");
                 View view = getLayoutInflater().inflate(R.layout.map_marker_info_window,null);
                 TextView userId = (TextView)view.findViewById(R.id.user_id);
                 userId.setText( sharedPreferencesData.getUserId());
@@ -250,18 +269,19 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.On
             }
         };
         googleMap.setInfoWindowAdapter(infoWindowAdapter);
-        return true;
+        return false;
     }
     public void getFriendsData(){
-        UserDataMapper userDataMapper = new UserDataMapper(MapActivity.this);
+        UserDataMapper userDataMapper = new UserDataMapper(MyApplication.getInstance().getCurrentActivityContext());
         userDataMapper.getUserData();
-        List<UserDataTable> userData = UserDataOperations.getUserData(MapActivity.this);
+        List<UserDataTable> userData = UserDataOperations.getUserData(MyApplication.getInstance().getCurrentActivityContext());
         for (int i = 0;i < userData.size(); i++){
             Double latitude = Double.parseDouble(userData.get(i).getLatitude());
             Double longitude = Double.parseDouble(userData.get(i).getLongitude());
             LatLng latLng = new LatLng(latitude,longitude);
             googleMap.addMarker(new MarkerOptions().position(latLng)
                     .draggable(false));
+            CustomLog.d("Get friends Data:",""+latitude+" "+longitude);
         }
     }
 }

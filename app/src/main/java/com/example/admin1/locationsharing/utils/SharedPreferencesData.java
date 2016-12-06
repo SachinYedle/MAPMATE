@@ -21,6 +21,7 @@ public class SharedPreferencesData {
     //Variable Names saved in preferences
     private final String USER_ID = "userID";
     private final String USER_PHONE = "userPhone";
+    private final String USER_COUNTRY_CODE = "userCountryCode";
 
     public SharedPreferencesData(Context context) {
         this.context = context;
@@ -37,6 +38,13 @@ public class SharedPreferencesData {
         editor.commit();
     }
 
+    public void setUserCountryCode(String userCountryCode) {
+        editor.putString(USER_COUNTRY_CODE, userCountryCode);
+        editor.commit();
+    }
+    public String getUserCountryCode() {
+        return sharedPreferences.getString(USER_COUNTRY_CODE,"");
+    }
     public String getUserId() {
         return sharedPreferences.getString(USER_ID,"");
     }

@@ -1,4 +1,4 @@
-package com.example.admin1.locationsharing.pojo;
+package com.example.admin1.locationsharing.responses;
 
 /**
  * Created by admin1 on 2/12/16.

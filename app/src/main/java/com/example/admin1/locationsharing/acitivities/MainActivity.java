@@ -3,6 +3,7 @@ package com.example.admin1.locationsharing.acitivities;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +13,8 @@ import android.widget.Toast;
 
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.app.MyApplication;
+import com.example.admin1.locationsharing.utils.CustomLog;
+import com.example.admin1.locationsharing.utils.Navigator;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -50,7 +53,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initializeFacebookAuth();
+        setContentView(R.layout.activity_main);
+        MyApplication.getInstance().setCurrentActivityContext(this);
+        initializeVariables();
+        setUpListeners();
+        setUpGoogleLoginOption();
+    }
 
+    public void initializeFacebookAuth(){
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
         AppEventsLogger.activateApp(this);
@@ -59,28 +70,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         accessToken.setCurrentAccessToken(null);
         Profile.getCurrentProfile().setCurrentProfile(null);
         LoginManager.getInstance().logOut();
+    }
+    public void initializeVariables(){
 
-        setContentView(R.layout.activity_main);
 
-        MyApplication.getInstance().setCurrentActivityContext(this);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //setDrawerLayout(MyApplication.getInstance().getCurrentActivityContext());
+
         LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
         FacebookCallback<LoginResult> facebookCallback = getFacebookCallback();
-
         loginButton.registerCallback(callbackManager,facebookCallback);
-
 
         googleSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
         googleSignInButton.setSize(SignInButton.SIZE_STANDARD);
-        googleSignInButton.setOnClickListener(this);
 
         googleSignOut = (Button)findViewById(R.id.btn_sign_out);
-        googleSignOut.setOnClickListener(this);
 
         Button signIn = (Button)findViewById(R.id.sign_in);
         signIn.setOnClickListener(this);
         phoneEditText = (EditText)findViewById(R.id.phone);
 
         sharedPreferencesData = new SharedPreferencesData(MainActivity.this);
+    }
+    public void setUpListeners(){
+        googleSignInButton.setOnClickListener(this);
+        googleSignOut.setOnClickListener(this);
+    }
+    public void setUpGoogleLoginOption(){
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
@@ -88,21 +105,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
         googleApiClient.connect();
-
     }
-
     public FacebookCallback<LoginResult> getFacebookCallback(){
         FacebookCallback<LoginResult> facebookCallback =  new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                Toast.makeText(MainActivity.this,"Login Successfull",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MyApplication.getInstance().getCurrentActivityContext(),"Login Successfull",Toast.LENGTH_SHORT).show();
                 GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
-                        Log.d("Parth", response.toString() + "\njson" + object.toString());
+                        CustomLog.d("Parth", response.toString() + "\njson" + object.toString());
                         try {
                             String email = (String) object.get("email");
-                            Toast.makeText(MainActivity.this, email, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MyApplication.getInstance().getCurrentActivityContext(), email, Toast.LENGTH_SHORT).show();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -116,12 +131,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onCancel() {
-                Log.e("OnCancel","Login Canceled");
+                CustomLog.e("OnCancel","Login Canceled");
             }
 
             @Override
             public void onError(FacebookException error) {
-                Log.e("OnError",error.toString()+"error");
+                CustomLog.e("OnError",error.toString()+"error");
             }
         };
         return facebookCallback;
@@ -151,15 +166,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d("MainActivity", "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
-
             String fullName = acct.getDisplayName();
             String email = acct.getEmail();
-
-            Log.i("Name & Email",fullName + "&" +email);
+            CustomLog.i("Name & Email",fullName + "&" +email);
             googleSignInButton.setVisibility(View.GONE);
             googleSignOut.setVisibility(View.VISIBLE);
         } else {
-            Log.e("Login","Unsuccesfull");
+            CustomLog.e("Login","Unsuccesfull");
         }
     }
     @Override
@@ -195,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
-                        Log.d("Google Access","Revoked");
+                        CustomLog.d("Google Access","Revoked");
                     }
                 });
     }
@@ -203,21 +216,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void singInUserWithPhone(){
         String userPhone = phoneEditText.getText().toString();
 
-        /*TelephonyManager tm = (TelephonyManager)getSystemService(getApplicationContext().TELEPHONY_SERVICE);
-        String countryCode = tm.getNetworkCountryIso();*/
-
+        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(getApplicationContext().TELEPHONY_SERVICE);
+        String countryCode = telephonyManager.getNetworkCountryIso();
+        CustomLog.i("MainActivity",countryCode+"");
         if(!isValidPhoneNumber(userPhone)){
             phoneEditText.setError("Phone not Valid");
         }
         else{
             sharedPreferencesData.setUserId(userPhone);
             sharedPreferencesData.setUserPhone(userPhone);
-            Intent intent = new Intent(MainActivity.this,MapActivity.class);
-            startActivity(intent);
+            sharedPreferencesData.setUserCountryCode(countryCode);
+            Navigator.navigateToMapActivity();
         }
     }
     public static boolean isValidPhoneNumber(String phone) {
-        if (phone.length() < 6 || phone.length() > 13 || phone == null) {
+        if (phone.length() < 6 || phone.length() > 13 || phone.equals("")) {
             return false;
         } else {
             return android.util.Patterns.PHONE.matcher(phone).matches();

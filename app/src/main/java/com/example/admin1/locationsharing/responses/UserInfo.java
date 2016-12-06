@@ -1,4 +1,4 @@
-package com.example.admin1.locationsharing.pojo;
+package com.example.admin1.locationsharing.responses;
 
 import java.util.ArrayList;
 

@@ -1,6 +1,6 @@
 package com.example.admin1.locationsharing.services;
 
-import com.example.admin1.locationsharing.pojo.UserInfo;
+import com.example.admin1.locationsharing.responses.UserInfo;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

@@ -6,8 +6,8 @@ import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.db.dao.DaoSession;
 import com.example.admin1.locationsharing.db.dao.UserDataTable;
 import com.example.admin1.locationsharing.db.dao.UserDataTableDao;
-import com.example.admin1.locationsharing.pojo.UserData;
-import com.example.admin1.locationsharing.pojo.UserInfo;
+import com.example.admin1.locationsharing.responses.UserData;
+import com.example.admin1.locationsharing.responses.UserInfo;
 import com.example.admin1.locationsharing.services.UserDataService;
 import com.example.admin1.locationsharing.utils.CustomLog;
 
@@ -43,6 +43,7 @@ public class UserDataMapper {
                                                response) {
                     if (response.isSuccessful()) {
                         parseUserDataResponse(response.body());
+                        CustomLog.i("Response",""+response);
                     } else {
                         CustomLog.e("UserInfo callback","user info data service error");
                     }
