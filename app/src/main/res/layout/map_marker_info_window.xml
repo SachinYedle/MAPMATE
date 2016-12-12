@@ -4,14 +4,12 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/user_id"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        style="@style/medium_text_textview"/>
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/user_phone"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        style="@style/medium_text_textview"/>
 </LinearLayout>

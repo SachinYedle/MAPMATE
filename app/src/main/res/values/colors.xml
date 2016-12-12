@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="drawer_header_color">#111111</color>
+    <color name="phone_text_color">#9f9f9f</color>
 </resources>

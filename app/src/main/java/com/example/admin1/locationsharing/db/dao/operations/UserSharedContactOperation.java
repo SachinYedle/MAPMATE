@@ -17,7 +17,7 @@ import de.greenrobot.dao.query.QueryBuilder;
  */
 
 public class UserSharedContactOperation {
-    public static List<SharedContactTable> getUserData(Context context) {
+    public static List<SharedContactTable> getSharedContacts(Context context) {
         DaoSession daoSession = MyApplication.getInstance().getReadableDaoSession(context);
         SharedContactTableDao sharedContactTableDao = daoSession.getSharedContactTableDao();
         return sharedContactTableDao.loadAll();

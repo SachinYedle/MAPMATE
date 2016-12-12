@@ -12,11 +12,14 @@ import android.os.Environment;
 
 import com.example.admin1.locationsharing.BuildConfig;
 import com.example.admin1.locationsharing.R;
+import com.example.admin1.locationsharing.Services.UserDataService;
 import com.example.admin1.locationsharing.db.dao.DaoMaster;
 import com.example.admin1.locationsharing.db.dao.DaoSession;
 import com.example.admin1.locationsharing.interfaces.PositiveClick;
 import com.example.admin1.locationsharing.utils.Constants;
+import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -40,6 +43,7 @@ public class MyApplication extends Application {
     private static Context applicationContext;
     private static MyApplication instance;
     private static Context context;
+    private GoogleMap googleMap;
     private DaoMaster.DevOpenHelper devOpenHelper;
     private ProgressDialog mProgressDialog;
 
@@ -90,6 +94,14 @@ public class MyApplication extends Application {
         devOpenHelper = new DaoMaster.DevOpenHelper(context, Constants.DB_NAME, null);
     }
 
+    public void setGoogleMap(GoogleMap googleMap) {
+        this.googleMap = googleMap;
+    }
+
+    public GoogleMap getGoogleMap() {
+        return googleMap;
+    }
+
     public DaoSession getWritableDaoSession(Context context) {
         if(devOpenHelper == null){
             initializeDatabase(context);
@@ -109,6 +121,12 @@ public class MyApplication extends Application {
         return daoMaster.newSession();
     }
 
+    public UserDataService getUserDataService(){
+        if(retrofit == null){
+            buildRetrofitClient();
+        }
+        return retrofit.create(UserDataService.class);
+    }
     private void buildRetrofitClient() {
         retrofit = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
@@ -128,7 +146,7 @@ public class MyApplication extends Application {
         }
         return false;
     }
-    public Context getCurrentActivityContext() {
+    public static Context getCurrentActivityContext() {
         if (context == null) {
             return applicationContext;
         } else {

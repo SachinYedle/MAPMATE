@@ -50,8 +50,12 @@ public class ContactsFragment extends Fragment {
     }
 
     public void initializeVariables() {
+        CustomLog.d("Contacts","initialize");
         contactArrayList = new ArrayList<Contact>();
-        checkContactsPermission();
+
+        if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED){
+            checkContactsPermission();
+        }
         getContacts();
     }
 
@@ -86,7 +90,6 @@ public class ContactsFragment extends Fragment {
             case REQUEST_PERMISSION_CODE:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                     if (ActivityCompat.checkSelfPermission(getActivity(),
                             Manifest.permission.READ_CONTACTS)
                             == PackageManager.PERMISSION_GRANTED) {
@@ -134,20 +137,20 @@ public class ContactsFragment extends Fragment {
                 sharedContactTable.setPhone(contact.getPhone());
                 sharedContactTableDao.insert(sharedContactTable);
             }
-
         }
     }
 
     public void getContacts(){
+        MyApplication.getInstance().showProgressDialog(getString(R.string.loading_contacts),getString(R.string.please_wait));
         contacts = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
         if (contacts != null) {
-            CustomLog.d("contacts count", "" + contacts.getCount());
             if (contacts.getCount() == 0) {
                 Toast.makeText(getActivity(), "No contacts in your contact list.", Toast.LENGTH_LONG).show();
             }
             while (contacts.moveToNext()) {
                 String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                 String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                phoneNumber = phoneNumber.replaceAll("[()\\-\\s]", "");
                 Contact contact = new Contact();
                 contact.setName(name);
                 contact.setPhone(phoneNumber);
@@ -157,10 +160,10 @@ public class ContactsFragment extends Fragment {
                     contactArrayList.add(contact);
                 }
             }
-            contacts.close();
         } else {
             CustomLog.e("Cursor close 1", "----------------");
-            contacts.close();
         }
+        contacts.close();
+        MyApplication.getInstance().hideProgressDialog();
     }
 }

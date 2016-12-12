@@ -14,7 +14,7 @@ import com.example.admin1.locationsharing.db.dao.SharedContactTable;
 /** 
  * DAO for table "SHARED_CONTACT_TABLE".
 */
-public class SharedContactTableDao extends AbstractDao<SharedContactTable, Integer> {
+public class SharedContactTableDao extends AbstractDao<SharedContactTable, Long> {
 
     public static final String TABLENAME = "SHARED_CONTACT_TABLE";
 
@@ -23,7 +23,7 @@ public class SharedContactTableDao extends AbstractDao<SharedContactTable, Integ
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property Id = new Property(0, Integer.class, "id", true, "ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
         public final static Property Phone = new Property(2, String.class, "phone", false, "PHONE");
     };
@@ -41,7 +41,7 @@ public class SharedContactTableDao extends AbstractDao<SharedContactTable, Integ
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"SHARED_CONTACT_TABLE\" (" + //
-                "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"NAME\" TEXT," + // 1: name
                 "\"PHONE\" TEXT);"); // 2: phone
     }
@@ -57,7 +57,7 @@ public class SharedContactTableDao extends AbstractDao<SharedContactTable, Integ
     protected void bindValues(SQLiteStatement stmt, SharedContactTable entity) {
         stmt.clearBindings();
  
-        Integer id = entity.getId();
+        Long id = entity.getId();
         if (id != null) {
             stmt.bindLong(1, id);
         }
@@ -75,15 +75,15 @@ public class SharedContactTableDao extends AbstractDao<SharedContactTable, Integ
 
     /** @inheritdoc */
     @Override
-    public Integer readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public SharedContactTable readEntity(Cursor cursor, int offset) {
         SharedContactTable entity = new SharedContactTable( //
-            cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0), // id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // phone
         );
@@ -93,20 +93,21 @@ public class SharedContactTableDao extends AbstractDao<SharedContactTable, Integ
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, SharedContactTable entity, int offset) {
-        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setPhone(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
      }
     
     /** @inheritdoc */
     @Override
-    protected Integer updateKeyAfterInsert(SharedContactTable entity, long rowId) {
-        return entity.getId();
+    protected Long updateKeyAfterInsert(SharedContactTable entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Integer getKey(SharedContactTable entity) {
+    public Long getKey(SharedContactTable entity) {
         if(entity != null) {
             return entity.getId();
         } else {

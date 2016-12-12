@@ -13,17 +13,11 @@
         android:layout_weight="1">
         <TextView
             android:id="@+id/name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#000"
-            android:textSize="18sp"/>
+            style="@style/medium_text_textview"/>
 
         <TextView
             android:id="@+id/phone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#9f9f9f"
-            android:textSize="15sp"/>
+            style="@style/small_text_textview" />
 
     </LinearLayout>
     <CheckBox

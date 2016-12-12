@@ -7,7 +7,22 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-    <style name="ProgressDialogStyle" parent="Theme.AppCompat.Dialog"/>
-    <style name="AlertDialogStyle" parent="Theme.AppCompat.Dialog"/>
+    <style name="ProgressDialogStyle" parent="Theme.AppCompat.Light.Dialog"/>
+
+    <style name="AlertDialogStyle" parent="Theme.AppCompat.Light.Dialog"/>
+    
+    <style name="small_text_textview">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">@dimen/button_text_size</item>
+        <item name="android:textColor">@color/phone_text_color</item>
+    </style>
+    <style name="medium_text_textview">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/font_size</item>
+        <item name="android:textColor">@color/drawer_header_color</item>
+    </style>
 
 </resources>

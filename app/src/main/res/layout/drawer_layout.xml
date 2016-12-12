@@ -6,24 +6,24 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/drawer_header_height"
         android:gravity="center"
-        android:orientation="horizontal"
+        android:orientation="vertical"
+        android:background="@color/drawer_header_color"
         android:paddingEnd="@dimen/drawer_header_padding"
         android:paddingLeft="@dimen/drawer_header_padding"
         android:paddingRight="@dimen/drawer_header_padding"
         android:paddingStart="@dimen/drawer_header_padding">
         <TextView
             android:id="@+id/welcome_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
+            style="@style/small_text_textview"
             android:text="@string/welcome"
-            android:textSize="@dimen/button_text_size" />
+            android:gravity="center"
+            android:textColor="@android:color/white"/>
 
         <TextView
             android:id="@+id/drawer_user_name_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/font_size" />
+            android:gravity="center"
+            style="@style/medium_text_textview"
+            android:textColor="@android:color/white"/>
     </LinearLayout>
 
     <LinearLayout

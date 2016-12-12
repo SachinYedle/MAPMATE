@@ -7,15 +7,33 @@ import de.greenrobot.daogenerator.Schema;
 public class LocationSharingDaoGenerator {
     public static void main(String[] args) throws Exception {
         Schema schema = new Schema(1, "com.example.admin1.locationsharing.db.dao");
-        //addUserDataTable(schema);
         addSharedContactTable(schema);
+        addUserLastKnownLocationTable(schema);
+        addUserLocationsTable(schema);
         new DaoGenerator().generateAll(schema, "./app/src/main/java");
     }
     private static void addSharedContactTable(Schema schema){
         Entity entity = schema.addEntity("SharedContactTable");
-        entity.addIntProperty("id").primaryKey();
+        entity.addIdProperty().primaryKey().autoincrement();
         entity.addStringProperty("name");
         entity.addStringProperty("phone");
+    }
+
+    public static void addUserLocationsTable(Schema schema){
+        Entity entity = schema.addEntity("UserLocations");
+        entity.addIdProperty().primaryKey().autoincrement();
+        entity.addStringProperty("phone");
+        entity.addStringProperty("name");
+        entity.addStringProperty("latitude");
+        entity.addStringProperty("longitude");
+        entity.addStringProperty("time");
+    }
+    public static void addUserLastKnownLocationTable(Schema schema){
+        Entity entity = schema.addEntity("UserLastKnownLocation");
+        entity.addStringProperty("name");
+        entity.addStringProperty("phone").primaryKey();
+        entity.addStringProperty("latitude");
+        entity.addStringProperty("longitude");
     }
 }
 

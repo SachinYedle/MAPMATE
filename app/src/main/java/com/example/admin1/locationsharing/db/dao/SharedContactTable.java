@@ -6,28 +6,28 @@ package com.example.admin1.locationsharing.db.dao;
  */
 public class SharedContactTable {
 
-    private Integer id;
+    private Long id;
     private String name;
     private String phone;
 
     public SharedContactTable() {
     }
 
-    public SharedContactTable(Integer id) {
+    public SharedContactTable(Long id) {
         this.id = id;
     }
 
-    public SharedContactTable(Integer id, String name, String phone) {
+    public SharedContactTable(Long id, String name, String phone) {
         this.id = id;
         this.name = name;
         this.phone = phone;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
