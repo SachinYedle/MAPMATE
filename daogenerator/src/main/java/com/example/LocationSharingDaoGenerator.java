@@ -7,16 +7,20 @@ import de.greenrobot.daogenerator.Schema;
 public class LocationSharingDaoGenerator {
     public static void main(String[] args) throws Exception {
         Schema schema = new Schema(1, "com.example.admin1.locationsharing.db.dao");
-        addSharedContactTable(schema);
+        addContactsTable(schema);
         addUserLastKnownLocationTable(schema);
         addUserLocationsTable(schema);
         new DaoGenerator().generateAll(schema, "./app/src/main/java");
     }
-    private static void addSharedContactTable(Schema schema){
-        Entity entity = schema.addEntity("SharedContactTable");
+    private static void addContactsTable(Schema schema){
+        Entity entity = schema.addEntity("Contacts");
         entity.addIdProperty().primaryKey().autoincrement();
-        entity.addStringProperty("name");
+        entity.addStringProperty("first_name");
+        entity.addStringProperty("last_name");
         entity.addStringProperty("phone");
+        entity.addBooleanProperty("is_contact_added");
+        entity.addBooleanProperty("is_location_requested");
+        entity.addBooleanProperty("is_location_shared");
     }
 
     public static void addUserLocationsTable(Schema schema){

@@ -5,31 +5,58 @@ package com.example.admin1.locationsharing.pojo;
  */
 
 public class Contact {
-    private String name;
+    private String firstName;
+    private String lastName;
     private String phone;
-    private boolean selected;
+    private boolean isAdded;
+    private boolean isShared;
+    private boolean isRequested;
 
     public void setPhone(String phone) {
         this.phone = phone;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setAdded(boolean added) {
+        isAdded = added;
+    }
+
+    public void setShared(boolean shared) {
+        isShared = shared;
+    }
+
+    public void setRequested(boolean requested) {
+        isRequested = requested;
     }
 
     public String getPhone() {
         return phone;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public boolean isSelected() {
-        return selected;
+    public String getLastName() {
+        return lastName;
+    }
+
+    public boolean isAdded() {
+        return isAdded;
+    }
+
+    public boolean isShared() {
+        return isShared;
+    }
+
+    public boolean isRequested() {
+        return isRequested;
     }
 }

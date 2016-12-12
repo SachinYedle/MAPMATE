@@ -4,8 +4,6 @@ import android.content.Context;
 
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.db.dao.DaoSession;
-import com.example.admin1.locationsharing.db.dao.SharedContactTable;
-import com.example.admin1.locationsharing.db.dao.SharedContactTableDao;
 import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
 import com.example.admin1.locationsharing.db.dao.UserLastKnownLocationDao;
 

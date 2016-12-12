@@ -12,21 +12,20 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.example.admin1.locationsharing.R;
+import com.example.admin1.locationsharing.db.dao.Contacts;
 import com.example.admin1.locationsharing.interfaces.ItemClickListener;
 import com.example.admin1.locationsharing.pojo.Contact;
 
 import java.util.ArrayList;
 
-/**
- * Created by sid-riktam-2 on 15-11-2016.
- */
+
 
 public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecyclerViewAdapter.ViewHolder>  {
 
     private Context context;
-    private ArrayList<Contact> contacts;
+    private ArrayList<Contacts> contacts;
 
-    public ContactRecyclerViewAdapter(Context context, ArrayList<Contact> contacts) {
+    public ContactRecyclerViewAdapter(Context context, ArrayList<Contacts> contacts) {
         this.context = context;
         this.contacts = contacts;
     }
@@ -41,17 +40,18 @@ public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecy
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        holder.name.setText(contacts.get(position).getName());
+        String name = contacts.get(position).getFirst_name() +" "+ contacts.get(position).getFirst_name();
+        holder.name.setText(name);
         holder.phone.setText(contacts.get(position).getPhone());
         holder.checkBox.setOnCheckedChangeListener(null);
-        holder.checkBox.setChecked(contacts.get(position).isSelected());
+        holder.checkBox.setChecked(contacts.get(position).getIs_contact_added());
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(!contacts.get(position).isSelected()){
-                    contacts.get(position).setSelected(true);
+                if(!contacts.get(position).getIs_contact_added()){
+                    contacts.get(position).setIs_contact_added(true);
                 }else {
-                    contacts.get(position).setSelected(false);
+                    contacts.get(position).setIs_contact_added(false);
                 }
             }
         });
@@ -71,6 +71,5 @@ public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecy
             phone = (TextView) itemView.findViewById(R.id.phone);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkbox);
         }
-
     }
 }

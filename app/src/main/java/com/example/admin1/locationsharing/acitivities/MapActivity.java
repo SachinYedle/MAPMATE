@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,7 +25,6 @@ import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
 import com.example.admin1.locationsharing.db.dao.UserLocations;
 import com.example.admin1.locationsharing.db.dao.operations.UserLastknownLocationOperations;
-import com.example.admin1.locationsharing.db.dao.operations.UserSharedContactOperation;
 import com.example.admin1.locationsharing.db.dao.operations.UsersLast30MinLocationsOperation;
 import com.example.admin1.locationsharing.fragments.ContactsFragment;
 import com.example.admin1.locationsharing.fragments.DrawerFragment;
@@ -61,7 +59,6 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     private SupportMapFragment mapFragment;
     private GoogleMap googleMap;
     private LocationRequest locationRequest;
-    private final int REQUSTED_CODE = 99;
     private SharedPreferencesData sharedPreferencesData;
     private LatLng myLatLngLocation;
     @Override
@@ -70,7 +67,10 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         setContentView(R.layout.activity_map);
         MyApplication.getInstance().setCurrentActivityContext(MapActivity.this);
         initializeVariables();
-        getMyLocation();
+        if(ActivityCompat.checkSelfPermission(MyApplication.getCurrentActivityContext(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
+            getMyLocation();
+        }
+
         MyApplication.getInstance().setGoogleMap(googleMap);
     }
 
@@ -79,8 +79,8 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setDrawerLayout(MyApplication.getInstance().getCurrentActivityContext());
-        sharedPreferencesData = new SharedPreferencesData(MyApplication.getInstance().getCurrentActivityContext());
+        setDrawerLayout(MyApplication.getCurrentActivityContext());
+        sharedPreferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
         DrawerFragment fragment = new DrawerFragment();
@@ -91,7 +91,6 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     }
     public void getMyLocation() {
 
-        checkPermission();
         if (!checkGpsStatus()) {
             Toast.makeText(this, "please enable gps location..", Toast.LENGTH_SHORT).show();
             return;
@@ -173,48 +172,9 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
 
     }
 
-    public boolean checkPermission() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUSTED_CODE);
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUSTED_CODE);
-            }
-            return false;
-        } else {
-            return true;
-        }
-    }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUSTED_CODE:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    if (ActivityCompat.checkSelfPermission(this,
-                            Manifest.permission.ACCESS_FINE_LOCATION)
-                            == PackageManager.PERMISSION_GRANTED) {
 
-                        if (googleApiClient == null) {
-
-                            if (checkGpsStatus()) {
-                                LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-                                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                                    buildGoogleApiClient();
-                                }
-                            }
-                        }
-                        googleMap.setMyLocationEnabled(true);
-                    }
-
-                } else {
-                    Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
-                }
-                return;
-        }
-    }
 
     public boolean checkGpsStatus() {
 

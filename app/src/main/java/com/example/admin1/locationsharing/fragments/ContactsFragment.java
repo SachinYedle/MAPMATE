@@ -1,12 +1,13 @@
 package com.example.admin1.locationsharing.fragments;
 
 import android.Manifest;
+import android.app.ProgressDialog;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,15 +23,16 @@ import android.widget.Toast;
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.adapters.ContactRecyclerViewAdapter;
 import com.example.admin1.locationsharing.app.MyApplication;
-import com.example.admin1.locationsharing.db.dao.DaoSession;
-import com.example.admin1.locationsharing.db.dao.SharedContactTable;
-import com.example.admin1.locationsharing.db.dao.SharedContactTableDao;
-import com.example.admin1.locationsharing.db.dao.operations.UserSharedContactOperation;
+import com.example.admin1.locationsharing.db.dao.Contacts;
+import com.example.admin1.locationsharing.db.dao.operations.ContactsOperations;
 import com.example.admin1.locationsharing.pojo.Contact;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
+import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -39,9 +41,10 @@ import java.util.List;
 
 public class ContactsFragment extends Fragment {
 
-    private static final int REQUEST_PERMISSION_CODE = 123;
     private Cursor contacts;
-    private ArrayList<Contact> contactArrayList;
+    private ArrayList<Contacts> contactsArrayList;
+    private Handler updateBarHandler;
+    int counter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,13 +53,46 @@ public class ContactsFragment extends Fragment {
     }
 
     public void initializeVariables() {
-        CustomLog.d("Contacts","initialize");
-        contactArrayList = new ArrayList<Contact>();
+        SharedPreferencesData preferencesData = new SharedPreferencesData(getActivity());
 
-        if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED){
-            checkContactsPermission();
+        CustomLog.d("Contacts","initialize"+preferencesData.getIsFirstTime());
+
+        if(!preferencesData.getIsFirstTime()){
+            preferencesData.setIsFirstTime(true);
+            updateBarHandler =new Handler();
+
+            fetchContactsAndStoreToDB();
+
+        }else{
+            getContactsFromDB();
         }
-        getContacts();
+    }
+
+    public void getContactsFromDB(){
+        List<Contacts> contactsList = ContactsOperations.getAllContactsFromDB(getActivity());
+        contactsArrayList = new ArrayList<Contacts>(contactsList);
+
+        Collections.sort(contactsArrayList, new Comparator<Contacts>(){
+            @Override
+            public int compare(Contacts contacts1, Contacts contacts2){
+
+                boolean isAdded1 = contacts1.getIs_contact_added();
+                boolean isAdded2 = contacts2.getIs_contact_added();
+                if (isAdded1 != isAdded2){
+                    if (isAdded1){
+                        return -1;
+                    }
+                    return 1;
+                }
+                return 0;
+            }
+        });
+    }
+
+    public void fetchContactsAndStoreToDB(){
+        if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
+            getContactsAndStoreToDB();
+        }
     }
 
     @Nullable
@@ -66,42 +102,11 @@ public class ContactsFragment extends Fragment {
         RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.contact_recyclerview);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
-        ContactRecyclerViewAdapter recyclerViewAdapter = new ContactRecyclerViewAdapter(getActivity(),contactArrayList);
+        ContactRecyclerViewAdapter recyclerViewAdapter = new ContactRecyclerViewAdapter(getActivity(),contactsArrayList);
         recyclerView.setAdapter(recyclerViewAdapter);
         return view;
     }
 
-    public boolean checkContactsPermission() {
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_CONTACTS)) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_PERMISSION_CODE);
-            } else {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_PERMISSION_CODE);
-            }
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_PERMISSION_CODE:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.checkSelfPermission(getActivity(),
-                            Manifest.permission.READ_CONTACTS)
-                            == PackageManager.PERMISSION_GRANTED) {
-                        getContacts();
-                    }
-
-                } else {
-                    Toast.makeText(getActivity(), "permission denied", Toast.LENGTH_LONG).show();
-                }
-                break;
-        }
-    }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -118,47 +123,45 @@ public class ContactsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.done){
-            addSelectedContactsToDB();
             Navigator.navigateToMapActivity();
         }
         return super.onOptionsItemSelected(item);
 
     }
 
-    private void addSelectedContactsToDB(){
-        DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(getActivity());
-        SharedContactTableDao sharedContactTableDao = daoSession.getSharedContactTableDao();
-        Contact contact;
-        for (int i = 0; i < contactArrayList.size(); i++){
-            contact = contactArrayList.get(i);
-            if(contact.isSelected()){
-                SharedContactTable sharedContactTable = new SharedContactTable();
-                sharedContactTable.setName(contact.getName());
-                sharedContactTable.setPhone(contact.getPhone());
-                sharedContactTableDao.insert(sharedContactTable);
-            }
-        }
-    }
+    public void getContactsAndStoreToDB(){
 
-    public void getContacts(){
-        MyApplication.getInstance().showProgressDialog(getString(R.string.loading_contacts),getString(R.string.please_wait));
+        final ProgressDialog pDialog = new ProgressDialog(getActivity());
+        pDialog.setMessage("Reading contacts...");
+        pDialog.setCancelable(false);
+        pDialog.show();
+        counter = 0;
         contacts = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
         if (contacts != null) {
             if (contacts.getCount() == 0) {
                 Toast.makeText(getActivity(), "No contacts in your contact list.", Toast.LENGTH_LONG).show();
             }
+
             while (contacts.moveToNext()) {
-                String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+
+
+                pDialog.setMessage("Reading contacts : "+ counter++ +"/"+contacts.getCount());;
+
+                String firstName = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                 String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                 phoneNumber = phoneNumber.replaceAll("[()\\-\\s]", "");
+                String lastName = "";
+
                 Contact contact = new Contact();
-                contact.setName(name);
+                contact.setFirstName(firstName);
+                contact.setLastName(lastName);
+                contact.setAdded(false);
+                contact.setRequested(false);
+                contact.setShared(false);
                 contact.setPhone(phoneNumber);
-                contact.setSelected(false);
-                List<SharedContactTable> sharedContact = UserSharedContactOperation.getUserWithPhneAndName(getActivity(),contact);
-                if(sharedContact.size() <= 0){
-                    contactArrayList.add(contact);
-                }
+
+                CustomLog.i("name","Fname:"+firstName+" Lname:"+lastName);
+                ContactsOperations.insertContactsToDb(getActivity(),contact);
             }
         } else {
             CustomLog.e("Cursor close 1", "----------------");

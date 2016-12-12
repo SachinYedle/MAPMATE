@@ -9,11 +9,11 @@ import de.greenrobot.dao.AbstractDaoSession;
 import de.greenrobot.dao.identityscope.IdentityScopeType;
 import de.greenrobot.dao.internal.DaoConfig;
 
-import com.example.admin1.locationsharing.db.dao.SharedContactTable;
+import com.example.admin1.locationsharing.db.dao.Contacts;
 import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
 import com.example.admin1.locationsharing.db.dao.UserLocations;
 
-import com.example.admin1.locationsharing.db.dao.SharedContactTableDao;
+import com.example.admin1.locationsharing.db.dao.ContactsDao;
 import com.example.admin1.locationsharing.db.dao.UserLastKnownLocationDao;
 import com.example.admin1.locationsharing.db.dao.UserLocationsDao;
 
@@ -26,11 +26,11 @@ import com.example.admin1.locationsharing.db.dao.UserLocationsDao;
  */
 public class DaoSession extends AbstractDaoSession {
 
-    private final DaoConfig sharedContactTableDaoConfig;
+    private final DaoConfig contactsDaoConfig;
     private final DaoConfig userLastKnownLocationDaoConfig;
     private final DaoConfig userLocationsDaoConfig;
 
-    private final SharedContactTableDao sharedContactTableDao;
+    private final ContactsDao contactsDao;
     private final UserLastKnownLocationDao userLastKnownLocationDao;
     private final UserLocationsDao userLocationsDao;
 
@@ -38,8 +38,8 @@ public class DaoSession extends AbstractDaoSession {
             daoConfigMap) {
         super(db);
 
-        sharedContactTableDaoConfig = daoConfigMap.get(SharedContactTableDao.class).clone();
-        sharedContactTableDaoConfig.initIdentityScope(type);
+        contactsDaoConfig = daoConfigMap.get(ContactsDao.class).clone();
+        contactsDaoConfig.initIdentityScope(type);
 
         userLastKnownLocationDaoConfig = daoConfigMap.get(UserLastKnownLocationDao.class).clone();
         userLastKnownLocationDaoConfig.initIdentityScope(type);
@@ -47,23 +47,23 @@ public class DaoSession extends AbstractDaoSession {
         userLocationsDaoConfig = daoConfigMap.get(UserLocationsDao.class).clone();
         userLocationsDaoConfig.initIdentityScope(type);
 
-        sharedContactTableDao = new SharedContactTableDao(sharedContactTableDaoConfig, this);
+        contactsDao = new ContactsDao(contactsDaoConfig, this);
         userLastKnownLocationDao = new UserLastKnownLocationDao(userLastKnownLocationDaoConfig, this);
         userLocationsDao = new UserLocationsDao(userLocationsDaoConfig, this);
 
-        registerDao(SharedContactTable.class, sharedContactTableDao);
+        registerDao(Contacts.class, contactsDao);
         registerDao(UserLastKnownLocation.class, userLastKnownLocationDao);
         registerDao(UserLocations.class, userLocationsDao);
     }
     
     public void clear() {
-        sharedContactTableDaoConfig.getIdentityScope().clear();
+        contactsDaoConfig.getIdentityScope().clear();
         userLastKnownLocationDaoConfig.getIdentityScope().clear();
         userLocationsDaoConfig.getIdentityScope().clear();
     }
 
-    public SharedContactTableDao getSharedContactTableDao() {
-        return sharedContactTableDao;
+    public ContactsDao getContactsDao() {
+        return contactsDao;
     }
 
     public UserLastKnownLocationDao getUserLastKnownLocationDao() {
