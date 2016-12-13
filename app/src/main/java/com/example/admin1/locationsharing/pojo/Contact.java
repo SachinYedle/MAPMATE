@@ -6,11 +6,21 @@ package com.example.admin1.locationsharing.pojo;
 
 public class Contact {
     private String firstName;
+    private String photo;
     private String lastName;
     private String phone;
     private boolean isAdded;
     private boolean isShared;
     private boolean isRequested;
+
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
 
     public void setPhone(String phone) {
         this.phone = phone;

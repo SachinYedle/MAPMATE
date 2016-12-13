@@ -10,6 +10,7 @@ public class Contacts {
     private String first_name;
     private String last_name;
     private String phone;
+    private String photo;
     private Boolean is_contact_added;
     private Boolean is_location_requested;
     private Boolean is_location_shared;
@@ -21,11 +22,12 @@ public class Contacts {
         this.id = id;
     }
 
-    public Contacts(Long id, String first_name, String last_name, String phone, Boolean is_contact_added, Boolean is_location_requested, Boolean is_location_shared) {
+    public Contacts(Long id, String first_name, String last_name, String phone, String photo, Boolean is_contact_added, Boolean is_location_requested, Boolean is_location_shared) {
         this.id = id;
         this.first_name = first_name;
         this.last_name = last_name;
         this.phone = phone;
+        this.photo = photo;
         this.is_contact_added = is_contact_added;
         this.is_location_requested = is_location_requested;
         this.is_location_shared = is_location_shared;
@@ -61,6 +63,14 @@ public class Contacts {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 
     public Boolean getIs_contact_added() {

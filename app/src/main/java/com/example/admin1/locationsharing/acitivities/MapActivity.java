@@ -133,11 +133,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         switch (item.getItemId()){
             case R.id.add:
                 FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                ContactsFragment contactsFragment = new ContactsFragment();
-                fragmentTransaction.replace(R.id.map,contactsFragment);
-                fragmentTransaction.addToBackStack("contacts");
-                fragmentTransaction.commit();
+                Navigator.navigateToContactsFragment(fragmentManager);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -233,7 +229,6 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         MyApplication.getInstance().showProgressDialog(getString(R.string.loading_data),getString(R.string.please_wait));
         UserDataMapper userDataMapper = new UserDataMapper(MyApplication.getCurrentActivityContext());
         userDataMapper.getUserLastKnownLocation();
-        MyApplication.getInstance().hideProgressDialog();
 
         googleMap.setOnMarkerClickListener(this);
         setMyLatLngLocation(latLng);
@@ -259,7 +254,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     }
 
     public void setFriendsLocationMarkers(){
-
+        MyApplication.getInstance().hideProgressDialog();
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         List<UserLastKnownLocation> locationList = UserLastknownLocationOperations.getUserLastKnownLocation(MyApplication.getCurrentActivityContext());
         if(locationList.size() >= 0){

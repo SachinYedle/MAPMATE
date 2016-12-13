@@ -30,6 +30,7 @@ public class ContactsOperations {
         contacts.setIs_contact_added(contact.isAdded());
         contacts.setIs_location_shared(contact.isShared());
         contacts.setIs_location_requested(contact.isRequested());
+        contacts.setPhoto(contact.getPhoto());
         contactsDao.insert(contacts);
     }
     public static List<Contacts> getAddedContactsFromDB(Context context){

@@ -10,4 +10,6 @@
     <dimen name="drawer_header_padding">16.8dp</dimen>
     <dimen name="drawer_item_height">45dp</dimen>
     <dimen name="drawer_width">250dp</dimen>
+    <dimen name="image_dimension">50dp</dimen>
+
 </resources>

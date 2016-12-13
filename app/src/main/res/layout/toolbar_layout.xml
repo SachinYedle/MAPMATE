@@ -4,6 +4,5 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toolbar"
     android:background="@color/colorPrimaryDark"
-    app:layout_scrollFlags="scroll|enterAlways"
     app:layout_collapseMode="pin"
     xmlns:android="http://schemas.android.com/apk/res/android" />

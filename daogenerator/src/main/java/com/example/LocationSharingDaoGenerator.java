@@ -18,6 +18,7 @@ public class LocationSharingDaoGenerator {
         entity.addStringProperty("first_name");
         entity.addStringProperty("last_name");
         entity.addStringProperty("phone");
+        entity.addStringProperty("photo");
         entity.addBooleanProperty("is_contact_added");
         entity.addBooleanProperty("is_location_requested");
         entity.addBooleanProperty("is_location_shared");

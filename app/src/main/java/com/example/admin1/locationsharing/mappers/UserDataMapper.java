@@ -2,6 +2,7 @@ package com.example.admin1.locationsharing.mappers;
 
 import android.content.Context;
 import android.support.v4.app.FragmentTransaction;
+import android.widget.Toast;
 
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.Services.UserDataService;
@@ -80,6 +81,7 @@ public class UserDataMapper {
                     } else {
                         CustomLog.e("UserInfo callback","user info data service error");
                     }
+
                 }
 
                 @Override
@@ -90,7 +92,6 @@ public class UserDataMapper {
 
     private Callback<UserInfo> userDataCallback = new
             Callback<UserInfo>() {
-
                 @Override
                 public void onResponse(Call<UserInfo> call,
                                        Response<UserInfo>
@@ -100,12 +101,16 @@ public class UserDataMapper {
                         CustomLog.i("Response",""+response);
                     } else {
                         CustomLog.e("UserInfo callback","user info data service error");
+                        MyApplication.getInstance().hideProgressDialog();
+                        Toast.makeText(MyApplication.getCurrentActivityContext(),"Something wnt wrong try again..",Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<UserInfo> call, Throwable t) {
                     CustomLog.e("UserInfo callback","user info data service error");
+                    MyApplication.getInstance().hideProgressDialog();
+                    Toast.makeText(MyApplication.getCurrentActivityContext(),"Something wnt wrong try again..",Toast.LENGTH_SHORT).show();
                 }
             };
     private void parseUserDataResponse(UserInfo userInfo){
