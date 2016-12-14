@@ -54,6 +54,10 @@ public class ContactsOperations {
         DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(context);
         ContactsDao contactsDao = daoSession.getContactsDao();
         return contactsDao.loadAll();
-
+    }
+    public static int getContactsCount(Context context){
+        DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(context);
+        ContactsDao contactsDao = daoSession.getContactsDao();
+        return contactsDao.loadAll().size();
     }
 }

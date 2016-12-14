@@ -3,6 +3,8 @@ package com.example.admin1.locationsharing.fragments;
 import android.Manifest;
 import android.content.ContentResolver;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -25,9 +27,12 @@ import android.widget.Toast;
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.adapters.ContactRecyclerViewAdapter;
 import com.example.admin1.locationsharing.adapters.SelectdContactsRVAdapter;
+import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.db.dao.Contacts;
 import com.example.admin1.locationsharing.db.dao.operations.ContactsOperations;
+import com.example.admin1.locationsharing.db.dao.operations.ContactsPhoneToDBSyncOperations;
 import com.example.admin1.locationsharing.interfaces.ItemClickListener;
+import com.example.admin1.locationsharing.observer.MyContentObserver;
 import com.example.admin1.locationsharing.pojo.Contact;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
@@ -44,13 +49,13 @@ import java.util.List;
 
 public class ContactsFragment extends Fragment implements ItemClickListener {
 
-    private Cursor contacts;
+
     private ArrayList<Contacts> contactsArrayList;
     private ArrayList<Contacts> selectedContactsList;
     private RecyclerView selectedContactsRecyclerView;
-    private ContentResolver resolver;
     private ContactRecyclerViewAdapter recyclerViewAdapter;
     private RecyclerView recyclerView;
+    private MyContentObserver myObserver;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +96,8 @@ public class ContactsFragment extends Fragment implements ItemClickListener {
 
     public void fetchContactsAndStoreToDB(){
         if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
-            getContactsAndStoreToDB();
+            ContactsPhoneToDBSyncOperations operations = new ContactsPhoneToDBSyncOperations(getActivity(),getFragmentManager());
+            operations.fetchContactsAndStoreToDB();
         }
     }
 
@@ -175,43 +181,30 @@ public class ContactsFragment extends Fragment implements ItemClickListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.done){
-            Navigator.navigateToMapActivity();
+        switch (item.getItemId()){
+            case R.id.done:
+                Navigator.navigateToMapActivity();
+                break;
+            case R.id.refresh:
+                Toast.makeText(getActivity(),"",Toast.LENGTH_SHORT).show();
+                break;
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
-    public void getContactsAndStoreToDB(){
-        resolver = getActivity().getContentResolver();
-        contacts = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
-        if (contacts != null) {
-            if (contacts.getCount() == 0) {
-                Toast.makeText(getActivity(), "No contacts in your contact list.", Toast.LENGTH_LONG).show();
-            }
-            while (contacts.moveToNext()) {
-                Bitmap photo = null;
-                String firstName = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                phoneNumber = phoneNumber.replaceAll("[()\\-\\s]", "");
-                String lastName = "";
-                String imageURI = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_THUMBNAIL_URI));
-                Contact contact = new Contact();
-                contact.setFirstName(firstName);
-                contact.setLastName(lastName);
-                contact.setPhoto(imageURI);
-                contact.setAdded(false);
-                contact.setRequested(false);
-                contact.setShared(false);
-                contact.setPhone(phoneNumber);
-
-                CustomLog.i("name","Fname:"+firstName+" Lname:"+lastName);
-                ContactsOperations.insertContactsToDb(getActivity(),contact);
-            }
-            getContactsFromDB();
-        } else {
-            CustomLog.e("Cursor close 1", "----------------");
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(myObserver == null){
+            myObserver = new MyContentObserver(new Handler());
         }
-        contacts.close();
+        getActivity().getContentResolver().registerContentObserver(ContactsContract.Contacts.CONTENT_URI, true,myObserver);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().getContentResolver().unregisterContentObserver(myObserver);
     }
 
     @Override
@@ -226,8 +219,13 @@ public class ContactsFragment extends Fragment implements ItemClickListener {
             selectedContactsList.remove(i);
             contacts.get(position).setIs_location_shared(false);
         }
-        selectedContactsRecyclerView.setVisibility(View.VISIBLE);
+        if(selectedContactsList.size() > 0){
+            selectedContactsRecyclerView.setVisibility(View.VISIBLE);
+        }else {
+            selectedContactsRecyclerView.setVisibility(View.GONE);
+        }
         SelectdContactsRVAdapter adapter = new SelectdContactsRVAdapter(getActivity(),selectedContactsList);
+        selectedContactsRecyclerView.smoothScrollToPosition(selectedContactsList.size());
         selectedContactsRecyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
@@ -236,5 +234,4 @@ public class ContactsFragment extends Fragment implements ItemClickListener {
     public void onItemClick(View view, int position) {
 
     }
-
 }

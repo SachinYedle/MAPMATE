@@ -5,4 +5,5 @@
     android:id="@+id/toolbar"
     android:background="@color/colorPrimaryDark"
     app:layout_collapseMode="pin"
+    app:theme="@style/ToolbarColoredBackArrow"
     xmlns:android="http://schemas.android.com/apk/res/android" />

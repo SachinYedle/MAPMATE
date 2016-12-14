@@ -340,7 +340,8 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        googleMap.clear();
-        setFriendsLocationMarkers();
+        /*googleMap.clear();
+        setFriendsLocationMarkers();*/
+        Navigator.navigateToMapActivity();
     }
 }

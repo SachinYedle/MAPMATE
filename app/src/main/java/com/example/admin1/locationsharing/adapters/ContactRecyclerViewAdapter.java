@@ -109,7 +109,12 @@ public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecy
 
     @Override
     public int getItemCount() {
-        return contacts.size();
+
+        if(contacts == null)
+            return 0;
+        else {
+            return contacts.size();
+        }
     }
 
     public void setFilter(ArrayList<Contacts> contactsArrayList,String searchText) {

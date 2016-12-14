@@ -58,6 +58,7 @@ public class MyApplication extends Application {
             saveDataDb();
         }
     }
+
     public void saveDataDb() {
         try {
             File sd = Environment.getExternalStorageDirectory();
@@ -180,6 +181,7 @@ public class MyApplication extends Application {
      * Hides progress bar
      */
     public void hideProgressDialog() {
+        CustomLog.d("Progress","hide");
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
         }
@@ -189,6 +191,8 @@ public class MyApplication extends Application {
      * Shows progress bar
      */
     public void showProgressDialog(String title, String description) {
+
+        CustomLog.d("Progress","Show");
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
         }
@@ -199,6 +203,15 @@ public class MyApplication extends Application {
         mProgressDialog.setCancelable(false);
         if (!mProgressDialog.isShowing()) {
             mProgressDialog.show();
+        }
+    }
+    public void updateTextInProgressDialog(String text){
+        try {
+            if (mProgressDialog.isShowing()) {
+                mProgressDialog.setMessage(text);
+            }
+        } catch (Exception e) {
+            CustomLog.e("Update Message Error",e.getMessage());
         }
     }
 
@@ -284,6 +297,4 @@ public class MyApplication extends Application {
         });
         alertDialog.show();
     }
-
-
 }
