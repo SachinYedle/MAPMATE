@@ -5,5 +5,5 @@ package com.example.admin1.locationsharing.utils;
  */
 
 public class Constants {
-    public static final String DB_NAME = "locationsharing.sqlite";
+    public static final String DB_NAME = "locationsharing.db";
 }

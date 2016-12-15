@@ -26,11 +26,13 @@ public class ContactsDao extends AbstractDao<Contacts, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property First_name = new Property(1, String.class, "first_name", false, "FIRST_NAME");
         public final static Property Last_name = new Property(2, String.class, "last_name", false, "LAST_NAME");
-        public final static Property Phone = new Property(3, String.class, "phone", false, "PHONE");
-        public final static Property Photo = new Property(4, String.class, "photo", false, "PHOTO");
-        public final static Property Is_contact_added = new Property(5, Boolean.class, "is_contact_added", false, "IS_CONTACT_ADDED");
-        public final static Property Is_location_requested = new Property(6, Boolean.class, "is_location_requested", false, "IS_LOCATION_REQUESTED");
-        public final static Property Is_location_shared = new Property(7, Boolean.class, "is_location_shared", false, "IS_LOCATION_SHARED");
+        public final static Property Contact_id = new Property(3, Integer.class, "contact_id", false, "CONTACT_ID");
+        public final static Property Phone = new Property(4, String.class, "phone", false, "PHONE");
+        public final static Property Photo = new Property(5, String.class, "photo", false, "PHOTO");
+        public final static Property Is_modified = new Property(6, Boolean.class, "is_modified", false, "IS_MODIFIED");
+        public final static Property Is_contact_added = new Property(7, Boolean.class, "is_contact_added", false, "IS_CONTACT_ADDED");
+        public final static Property Is_location_requested = new Property(8, Boolean.class, "is_location_requested", false, "IS_LOCATION_REQUESTED");
+        public final static Property Is_location_shared = new Property(9, Boolean.class, "is_location_shared", false, "IS_LOCATION_SHARED");
     };
 
 
@@ -49,11 +51,13 @@ public class ContactsDao extends AbstractDao<Contacts, Long> {
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"FIRST_NAME\" TEXT," + // 1: first_name
                 "\"LAST_NAME\" TEXT," + // 2: last_name
-                "\"PHONE\" TEXT," + // 3: phone
-                "\"PHOTO\" TEXT," + // 4: photo
-                "\"IS_CONTACT_ADDED\" INTEGER," + // 5: is_contact_added
-                "\"IS_LOCATION_REQUESTED\" INTEGER," + // 6: is_location_requested
-                "\"IS_LOCATION_SHARED\" INTEGER);"); // 7: is_location_shared
+                "\"CONTACT_ID\" INTEGER," + // 3: contact_id
+                "\"PHONE\" TEXT," + // 4: phone
+                "\"PHOTO\" TEXT," + // 5: photo
+                "\"IS_MODIFIED\" INTEGER," + // 6: is_modified
+                "\"IS_CONTACT_ADDED\" INTEGER," + // 7: is_contact_added
+                "\"IS_LOCATION_REQUESTED\" INTEGER," + // 8: is_location_requested
+                "\"IS_LOCATION_SHARED\" INTEGER);"); // 9: is_location_shared
     }
 
     /** Drops the underlying database table. */
@@ -82,29 +86,39 @@ public class ContactsDao extends AbstractDao<Contacts, Long> {
             stmt.bindString(3, last_name);
         }
  
+        Integer contact_id = entity.getContact_id();
+        if (contact_id != null) {
+            stmt.bindLong(4, contact_id);
+        }
+ 
         String phone = entity.getPhone();
         if (phone != null) {
-            stmt.bindString(4, phone);
+            stmt.bindString(5, phone);
         }
  
         String photo = entity.getPhoto();
         if (photo != null) {
-            stmt.bindString(5, photo);
+            stmt.bindString(6, photo);
+        }
+ 
+        Boolean is_modified = entity.getIs_modified();
+        if (is_modified != null) {
+            stmt.bindLong(7, is_modified ? 1L: 0L);
         }
  
         Boolean is_contact_added = entity.getIs_contact_added();
         if (is_contact_added != null) {
-            stmt.bindLong(6, is_contact_added ? 1L: 0L);
+            stmt.bindLong(8, is_contact_added ? 1L: 0L);
         }
  
         Boolean is_location_requested = entity.getIs_location_requested();
         if (is_location_requested != null) {
-            stmt.bindLong(7, is_location_requested ? 1L: 0L);
+            stmt.bindLong(9, is_location_requested ? 1L: 0L);
         }
  
         Boolean is_location_shared = entity.getIs_location_shared();
         if (is_location_shared != null) {
-            stmt.bindLong(8, is_location_shared ? 1L: 0L);
+            stmt.bindLong(10, is_location_shared ? 1L: 0L);
         }
     }
 
@@ -121,11 +135,13 @@ public class ContactsDao extends AbstractDao<Contacts, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // first_name
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // last_name
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // phone
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // photo
-            cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0, // is_contact_added
-            cursor.isNull(offset + 6) ? null : cursor.getShort(offset + 6) != 0, // is_location_requested
-            cursor.isNull(offset + 7) ? null : cursor.getShort(offset + 7) != 0 // is_location_shared
+            cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // contact_id
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // phone
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // photo
+            cursor.isNull(offset + 6) ? null : cursor.getShort(offset + 6) != 0, // is_modified
+            cursor.isNull(offset + 7) ? null : cursor.getShort(offset + 7) != 0, // is_contact_added
+            cursor.isNull(offset + 8) ? null : cursor.getShort(offset + 8) != 0, // is_location_requested
+            cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0 // is_location_shared
         );
         return entity;
     }
@@ -136,11 +152,13 @@ public class ContactsDao extends AbstractDao<Contacts, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setFirst_name(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setLast_name(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setPhone(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setPhoto(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setIs_contact_added(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);
-        entity.setIs_location_requested(cursor.isNull(offset + 6) ? null : cursor.getShort(offset + 6) != 0);
-        entity.setIs_location_shared(cursor.isNull(offset + 7) ? null : cursor.getShort(offset + 7) != 0);
+        entity.setContact_id(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
+        entity.setPhone(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setPhoto(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setIs_modified(cursor.isNull(offset + 6) ? null : cursor.getShort(offset + 6) != 0);
+        entity.setIs_contact_added(cursor.isNull(offset + 7) ? null : cursor.getShort(offset + 7) != 0);
+        entity.setIs_location_requested(cursor.isNull(offset + 8) ? null : cursor.getShort(offset + 8) != 0);
+        entity.setIs_location_shared(cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0);
      }
     
     /** @inheritdoc */

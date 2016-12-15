@@ -151,6 +151,7 @@ public class ContactsFragment extends Fragment implements ItemClickListener {
                     recyclerViewAdapter.setFilter(filteredContactList, string);
                     return true;
                 }else {
+                    recyclerViewAdapter.setFilter(filteredContactList,string);
                     CustomLog.i("SearchQuery","Result not found");
                     return false;
                 }
@@ -186,7 +187,7 @@ public class ContactsFragment extends Fragment implements ItemClickListener {
                 Navigator.navigateToMapActivity();
                 break;
             case R.id.refresh:
-                Toast.makeText(getActivity(),"",Toast.LENGTH_SHORT).show();
+                fetchContactsAndStoreToDB();
                 break;
         }
         return true;

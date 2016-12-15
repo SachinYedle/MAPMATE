@@ -9,8 +9,10 @@ public class Contacts {
     private Long id;
     private String first_name;
     private String last_name;
+    private Integer contact_id;
     private String phone;
     private String photo;
+    private Boolean is_modified;
     private Boolean is_contact_added;
     private Boolean is_location_requested;
     private Boolean is_location_shared;
@@ -22,12 +24,14 @@ public class Contacts {
         this.id = id;
     }
 
-    public Contacts(Long id, String first_name, String last_name, String phone, String photo, Boolean is_contact_added, Boolean is_location_requested, Boolean is_location_shared) {
+    public Contacts(Long id, String first_name, String last_name, Integer contact_id, String phone, String photo, Boolean is_modified, Boolean is_contact_added, Boolean is_location_requested, Boolean is_location_shared) {
         this.id = id;
         this.first_name = first_name;
         this.last_name = last_name;
+        this.contact_id = contact_id;
         this.phone = phone;
         this.photo = photo;
+        this.is_modified = is_modified;
         this.is_contact_added = is_contact_added;
         this.is_location_requested = is_location_requested;
         this.is_location_shared = is_location_shared;
@@ -57,6 +61,14 @@ public class Contacts {
         this.last_name = last_name;
     }
 
+    public Integer getContact_id() {
+        return contact_id;
+    }
+
+    public void setContact_id(Integer contact_id) {
+        this.contact_id = contact_id;
+    }
+
     public String getPhone() {
         return phone;
     }
@@ -71,6 +83,14 @@ public class Contacts {
 
     public void setPhoto(String photo) {
         this.photo = photo;
+    }
+
+    public Boolean getIs_modified() {
+        return is_modified;
+    }
+
+    public void setIs_modified(Boolean is_modified) {
+        this.is_modified = is_modified;
     }
 
     public Boolean getIs_contact_added() {

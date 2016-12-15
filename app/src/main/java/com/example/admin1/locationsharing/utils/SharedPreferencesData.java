@@ -23,6 +23,7 @@ public class SharedPreferencesData {
     private final String USER_PHONE = "userPhone";
     private final String USER_COUNTRY_CODE = "userCountryCode";
     private final String IS_FIRST_TIME = "isFirstTime";
+    private final String CONTACT_ID = "contactId";
 
 
     public SharedPreferencesData(Context context) {
@@ -48,6 +49,15 @@ public class SharedPreferencesData {
     public void setIsFirstTime(boolean isFirstTime) {
         editor.putBoolean(IS_FIRST_TIME, isFirstTime);
         editor.commit();
+    }
+
+    public void setContactId(int contactId) {
+        editor.putInt(CONTACT_ID, contactId);
+        editor.commit();
+    }
+
+    public int getContactId() {
+        return sharedPreferences.getInt(CONTACT_ID,0);
     }
 
     public String getUserCountryCode() {

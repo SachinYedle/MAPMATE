@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
+import android.util.Log;
 
 import com.example.admin1.locationsharing.BuildConfig;
 import com.example.admin1.locationsharing.R;
@@ -60,16 +61,16 @@ public class MyApplication extends Application {
     }
 
     public void saveDataDb() {
+        CustomLog.d("MyApplication","SaveDB");
         try {
             File sd = Environment.getExternalStorageDirectory();
             File data = Environment.getDataDirectory();
             if (sd.canWrite()) {
-                String currentDBPath = "//data//com.example.admin1.locationsharing.temp//databases//" +
+                String currentDBPath = "//data//com.example.admin1.locationsharing//databases//" +
                         Constants.DB_NAME;
-                String backupDBPath = Constants.DB_NAME;
+                String backupDBPath = "location_sharing";
                 File currentDB = new File(data, currentDBPath);
                 File backupDB = new File(sd, backupDBPath);
-
                 if (currentDB.exists()) {
                     FileChannel src = new FileInputStream(currentDB)
                             .getChannel();
@@ -81,7 +82,7 @@ public class MyApplication extends Application {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            CustomLog.e("MyApplication : ",e.getMessage());
         }
     }
     public void initializeVariables(){

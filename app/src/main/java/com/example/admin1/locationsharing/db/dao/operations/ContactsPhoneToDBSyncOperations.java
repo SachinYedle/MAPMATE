@@ -13,6 +13,7 @@ import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.pojo.Contact;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
+import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 
 /**
  * Created by admin1 on 14/12/16.
@@ -44,10 +45,10 @@ public class ContactsPhoneToDBSyncOperations {
         } else {
             flagToCheckCRUD = 1;
         }
-        new LoadContacts().execute();
+        new LoadContacts().execute(flagToCheckCRUD);
     }
 
-    private class LoadContacts extends AsyncTask<Void,Integer,Void> {
+    private class LoadContacts extends AsyncTask<Integer,Integer,Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -55,16 +56,19 @@ public class ContactsPhoneToDBSyncOperations {
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected Void doInBackground(Integer... integers) {
+            int flagToCheckCRUD = integers[0];
             if (contacts != null) {
                 int count = contacts.getCount(),counter = 1;
+                SharedPreferencesData preferencesData = new SharedPreferencesData(context);
+                int contactIdToStoreInPrefs = preferencesData.getContactId();
                 if (count == 0) {
                     Toast.makeText(context, "No contacts in your contact list.", Toast.LENGTH_LONG).show();
                 }
 
                 while (contacts.moveToNext()) {
                     String firstName = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                    String rawContactId = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID));
+                    int contactId = Integer.parseInt(contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID)));
                     String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                     phoneNumber = phoneNumber.replaceAll("[()\\-\\s]", "");
                     String lastName = "";
@@ -77,14 +81,36 @@ public class ContactsPhoneToDBSyncOperations {
                     contact.setRequested(false);
                     contact.setShared(false);
                     contact.setPhone(phoneNumber);
-
+                    contact.setContact_id(contactId);
                     publishProgress(counter,count);
 
-                    CustomLog.i("nameas","Fname:"+firstName+" Lname:"+lastName);
 
-                    ContactsOperations.insertContactsToDb(context,contact);
 
+                    CustomLog.i("nameas","Contact id: "+contactId +" Fname:"+firstName+" Lname:"+lastName);
+                    if(flagToCheckCRUD == 0){
+                        ContactsOperations.insertContactsToDb(context,contact);
+                    } else if(flagToCheckCRUD == 1 || contactId > contactIdToStoreInPrefs ){
+                        if(contactId > contactIdToStoreInPrefs){
+                            contactIdToStoreInPrefs = contactId;
+                            preferencesData.setContactId(contactIdToStoreInPrefs);
+                        }
+                        ContactsOperations.insertAddedContactToDb(context,contact);
+                        CustomLog.i("Do In background","Added");
+                    } else if(flagToCheckCRUD == 2){
+                        ContactsOperations.modifyContactToDb(context,contact);
+                        CustomLog.i("Do In background","Modified");
+                    } else if(flagToCheckCRUD == 3){
+                        ContactsOperations.deleteContactFromDb(context,contact);
+                        CustomLog.i("Do In background","Deleted");
+                    }
+                    if(contactId > contactIdToStoreInPrefs){
+                        contactIdToStoreInPrefs = contactId;
+                        preferencesData.setContactId(contactIdToStoreInPrefs);
+                    }
                     counter++;
+                }
+                if(flagToCheckCRUD == 3){
+                    ContactsOperations.deleteUnmodifiedContactFromDB(context);
                 }
             } else {
                 CustomLog.e("Cursor close 1", "----------------");

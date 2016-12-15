@@ -9,6 +9,8 @@ public class Contact {
     private String photo;
     private String lastName;
     private String phone;
+    private Integer contact_id;
+    private Boolean is_modified;
     private boolean isAdded;
     private boolean isShared;
     private boolean isRequested;
@@ -44,6 +46,21 @@ public class Contact {
 
     public void setRequested(boolean requested) {
         isRequested = requested;
+    }
+    public Integer getContact_id() {
+        return contact_id;
+    }
+
+    public void setContact_id(Integer contact_id) {
+        this.contact_id = contact_id;
+    }
+
+    public Boolean getIs_modified() {
+        return is_modified;
+    }
+
+    public void setIs_modified(Boolean is_modified) {
+        this.is_modified = is_modified;
     }
 
     public String getPhone() {
