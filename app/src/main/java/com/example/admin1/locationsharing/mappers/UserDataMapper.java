@@ -16,12 +16,15 @@ import com.example.admin1.locationsharing.db.dao.UserLocationsDao;
 import com.example.admin1.locationsharing.db.dao.operations.UserLastknownLocationOperations;
 import com.example.admin1.locationsharing.db.dao.operations.UsersLast30MinLocationsOperation;
 import com.example.admin1.locationsharing.interfaces.PositiveClick;
+import com.example.admin1.locationsharing.responses.UserAuthToken;
+import com.example.admin1.locationsharing.responses.UserAuthentication;
 import com.example.admin1.locationsharing.responses.UserData;
 import com.example.admin1.locationsharing.responses.UserInfo;
 import com.example.admin1.locationsharing.responses.UsersLast30MinLocations;
 import com.example.admin1.locationsharing.responses.UsersLastLocations;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
+import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +71,14 @@ public class UserDataMapper {
         }
     }
 
+    public void getUsersAuthToken(String email){
+        if (MyApplication.getInstance().isConnectedToInterNet()){
+            UserDataService userDataService = MyApplication.getInstance().getUserDataService();
+            Call<UserAuthentication> call = userDataService.getUserAuthToken(email);
+            call.enqueue(userAuthToken);
+        }
+    }
+
     private Callback<UsersLastLocations> userLast30MinLocationCallback = new
             Callback<UsersLastLocations>() {
 
@@ -90,6 +101,27 @@ public class UserDataMapper {
                 }
             };
 
+    private Callback<UserAuthentication> userAuthToken = new
+            Callback<UserAuthentication>() {
+
+                @Override
+                public void onResponse(Call<UserAuthentication> call,
+                                       Response<UserAuthentication>
+                                               response) {
+                    if (response.isSuccessful()) {
+                        parseUsersAuthToken(response.body());
+                        CustomLog.i("Response",""+response);
+                    } else {
+                        CustomLog.e("UserAutToken callback","user info data service error");
+                    }
+
+                }
+
+                @Override
+                public void onFailure(Call<UserAuthentication> call, Throwable t) {
+                    CustomLog.e("UserAutToken callback","user info data service error");
+                }
+            };
     private Callback<UserInfo> userDataCallback = new
             Callback<UserInfo>() {
                 @Override
@@ -126,6 +158,14 @@ public class UserDataMapper {
         }
         ((MapActivity)context).setFriendsLocationMarkers();
     }
+
+    private void parseUsersAuthToken(UserAuthentication userAuthentication){
+        UserAuthToken userAuthToken = userAuthentication.getUserAuthToken();
+        SharedPreferencesData preferencesData = new SharedPreferencesData(context);
+        preferencesData.setUserId(userAuthToken.getToken());
+        CustomLog.d("UserDatMapper","Token: "+preferencesData.getUserId());
+    }
+
     private void parseUsersLastLocationsDataResponse(UsersLastLocations usersLastLocations){
         ArrayList<UsersLast30MinLocations> last30MinLocationsArrayList = usersLastLocations.getUsersLast30MinLocations();
         List<UserLocations> userLocations = UsersLast30MinLocationsOperation.getUsersLast30MinLocations(context,last30MinLocationsArrayList.get(0).getPhone());

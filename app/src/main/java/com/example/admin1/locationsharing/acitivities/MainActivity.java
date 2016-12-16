@@ -19,6 +19,8 @@ import android.widget.Toast;
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.mappers.UserDataMapper;
+import com.example.admin1.locationsharing.responses.UserAuthToken;
+import com.example.admin1.locationsharing.responses.UserAuthentication;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
 import com.facebook.AccessToken;
@@ -132,6 +134,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         signIn.setOnClickListener(this);
         phoneEditText = (EditText)findViewById(R.id.phone);
         sharedPreferencesData = new SharedPreferencesData(MainActivity.this);
+        String authToken = sharedPreferencesData.getUserId();
+        if(!authToken.equals("")){
+            CustomLog.i("Token",sharedPreferencesData.getUserId());
+            Navigator.navigateToMapActivity();
+        }
     }
 
     public void setUpListeners(){
@@ -212,7 +219,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
             String fullName = acct.getDisplayName();
+            String token = acct.getId();
+            CustomLog.i("google Tokenid ","token: "+token + "Acc"+acct.getIdToken());
             String email = acct.getEmail();
+
+            new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(email);
+            Navigator.navigateToMapActivity();
             CustomLog.i("Name & Email",fullName + "&" +email);
             googleSignInButton.setVisibility(View.GONE);
             googleSignOut.setVisibility(View.VISIBLE);
@@ -265,21 +277,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TelephonyManager telephonyManager = (TelephonyManager)getSystemService(getApplicationContext().TELEPHONY_SERVICE);
         String countryCode = telephonyManager.getNetworkCountryIso();
         CustomLog.i("MainActivity",countryCode+"");
-        if(!isValidPhoneNumber(userPhone)){
-            phoneEditText.setError("Phone not Valid");
+        new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(userPhone);
+
+        if(sharedPreferencesData.getUserId().equals("")){
+            phoneEditText.setError("email not Valid");
         }
         else{
-            sharedPreferencesData.setUserId(userPhone);
+            CustomLog.i("Token ",""+sharedPreferencesData.getUserId());
             sharedPreferencesData.setUserPhone(userPhone);
-            sharedPreferencesData.setUserCountryCode(countryCode);
-            Navigator.navigateToMapActivity();
+            //sharedPreferencesData.setUserCountryCode(countryCode);
+            //Navigator.navigateToMapActivity();
         }
     }
-    public static boolean isValidPhoneNumber(String phone) {
+    /*public static boolean isValidPhoneNumber(String phone) {
         if (phone.length() < 6 || phone.length() > 13 || phone.equals("")) {
             return false;
         } else {
             return android.util.Patterns.PHONE.matcher(phone).matches();
         }
-    }
+    }*/
 }

@@ -15,13 +15,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField 'String', 'HOST', '"http://beta.json-generator.com"'
+            buildConfigField 'String', 'HOST', '"http://testbed2.riktamtech.com"'
             buildConfigField 'boolean', 'IS_PRODUCTION', 'true'
         }
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField 'String', 'HOST', '"http://beta.json-generator.com"'
+            buildConfigField 'String', 'HOST', '"http://testbed2.riktamtech.com"'
             buildConfigField 'boolean', 'IS_PRODUCTION', 'false'
         }
     }

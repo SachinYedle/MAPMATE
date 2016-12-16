@@ -235,4 +235,5 @@ public class ContactsFragment extends Fragment implements ItemClickListener {
     public void onItemClick(View view, int position) {
 
     }
+
 }

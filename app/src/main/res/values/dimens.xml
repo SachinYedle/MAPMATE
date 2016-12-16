@@ -12,4 +12,25 @@
     <dimen name="drawer_width">250dp</dimen>
     <dimen name="image_dimension">50dp</dimen>
 
+
+    <!-- Text Sizes-->
+    <dimen name="text_size_x_small">9sp</dimen>
+    <dimen name="text_size_small">10sp</dimen>
+    <dimen name="text_size_medium">12sp</dimen>
+    <dimen name="text_size_large">14sp</dimen>
+    <dimen name="text_size_xlarge">18sp</dimen>
+
+    <!-- Padding Sizes-->
+    <dimen name="padding_x_small">1dp</dimen>
+    <dimen name="padding_small">2dp</dimen>
+    <dimen name="padding_medium">5dp</dimen>
+    <dimen name="padding_large">10dp</dimen>
+    <dimen name="padding_xlarge">20dp</dimen>
+
+    <!-- Margin Sizes-->
+    <dimen name="margin_x_small">1dp</dimen>
+    <dimen name="margin_small">2dp</dimen>
+    <dimen name="margin_medium">5dp</dimen>
+    <dimen name="margin_large">10dp</dimen>
+    <dimen name="margin_xlarge">20dp</dimen>
 </resources>

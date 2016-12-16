@@ -61,6 +61,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     private LocationRequest locationRequest;
     private SharedPreferencesData sharedPreferencesData;
     private LatLng myLatLngLocation;
+    private static long back_pressed;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -222,6 +223,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     public void onLocationChanged(Location mlocation) {
 
         location = mlocation;
+        CustomLog.d("MapActivity","Radius"+location.getAccuracy());
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         googleMap.addMarker(new MarkerOptions().position(latLng)
                 .draggable(false));
@@ -340,8 +342,17 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        /*googleMap.clear();
-        setFriendsLocationMarkers();*/
-        Navigator.navigateToMapActivity();
+
+        if (getFragmentManager().getBackStackEntryCount() > 0) {
+            getFragmentManager().popBackStack();
+        } else {
+            if (back_pressed + 2000 > System.currentTimeMillis()){
+                super.onBackPressed();
+            }
+            else {
+                Toast.makeText(getBaseContext(), "Press once again to exit!", Toast.LENGTH_SHORT).show();
+                back_pressed = System.currentTimeMillis();
+            }
+        }
     }
 }
