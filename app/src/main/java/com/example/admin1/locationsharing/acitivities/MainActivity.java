@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.provider.Contacts;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -48,6 +49,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
+import com.google.android.gms.plus.People;
+import com.google.android.gms.plus.Plus;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+
+
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -124,13 +134,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //setDrawerLayout(MyApplication.getInstance().getCurrentActivityContext());
-        LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
+       /* LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
         FacebookCallback<LoginResult> facebookCallback = getFacebookCallback();
-        loginButton.registerCallback(callbackManager,facebookCallback);
+        loginButton.registerCallback(callbackManager,facebookCallback);*/
         googleSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
         googleSignInButton.setSize(SignInButton.SIZE_STANDARD);
         googleSignOut = (Button)findViewById(R.id.btn_sign_out);
-        Button signIn = (Button)findViewById(R.id.sign_in);
+        /*Button signIn = (Button)findViewById(R.id.sign_in);
         signIn.setOnClickListener(this);
         phoneEditText = (EditText)findViewById(R.id.phone);
         sharedPreferencesData = new SharedPreferencesData(MainActivity.this);
@@ -138,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(!authToken.equals("")){
             CustomLog.i("Token",sharedPreferencesData.getUserId());
             Navigator.navigateToMapActivity();
-        }
+        }*/
     }
 
     public void setUpListeners(){
@@ -155,45 +165,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build();
         googleApiClient.connect();
     }
-
-    public FacebookCallback<LoginResult> getFacebookCallback(){
-        FacebookCallback<LoginResult> facebookCallback =  new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Toast.makeText(MyApplication.getInstance().getCurrentActivityContext(),"Login Successfull",Toast.LENGTH_SHORT).show();
-                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        CustomLog.d("Response", response.toString() + "\njson" + object.toString());
-                        try {
-                            String email = (String) object.get("email");
-                            Toast.makeText(MyApplication.getInstance().getCurrentActivityContext(), email, Toast.LENGTH_SHORT).show();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name,email,gender,birthday");
-                request.setParameters(parameters);
-                request.executeAsync();
-            }
-
-            @Override
-            public void onCancel() {
-                //CustomLog.e("OnCancel","Login Canceled");
-                Toast.makeText(MyApplication.getCurrentActivityContext(),"Login cancelled",Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Toast.makeText(MyApplication.getCurrentActivityContext(),"Something went Wrong Please try again",Toast.LENGTH_SHORT).show();
-                //CustomLog.e("OnError",error.toString()+"error");
-            }
-        };
-        return facebookCallback;
-    }
-
 
     private void signInWithGoogle() {
 
@@ -243,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 signOut();
                 break;
             case R.id.sign_in:
-                singInUserWithPhone();
+                //singInUserWithPhone();
                 break;
         }
     }
@@ -271,7 +242,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
     }
 
-    public void singInUserWithPhone(){
+
+
+
+    /*public FacebookCallback<LoginResult> getFacebookCallback(){
+        FacebookCallback<LoginResult> facebookCallback =  new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Toast.makeText(MyApplication.getInstance().getCurrentActivityContext(),"Login Successfull",Toast.LENGTH_SHORT).show();
+                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+                        CustomLog.d("Response", response.toString() + "\njson" + object.toString());
+                        try {
+                            String email = (String) object.get("email");
+                            Toast.makeText(MyApplication.getInstance().getCurrentActivityContext(), email, Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,email,gender,birthday");
+                request.setParameters(parameters);
+                request.executeAsync();
+            }
+
+            @Override
+            public void onCancel() {
+                //CustomLog.e("OnCancel","Login Canceled");
+                Toast.makeText(MyApplication.getCurrentActivityContext(),"Login cancelled",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Toast.makeText(MyApplication.getCurrentActivityContext(),"Something went Wrong Please try again",Toast.LENGTH_SHORT).show();
+                //CustomLog.e("OnError",error.toString()+"error");
+            }
+        };
+        return facebookCallback;
+    }*/
+
+
+    /*public void singInUserWithPhone(){
         String userPhone = phoneEditText.getText().toString();
 
         TelephonyManager telephonyManager = (TelephonyManager)getSystemService(getApplicationContext().TELEPHONY_SERVICE);
@@ -288,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //sharedPreferencesData.setUserCountryCode(countryCode);
             //Navigator.navigateToMapActivity();
         }
-    }
+    }*/
     /*public static boolean isValidPhoneNumber(String phone) {
         if (phone.length() < 6 || phone.length() > 13 || phone.equals("")) {
             return false;

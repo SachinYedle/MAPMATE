@@ -26,10 +26,11 @@ import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
 import com.example.admin1.locationsharing.db.dao.UserLocations;
 import com.example.admin1.locationsharing.db.dao.operations.UserLastknownLocationOperations;
 import com.example.admin1.locationsharing.db.dao.operations.UsersLast30MinLocationsOperation;
-import com.example.admin1.locationsharing.fragments.ContactsFragment;
 import com.example.admin1.locationsharing.fragments.DrawerFragment;
 import com.example.admin1.locationsharing.interfaces.PositiveClick;
+import com.example.admin1.locationsharing.mappers.LocationDataMapper;
 import com.example.admin1.locationsharing.mappers.UserDataMapper;
+import com.example.admin1.locationsharing.responses.LocationSendingResponse;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
 import com.google.android.gms.common.ConnectionResult;
@@ -71,8 +72,6 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         if(ActivityCompat.checkSelfPermission(MyApplication.getCurrentActivityContext(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
             getMyLocation();
         }
-
-        MyApplication.getInstance().setGoogleMap(googleMap);
     }
 
 
@@ -229,8 +228,8 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
                 .draggable(false));
 
         MyApplication.getInstance().showProgressDialog(getString(R.string.loading_data),getString(R.string.please_wait));
-        UserDataMapper userDataMapper = new UserDataMapper(MyApplication.getCurrentActivityContext());
-        userDataMapper.getUserLastKnownLocation();
+        LocationDataMapper locationDataMapper = new LocationDataMapper(MyApplication.getCurrentActivityContext());
+        locationDataMapper.sendUserLocation(onTaskCompletedListener,""+location.getLatitude(), ""+location.getLongitude(),location.getAccuracy()+"");
 
         googleMap.setOnMarkerClickListener(this);
         setMyLatLngLocation(latLng);
@@ -246,11 +245,22 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
         }
     }
+    private LocationDataMapper.OnTaskCompletedListener onTaskCompletedListener = new LocationDataMapper.OnTaskCompletedListener() {
+        @Override
+        public void onTaskCompleted(LocationSendingResponse locationSendingResponse) {
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"Location sent to server: "+locationSendingResponse.getSucces(),Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onTaskFailed(String response) {
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"Location sending"+response,Toast.LENGTH_SHORT).show();
+        }
+    };
     public void getLast30MinLocations(Marker marker){
         CustomLog.d("Marker id","ID"+marker.getTitle());
         MyApplication.getInstance().showProgressDialog(getString(R.string.loading_data),getString(R.string.please_wait));
         UserDataMapper userDataMapper = new UserDataMapper(MyApplication.getCurrentActivityContext());
-        userDataMapper.getUsersLast30MinLocations();
+        //userDataMapper.getUsersLast30MinLocations();
         MyApplication.getInstance().hideProgressDialog();
 
     }

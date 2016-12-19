@@ -24,10 +24,10 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property Phone = new Property(1, String.class, "phone", false, "PHONE");
-        public final static Property Name = new Property(2, String.class, "name", false, "NAME");
-        public final static Property Latitude = new Property(3, String.class, "latitude", false, "LATITUDE");
-        public final static Property Longitude = new Property(4, String.class, "longitude", false, "LONGITUDE");
+        public final static Property Token = new Property(1, String.class, "token", false, "TOKEN");
+        public final static Property Latitude = new Property(2, String.class, "latitude", false, "LATITUDE");
+        public final static Property Longitude = new Property(3, String.class, "longitude", false, "LONGITUDE");
+        public final static Property Radius = new Property(4, String.class, "radius", false, "RADIUS");
         public final static Property Time = new Property(5, String.class, "time", false, "TIME");
     };
 
@@ -45,10 +45,10 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"USER_LOCATIONS\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "\"PHONE\" TEXT," + // 1: phone
-                "\"NAME\" TEXT," + // 2: name
-                "\"LATITUDE\" TEXT," + // 3: latitude
-                "\"LONGITUDE\" TEXT," + // 4: longitude
+                "\"TOKEN\" TEXT," + // 1: token
+                "\"LATITUDE\" TEXT," + // 2: latitude
+                "\"LONGITUDE\" TEXT," + // 3: longitude
+                "\"RADIUS\" TEXT," + // 4: radius
                 "\"TIME\" TEXT);"); // 5: time
     }
 
@@ -68,24 +68,24 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
             stmt.bindLong(1, id);
         }
  
-        String phone = entity.getPhone();
-        if (phone != null) {
-            stmt.bindString(2, phone);
-        }
- 
-        String name = entity.getName();
-        if (name != null) {
-            stmt.bindString(3, name);
+        String token = entity.getToken();
+        if (token != null) {
+            stmt.bindString(2, token);
         }
  
         String latitude = entity.getLatitude();
         if (latitude != null) {
-            stmt.bindString(4, latitude);
+            stmt.bindString(3, latitude);
         }
  
         String longitude = entity.getLongitude();
         if (longitude != null) {
-            stmt.bindString(5, longitude);
+            stmt.bindString(4, longitude);
+        }
+ 
+        String radius = entity.getRadius();
+        if (radius != null) {
+            stmt.bindString(5, radius);
         }
  
         String time = entity.getTime();
@@ -105,10 +105,10 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
     public UserLocations readEntity(Cursor cursor, int offset) {
         UserLocations entity = new UserLocations( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // phone
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // name
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // latitude
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // longitude
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // token
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // latitude
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // longitude
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // radius
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // time
         );
         return entity;
@@ -118,10 +118,10 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
     @Override
     public void readEntity(Cursor cursor, UserLocations entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setPhone(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setLatitude(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setLongitude(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setToken(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setLatitude(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setLongitude(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setRadius(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setTime(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
      }
     

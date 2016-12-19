@@ -4,12 +4,8 @@ import android.content.Context;
 
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.db.dao.DaoSession;
-import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
-import com.example.admin1.locationsharing.db.dao.UserLastKnownLocationDao;
 import com.example.admin1.locationsharing.db.dao.UserLocations;
 import com.example.admin1.locationsharing.db.dao.UserLocationsDao;
-import com.example.admin1.locationsharing.responses.UsersLast30MinLocations;
-import com.example.admin1.locationsharing.responses.UsersLastLocations;
 
 import java.util.List;
 
@@ -25,7 +21,7 @@ public class UsersLast30MinLocationsOperation {
         DaoSession daoSession = MyApplication.getInstance().getReadableDaoSession(context);
         UserLocationsDao userLocationsDao = daoSession.getUserLocationsDao();
         QueryBuilder<UserLocations> queryBuilder = userLocationsDao.queryBuilder();
-        queryBuilder.distinct().where(UserLocationsDao.Properties.Phone.eq(phone));
+        //queryBuilder.distinct().where(UserLocationsDao.Properties.Phone.eq(phone));
         return queryBuilder.list();
     }
 

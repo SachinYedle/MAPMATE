@@ -9,10 +9,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
-import android.util.Log;
 
 import com.example.admin1.locationsharing.BuildConfig;
 import com.example.admin1.locationsharing.R;
+import com.example.admin1.locationsharing.Services.LocationDataService;
 import com.example.admin1.locationsharing.Services.UserDataService;
 import com.example.admin1.locationsharing.db.dao.DaoMaster;
 import com.example.admin1.locationsharing.db.dao.DaoSession;
@@ -21,16 +21,17 @@ import com.example.admin1.locationsharing.utils.Constants;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.util.concurrent.TimeUnit;
 
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -96,13 +97,6 @@ public class MyApplication extends Application {
         devOpenHelper = new DaoMaster.DevOpenHelper(context, Constants.DB_NAME, null);
     }
 
-    public void setGoogleMap(GoogleMap googleMap) {
-        this.googleMap = googleMap;
-    }
-
-    public GoogleMap getGoogleMap() {
-        return googleMap;
-    }
 
     public DaoSession getWritableDaoSession(Context context) {
         if(devOpenHelper == null){
@@ -134,6 +128,29 @@ public class MyApplication extends Application {
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(BuildConfig.HOST).build();
     }
+    public LocationDataService getLocationDataService(final String token) {
+
+        OkHttpClient httpClient = new OkHttpClient.Builder()
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request request = chain.request();
+                        request = request.newBuilder()
+                                .addHeader("auth_token", token)
+                                .build();
+                        Response response = chain.proceed(request);
+                        return response;
+                    }
+                })
+                .build();
+
+        retrofit = new Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient)
+                .baseUrl(BuildConfig.HOST).build();
+
+        return retrofit.create(LocationDataService.class);
+    }
     public boolean isConnectedToInterNet() {
         ConnectivityManager connectivity = (ConnectivityManager) getCurrentActivityContext()
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -158,6 +175,7 @@ public class MyApplication extends Application {
     public void setCurrentActivityContext(Context mContext) {
         context = mContext;
     }
+
     public static synchronized MyApplication getInstance() {
         if (instance == null) {
             instance = new MyApplication();
@@ -298,4 +316,6 @@ public class MyApplication extends Application {
         });
         alertDialog.show();
     }
+
+
 }

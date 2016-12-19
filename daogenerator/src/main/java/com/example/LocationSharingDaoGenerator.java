@@ -29,10 +29,10 @@ public class LocationSharingDaoGenerator {
     public static void addUserLocationsTable(Schema schema){
         Entity entity = schema.addEntity("UserLocations");
         entity.addIdProperty().primaryKey().autoincrement();
-        entity.addStringProperty("phone");
-        entity.addStringProperty("name");
+        entity.addStringProperty("token");
         entity.addStringProperty("latitude");
         entity.addStringProperty("longitude");
+        entity.addStringProperty("radius");
         entity.addStringProperty("time");
     }
     public static void addUserLastKnownLocationTable(Schema schema){

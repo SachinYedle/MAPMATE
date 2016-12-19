@@ -22,7 +22,7 @@
             android:value="@string/facebook_app_id" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value=" AIzaSyB5bccww_dXYLfIpNTgMb_FDjyIWx5P_qg " />
+            android:value=" AIzaSyBgrZtO3DxHUAactAZiwGjnJ0X3yljUAls " />
 
         <activity android:name=".acitivities.MainActivity">
             <intent-filter>

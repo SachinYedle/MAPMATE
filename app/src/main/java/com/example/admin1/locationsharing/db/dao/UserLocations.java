@@ -7,10 +7,10 @@ package com.example.admin1.locationsharing.db.dao;
 public class UserLocations {
 
     private Long id;
-    private String phone;
-    private String name;
+    private String token;
     private String latitude;
     private String longitude;
+    private String radius;
     private String time;
 
     public UserLocations() {
@@ -20,12 +20,12 @@ public class UserLocations {
         this.id = id;
     }
 
-    public UserLocations(Long id, String phone, String name, String latitude, String longitude, String time) {
+    public UserLocations(Long id, String token, String latitude, String longitude, String radius, String time) {
         this.id = id;
-        this.phone = phone;
-        this.name = name;
+        this.token = token;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.radius = radius;
         this.time = time;
     }
 
@@ -37,20 +37,12 @@ public class UserLocations {
         this.id = id;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getToken() {
+        return token;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getLatitude() {
@@ -67,6 +59,14 @@ public class UserLocations {
 
     public void setLongitude(String longitude) {
         this.longitude = longitude;
+    }
+
+    public String getRadius() {
+        return radius;
+    }
+
+    public void setRadius(String radius) {
+        this.radius = radius;
     }
 
     public String getTime() {
