@@ -1,4 +1,4 @@
-package com.example.admin1.locationsharing.Services;
+package com.example.admin1.locationsharing.services;
 
 import com.example.admin1.locationsharing.responses.LocationSendingResponse;
 

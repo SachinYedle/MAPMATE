@@ -40,6 +40,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -53,7 +54,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MapActivity extends DrawerActivity implements GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener {
+        LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener,LocationSource {
 
     private GoogleApiClient googleApiClient;
     private Location location;
@@ -63,14 +64,17 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     private SharedPreferencesData sharedPreferencesData;
     private LatLng myLatLngLocation;
     private static long back_pressed;
+    private OnLocationChangedListener mMapLocationListener = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         MyApplication.getInstance().setCurrentActivityContext(MapActivity.this);
         initializeVariables();
+
         if(ActivityCompat.checkSelfPermission(MyApplication.getCurrentActivityContext(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
             getMyLocation();
+
         }
     }
 
@@ -107,6 +111,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
                         android.Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
                     buildGoogleApiClient();
+
                     googleMap.setMyLocationEnabled(true);
                 }
             }
@@ -220,16 +225,15 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
 
     @Override
     public void onLocationChanged(Location mlocation) {
-
+        if(mMapLocationListener!=null){
+            mMapLocationListener.onLocationChanged(mlocation);
+        }
         location = mlocation;
         CustomLog.d("MapActivity","Radius"+location.getAccuracy());
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         googleMap.addMarker(new MarkerOptions().position(latLng)
                 .draggable(false));
 
-        MyApplication.getInstance().showProgressDialog(getString(R.string.loading_data),getString(R.string.please_wait));
-        LocationDataMapper locationDataMapper = new LocationDataMapper(MyApplication.getCurrentActivityContext());
-        locationDataMapper.sendUserLocation(onTaskCompletedListener,""+location.getLatitude(), ""+location.getLongitude(),location.getAccuracy()+"");
 
         googleMap.setOnMarkerClickListener(this);
         setMyLatLngLocation(latLng);
@@ -364,5 +368,15 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
                 back_pressed = System.currentTimeMillis();
             }
         }
+    }
+
+    @Override
+    public void activate(OnLocationChangedListener onLocationChangedListener) {
+        mMapLocationListener = onLocationChangedListener;
+    }
+
+    @Override
+    public void deactivate() {
+        mMapLocationListener = null;
     }
 }

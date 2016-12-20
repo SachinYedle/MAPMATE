@@ -3,14 +3,12 @@ package com.example.admin1.locationsharing.acitivities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.LocationManager;
 import android.provider.Contacts;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,45 +16,34 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.admin1.locationsharing.R;
+import com.example.admin1.locationsharing.services.BackgroundLocationService;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.mappers.UserDataMapper;
-import com.example.admin1.locationsharing.responses.UserAuthToken;
-import com.example.admin1.locationsharing.responses.UserAuthentication;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.model.people.Person;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
@@ -68,19 +55,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText phoneEditText;
     private GoogleApiClient googleApiClient;
     private final int REQUSTED_CODE = 99;
-    private SharedPreferencesData sharedPreferencesData;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initializeFacebookAuth();
         setContentView(R.layout.activity_main);
         MyApplication.getInstance().setCurrentActivityContext(MainActivity.this);
+        checkIsLoggedIn();
         checkPermission();
         initializeVariables();
         setUpListeners();
         setUpGoogleLoginOption();
     }
 
+    public void checkIsLoggedIn(){
+        SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
+        if(!preferencesData.getUserId().equals("")){
+            Navigator.navigateToMapActivity();
+        }
+    }
     public void initializeFacebookAuth(){
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
@@ -92,6 +85,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LoginManager.getInstance().logOut();
     }
 
+    public void callToBackgroundLocationService(){
+        if(ActivityCompat.checkSelfPermission(MyApplication.getCurrentActivityContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            startService(new Intent(this, BackgroundLocationService.class));
+        }
+    }
     public boolean checkPermission() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
@@ -160,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
+        //.requestScopes(new Scope("googleapis.com/auth/contacts.readonly"))
         googleApiClient = new GoogleApiClient.Builder(MainActivity.this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
@@ -185,6 +184,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public void getGoogleContacts(){
+
+
+
+        googleApiClient.disconnect();
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestScopes(new Scope(Scopes.PLUS_LOGIN)) // "https://www.googleapis.com/auth/plus.login"
+                .requestScopes(new Scope(Scopes.PLUS_ME)) // "https://www.googleapis.com/auth/plus.me"
+                .requestEmail()
+                .build();
+
+        googleApiClient = new GoogleApiClient.Builder(MainActivity.this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        googleApiClient.connect();
+
+    }
+
     private void handleGoogleSignInResult(GoogleSignInResult result) {
         Log.d("MainActivity", "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
@@ -194,7 +212,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             CustomLog.i("google Tokenid ","token: "+token + "Acc"+acct.getIdToken());
             String email = acct.getEmail();
 
+            //List<Contacts.People> peopleList = acct.getGrantedScopes();
             new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(email);
+            callToBackgroundLocationService();
+
+            finish();
             Navigator.navigateToMapActivity();
             CustomLog.i("Name & Email",fullName + "&" +email);
             googleSignInButton.setVisibility(View.GONE);

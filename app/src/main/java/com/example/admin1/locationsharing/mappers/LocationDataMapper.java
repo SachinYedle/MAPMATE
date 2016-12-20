@@ -2,9 +2,12 @@ package com.example.admin1.locationsharing.mappers;
 
 import android.content.Context;
 
-import com.example.admin1.locationsharing.Services.LocationDataService;
+import com.example.admin1.locationsharing.R;
+import com.example.admin1.locationsharing.interfaces.PositiveClick;
+import com.example.admin1.locationsharing.services.LocationDataService;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.responses.LocationSendingResponse;
+import com.example.admin1.locationsharing.utils.Navigator;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 
 import retrofit2.Call;
@@ -40,7 +43,6 @@ public class LocationDataMapper {
                 public void onResponse(Call<LocationSendingResponse> call,
                                        Response<LocationSendingResponse>
                                                response) {
-                    MyApplication.getInstance().hideProgressDialog();
                     if (response.code() == 401) {
                         onTaskCompletedListener.onTaskFailed("session expired");
                     } else if (response.code() == 504) {
@@ -53,7 +55,6 @@ public class LocationDataMapper {
 
                 @Override
                 public void onFailure(Call<LocationSendingResponse> call, Throwable t) {
-                    MyApplication.getInstance().hideProgressDialog();
                     onTaskCompletedListener.onTaskFailed("Network error");
                 }
             };

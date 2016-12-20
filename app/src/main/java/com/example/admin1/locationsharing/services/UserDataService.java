@@ -1,11 +1,10 @@
-package com.example.admin1.locationsharing.Services;
+package com.example.admin1.locationsharing.services;
 
 import com.example.admin1.locationsharing.responses.UserAuthentication;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
-import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 /**

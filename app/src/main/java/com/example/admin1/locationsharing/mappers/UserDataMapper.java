@@ -1,28 +1,16 @@
 package com.example.admin1.locationsharing.mappers;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import com.example.admin1.locationsharing.R;
-import com.example.admin1.locationsharing.Services.UserDataService;
-import com.example.admin1.locationsharing.acitivities.MapActivity;
+import com.example.admin1.locationsharing.services.UserDataService;
 import com.example.admin1.locationsharing.app.MyApplication;
-import com.example.admin1.locationsharing.db.dao.DaoSession;
-import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
-import com.example.admin1.locationsharing.db.dao.UserLastKnownLocationDao;
-import com.example.admin1.locationsharing.db.dao.UserLocations;
-import com.example.admin1.locationsharing.db.dao.UserLocationsDao;
-import com.example.admin1.locationsharing.db.dao.operations.UserLastknownLocationOperations;
-import com.example.admin1.locationsharing.db.dao.operations.UsersLast30MinLocationsOperation;
 import com.example.admin1.locationsharing.interfaces.PositiveClick;
 import com.example.admin1.locationsharing.responses.UserAuthToken;
 import com.example.admin1.locationsharing.responses.UserAuthentication;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;

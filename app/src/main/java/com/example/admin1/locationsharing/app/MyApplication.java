@@ -12,8 +12,8 @@ import android.os.Environment;
 
 import com.example.admin1.locationsharing.BuildConfig;
 import com.example.admin1.locationsharing.R;
-import com.example.admin1.locationsharing.Services.LocationDataService;
-import com.example.admin1.locationsharing.Services.UserDataService;
+import com.example.admin1.locationsharing.services.LocationDataService;
+import com.example.admin1.locationsharing.services.UserDataService;
 import com.example.admin1.locationsharing.db.dao.DaoMaster;
 import com.example.admin1.locationsharing.db.dao.DaoSession;
 import com.example.admin1.locationsharing.interfaces.PositiveClick;
