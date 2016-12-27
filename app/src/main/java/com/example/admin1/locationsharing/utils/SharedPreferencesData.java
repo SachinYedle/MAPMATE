@@ -25,6 +25,8 @@ public class SharedPreferencesData {
     private final String IS_FIRST_TIME = "isFirstTime";
     private final String CONTACT_ID = "contactId";
 
+    private final String SELECTED_USER_TOKEN = "selectedUserToken";
+
 
     public SharedPreferencesData(Context context) {
         this.context = context;
@@ -54,6 +56,16 @@ public class SharedPreferencesData {
     public void setContactId(int contactId) {
         editor.putInt(CONTACT_ID, contactId);
         editor.commit();
+    }
+
+    public void setSelectedUserToken(String selectedUserToken) {
+        editor.putString(SELECTED_USER_TOKEN, selectedUserToken);
+        editor.commit();
+    }
+
+
+    public String getSelectedUserToken() {
+        return sharedPreferences.getString(SELECTED_USER_TOKEN, "");
     }
 
     public int getContactId() {

@@ -2,6 +2,7 @@ package com.example.admin1.locationsharing.mappers;
 
 import android.content.Context;
 
+import com.example.GetGoogleCirclesList;
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.services.UserDataService;
 import com.example.admin1.locationsharing.app.MyApplication;
@@ -11,6 +12,8 @@ import com.example.admin1.locationsharing.responses.UserAuthentication;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
+
+import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -71,6 +74,12 @@ public class UserDataMapper {
         SharedPreferencesData preferencesData = new SharedPreferencesData(context);
         preferencesData.setUserId(userAuthToken.getToken());
         CustomLog.d("UserDatMapper","Token: "+preferencesData.getUserId());
+
+        try {
+            GetGoogleCirclesList.setUp(preferencesData.getUserId());
+        } catch (IOException e) {
+            CustomLog.e("MainActivity","people Api Error"+e);
+        }
     }
 
 }

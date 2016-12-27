@@ -1,6 +1,8 @@
 package com.example.admin1.locationsharing.services;
 
+import com.example.admin1.locationsharing.db.dao.UserLocations;
 import com.example.admin1.locationsharing.responses.LocationSendingResponse;
+import com.example.admin1.locationsharing.responses.UserLocationsResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -20,5 +22,5 @@ public interface LocationDataService {
                                                    @Field("radius") String radius);
 
     @GET("know_where/api/v1/user/location")
-    Call<LocationSendingResponse> sendUserLocation();
+    Call<UserLocationsResponse> getUserLocations();
 }

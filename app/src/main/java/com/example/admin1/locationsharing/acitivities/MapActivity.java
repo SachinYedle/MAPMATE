@@ -1,6 +1,7 @@
 package com.example.admin1.locationsharing.acitivities;
 
 import android.Manifest;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.support.v4.app.FragmentManager;
 import android.content.pm.PackageManager;
@@ -25,12 +26,14 @@ import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
 import com.example.admin1.locationsharing.db.dao.UserLocations;
 import com.example.admin1.locationsharing.db.dao.operations.UserLastknownLocationOperations;
-import com.example.admin1.locationsharing.db.dao.operations.UsersLast30MinLocationsOperation;
+import com.example.admin1.locationsharing.db.dao.operations.UserLocationsOperations;
 import com.example.admin1.locationsharing.fragments.DrawerFragment;
 import com.example.admin1.locationsharing.interfaces.PositiveClick;
-import com.example.admin1.locationsharing.mappers.LocationDataMapper;
+import com.example.admin1.locationsharing.mappers.DownloadLocationsDataMapper;
+import com.example.admin1.locationsharing.mappers.UploadLocationsDataMapper;
 import com.example.admin1.locationsharing.mappers.UserDataMapper;
 import com.example.admin1.locationsharing.responses.LocationSendingResponse;
+import com.example.admin1.locationsharing.responses.UserLocationsResponse;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
 import com.google.android.gms.common.ConnectionResult;
@@ -43,6 +46,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -83,6 +87,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        MyApplication.getInstance().showProgressDialog(getString(R.string.loading_data),getString(R.string.please_wait));
         setDrawerLayout(MyApplication.getCurrentActivityContext());
         sharedPreferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -123,14 +128,6 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.toolbar_menu,menu);
         return super.onCreateOptionsMenu(menu);
-    }
-
-    public LatLng getMyLatLngLocation() {
-        return myLatLngLocation;
-    }
-
-    public void setMyLatLngLocation(LatLng myLatLngLocation) {
-        this.myLatLngLocation = myLatLngLocation;
     }
 
     @Override
@@ -225,48 +222,60 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
 
     @Override
     public void onLocationChanged(Location mlocation) {
+        MyApplication.getInstance().hideProgressDialog();
         if(mMapLocationListener!=null){
             mMapLocationListener.onLocationChanged(mlocation);
         }
         location = mlocation;
         CustomLog.d("MapActivity","Radius"+location.getAccuracy());
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        googleMap.addMarker(new MarkerOptions().position(latLng)
+        /*googleMap.addMarker(new MarkerOptions().position(latLng)
                 .draggable(false));
-
+*/
 
         googleMap.setOnMarkerClickListener(this);
-        setMyLatLngLocation(latLng);
+
+        setFriendsLocationMarkers();
 
         googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
                 CustomLog.d("Click","InfoWindow Click");
-                getLast30MinLocations(marker);
+                getUserLocations(marker);
             }
         });
         if (googleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
         }
     }
-    private LocationDataMapper.OnTaskCompletedListener onTaskCompletedListener = new LocationDataMapper.OnTaskCompletedListener() {
+    private DownloadLocationsDataMapper.OnTaskCompletedListener onTaskCompletedListener = new DownloadLocationsDataMapper.OnTaskCompletedListener() {
         @Override
-        public void onTaskCompleted(LocationSendingResponse locationSendingResponse) {
-            Toast.makeText(MyApplication.getCurrentActivityContext(),"Location sent to server: "+locationSendingResponse.getSucces(),Toast.LENGTH_SHORT).show();
+        public void onTaskCompleted(UserLocationsResponse userLocationsResponse) {
+            SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
+            String token = preferencesData.getSelectedUserToken();
+            CustomLog.i("Map Activity","Download Locations"+userLocationsResponse.getSuccess()+":"+token);
+            drawRouteOfSelectedUser(token);
         }
 
         @Override
         public void onTaskFailed(String response) {
-            Toast.makeText(MyApplication.getCurrentActivityContext(),"Location sending"+response,Toast.LENGTH_SHORT).show();
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"Location download Failed "+response,Toast.LENGTH_SHORT).show();
         }
     };
-    public void getLast30MinLocations(Marker marker){
-        CustomLog.d("Marker id","ID"+marker.getTitle());
-        MyApplication.getInstance().showProgressDialog(getString(R.string.loading_data),getString(R.string.please_wait));
-        UserDataMapper userDataMapper = new UserDataMapper(MyApplication.getCurrentActivityContext());
-        //userDataMapper.getUsersLast30MinLocations();
-        MyApplication.getInstance().hideProgressDialog();
+    public void getUserLocations(Marker marker){
+        String token = null;
+        if(marker.getTitle() !=null ){
+            String [] tokenArrray = marker.getTitle().split(" ");
+            token = tokenArrray[tokenArrray.length -1];
+        }
 
+        SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
+        preferencesData.setSelectedUserToken(token);
+
+        CustomLog.d("Marker id","ID:"+ token);
+        DownloadLocationsDataMapper dataMapper = new DownloadLocationsDataMapper(MyApplication.getCurrentActivityContext());
+
+        dataMapper.getLocations(onTaskCompletedListener,token);
     }
 
     public void setFriendsLocationMarkers(){
@@ -280,40 +289,59 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
 
                 LatLng latLng = new LatLng(latitude, longitude);
                 googleMap.addMarker(new MarkerOptions().position(latLng)
-                        .draggable(false).title(""+locationList.get(i).getPhone()));
+                        .draggable(false).title(""+locationList.get(i).getToken()));
                 builder.include(latLng);
             }
-            LatLng latLng = getMyLatLngLocation();
-            builder.include(latLng);
+            //LatLng latLng = getMyLatLngLocation();
+            /*SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
+            googleMap.addMarker(new MarkerOptions().position(latLng)
+                    .draggable(false).title(""+preferencesData.getUserId()));
+            */
+            //builder.include(latLng);
             googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 48));
         }
 
     }
 
-    public void drawRouteOfSelectedUser(){
-
+    public void drawRouteOfSelectedUser(String token){
         googleMap.clear();
 
+        CustomLog.i("Map Activity","draw route");
         ArrayList<LatLng> points = new ArrayList<LatLng>();
         PolylineOptions lineOptions = new PolylineOptions();
-        List<UserLocations> locations = UsersLast30MinLocationsOperation.getUsersLast30MinLocations(MyApplication.getCurrentActivityContext());
+        List<UserLocations> locations = UserLocationsOperations.getUserLocations(MyApplication.getCurrentActivityContext(),token);
+        CustomLog.i("Map Activity","draw route size"+locations.size());
+
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (int i = 0; i < locations.size(); i++) {
-
             double lat = Double.parseDouble(locations.get(i).getLatitude());
             double lng = Double.parseDouble(locations.get(i).getLongitude());
             LatLng position = new LatLng(lat, lng);
-
+            CustomLog.i("Data",lat+" "+lng+" "+locations.get(i).getToken());
             builder.include(position);
             points.add(position);
+
         }
         if(points.size() > 0){
             lineOptions.addAll(points);
-            lineOptions.width(10);
+            lineOptions.width(7);
             lineOptions.color(Color.RED);
             googleMap.addPolyline(lineOptions);
+            double lat = Double.parseDouble(locations.get(locations.size()-1).getLatitude());
+            double lng = Double.parseDouble(locations.get(locations.size()-1).getLongitude());
+            LatLng position = new LatLng(lat, lng);
+            googleMap.addMarker(new MarkerOptions()
+                    .position(position)
+                    .title("Start")
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.start)));
+            lat = Double.parseDouble(locations.get(0).getLatitude());
+            lng = Double.parseDouble(locations.get(0).getLongitude());
+            position = new LatLng(lat, lng);
+            googleMap.addMarker(new MarkerOptions()
+                    .position(position)
+                    .title("End")
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.end)));
             googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 48));
-
         }
     }
 
@@ -339,7 +367,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
                 TextView userId = (TextView)view.findViewById(R.id.user_id);
                 TextView userPhone = (TextView)view.findViewById(R.id.user_phone);
                 if(userData.size() > 0){
-                    userId.setText(userData.get(0).getPhone());
+                    userId.setText(userData.get(0).getToken());
                     userPhone.setText(userData.get(0).getName());
                 }
                 else {
@@ -364,6 +392,8 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
                 super.onBackPressed();
             }
             else {
+                finish();
+                Navigator.navigateToMapActivity();
                 Toast.makeText(getBaseContext(), "Press once again to exit!", Toast.LENGTH_SHORT).show();
                 back_pressed = System.currentTimeMillis();
             }

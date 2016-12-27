@@ -18,10 +18,10 @@ import retrofit2.Response;
  * Created by admin1 on 19/12/16.
  */
 
-public class LocationDataMapper {
+public class UploadLocationsDataMapper {
     private Context context;
     private OnTaskCompletedListener onTaskCompletedListener;
-    public LocationDataMapper(Context context){
+    public UploadLocationsDataMapper(Context context){
         this.context = context;
     }
 

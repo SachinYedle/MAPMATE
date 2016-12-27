@@ -3,7 +3,6 @@ package com.example.admin1.locationsharing.acitivities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.provider.Contacts;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +14,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.GetGoogleCirclesList;
 import com.example.admin1.locationsharing.R;
+import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
+import com.example.admin1.locationsharing.db.dao.operations.UserLastknownLocationOperations;
 import com.example.admin1.locationsharing.services.BackgroundLocationService;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.mappers.UserDataMapper;
@@ -39,11 +41,8 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
-import com.google.android.gms.plus.People;
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.model.people.Person;
 
-import java.util.List;
+import java.io.IOException;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
@@ -155,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void setUpGoogleLoginOption(){
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
@@ -166,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void signInWithGoogle() {
-
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -184,25 +183,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void getGoogleContacts(){
-
-
-
-        googleApiClient.disconnect();
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(new Scope(Scopes.PLUS_LOGIN)) // "https://www.googleapis.com/auth/plus.login"
-                .requestScopes(new Scope(Scopes.PLUS_ME)) // "https://www.googleapis.com/auth/plus.me"
-                .requestEmail()
-                .build();
-
-        googleApiClient = new GoogleApiClient.Builder(MainActivity.this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-        googleApiClient.connect();
-
-    }
-
     private void handleGoogleSignInResult(GoogleSignInResult result) {
         Log.d("MainActivity", "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
@@ -212,9 +192,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             CustomLog.i("google Tokenid ","token: "+token + "Acc"+acct.getIdToken());
             String email = acct.getEmail();
 
+
             //List<Contacts.People> peopleList = acct.getGrantedScopes();
             new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(email);
             callToBackgroundLocationService();
+
+            UserLastKnownLocation lastloc = new UserLastKnownLocation(null,"Sachin","df8b0f40b0344111a195a3bc46182599","17.4107389","78.4149535","2016-12-27 06:29:39");
+            UserLastknownLocationOperations.insertUsersLastKnownLocation(MyApplication.getCurrentActivityContext(),lastloc);
+            lastloc = new UserLastKnownLocation(null,"Sunand","95dac4dfeb1f44b6887a4316cc4f5331","17.5307389","78.5449535","2016-12-27 06:29:39");
+            UserLastknownLocationOperations.insertUsersLastKnownLocation(MyApplication.getCurrentActivityContext(),lastloc);
+            lastloc = new UserLastKnownLocation(null,"Venky","ec22012fc9704663a6b558da37f7d01a","17.4907389","78.5949535","2016-12-27 06:29:39");
+            UserLastknownLocationOperations.insertUsersLastKnownLocation(MyApplication.getCurrentActivityContext(),lastloc);
+            lastloc = new UserLastKnownLocation(null,"riktam","6b0ecda7ca6c46a7b268a713c93fa61b","17.5107389","78.3949535","2016-12-27 06:29:39");
+            UserLastknownLocationOperations.insertUsersLastKnownLocation(MyApplication.getCurrentActivityContext(),lastloc);
 
             finish();
             Navigator.navigateToMapActivity();

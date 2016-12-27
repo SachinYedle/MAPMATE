@@ -6,23 +6,35 @@ package com.example.admin1.locationsharing.db.dao;
  */
 public class UserLastKnownLocation {
 
+    private Long id;
     private String name;
-    private String phone;
+    private String token;
     private String latitude;
     private String longitude;
+    private String time;
 
     public UserLastKnownLocation() {
     }
 
-    public UserLastKnownLocation(String phone) {
-        this.phone = phone;
+    public UserLastKnownLocation(Long id) {
+        this.id = id;
     }
 
-    public UserLastKnownLocation(String name, String phone, String latitude, String longitude) {
+    public UserLastKnownLocation(Long id, String name, String token, String latitude, String longitude, String time) {
+        this.id = id;
         this.name = name;
-        this.phone = phone;
+        this.token = token;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.time = time;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -33,12 +45,12 @@ public class UserLastKnownLocation {
         this.name = name;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getToken() {
+        return token;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getLatitude() {
@@ -55,6 +67,14 @@ public class UserLastKnownLocation {
 
     public void setLongitude(String longitude) {
         this.longitude = longitude;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 
 }

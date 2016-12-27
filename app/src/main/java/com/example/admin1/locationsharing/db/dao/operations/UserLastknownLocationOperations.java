@@ -16,12 +16,18 @@ import de.greenrobot.dao.query.QueryBuilder;
  */
 
 public class UserLastknownLocationOperations {
-    public static List<UserLastKnownLocation> getUserLastKnownLocation(Context context, String phone) {
+    public static List<UserLastKnownLocation> getUserLastKnownLocation(Context context, String token) {
         DaoSession daoSession = MyApplication.getInstance().getReadableDaoSession(context);
         UserLastKnownLocationDao userLastKnownLocationDao = daoSession.getUserLastKnownLocationDao();
         QueryBuilder<UserLastKnownLocation> queryBuilder = userLastKnownLocationDao.queryBuilder();
-        queryBuilder.distinct().where(UserLastKnownLocationDao.Properties.Phone.eq(phone));
+        queryBuilder.distinct().where(UserLastKnownLocationDao.Properties.Token.eq(token));
         return queryBuilder.list();
+    }
+
+    public static void insertUsersLastKnownLocation(Context context,UserLastKnownLocation userLastKnownLocation){
+        DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(context);
+        UserLastKnownLocationDao userLastKnownLocationDao = daoSession.getUserLastKnownLocationDao();
+        userLastKnownLocationDao.insert(userLastKnownLocation);
     }
 
     public static List<UserLastKnownLocation> getUserLastKnownLocation(Context context) {

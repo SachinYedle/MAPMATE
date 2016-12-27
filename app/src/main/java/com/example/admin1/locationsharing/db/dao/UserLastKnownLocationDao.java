@@ -14,7 +14,7 @@ import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
 /** 
  * DAO for table "USER_LAST_KNOWN_LOCATION".
 */
-public class UserLastKnownLocationDao extends AbstractDao<UserLastKnownLocation, String> {
+public class UserLastKnownLocationDao extends AbstractDao<UserLastKnownLocation, Long> {
 
     public static final String TABLENAME = "USER_LAST_KNOWN_LOCATION";
 
@@ -23,10 +23,12 @@ public class UserLastKnownLocationDao extends AbstractDao<UserLastKnownLocation,
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property Name = new Property(0, String.class, "name", false, "NAME");
-        public final static Property Phone = new Property(1, String.class, "phone", true, "PHONE");
-        public final static Property Latitude = new Property(2, String.class, "latitude", false, "LATITUDE");
-        public final static Property Longitude = new Property(3, String.class, "longitude", false, "LONGITUDE");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Name = new Property(1, String.class, "name", false, "NAME");
+        public final static Property Token = new Property(2, String.class, "token", false, "TOKEN");
+        public final static Property Latitude = new Property(3, String.class, "latitude", false, "LATITUDE");
+        public final static Property Longitude = new Property(4, String.class, "longitude", false, "LONGITUDE");
+        public final static Property Time = new Property(5, String.class, "time", false, "TIME");
     };
 
 
@@ -42,10 +44,12 @@ public class UserLastKnownLocationDao extends AbstractDao<UserLastKnownLocation,
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"USER_LAST_KNOWN_LOCATION\" (" + //
-                "\"NAME\" TEXT," + // 0: name
-                "\"PHONE\" TEXT PRIMARY KEY NOT NULL ," + // 1: phone
-                "\"LATITUDE\" TEXT," + // 2: latitude
-                "\"LONGITUDE\" TEXT);"); // 3: longitude
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
+                "\"NAME\" TEXT," + // 1: name
+                "\"TOKEN\" TEXT," + // 2: token
+                "\"LATITUDE\" TEXT," + // 3: latitude
+                "\"LONGITUDE\" TEXT," + // 4: longitude
+                "\"TIME\" TEXT);"); // 5: time
     }
 
     /** Drops the underlying database table. */
@@ -59,41 +63,53 @@ public class UserLastKnownLocationDao extends AbstractDao<UserLastKnownLocation,
     protected void bindValues(SQLiteStatement stmt, UserLastKnownLocation entity) {
         stmt.clearBindings();
  
-        String name = entity.getName();
-        if (name != null) {
-            stmt.bindString(1, name);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
  
-        String phone = entity.getPhone();
-        if (phone != null) {
-            stmt.bindString(2, phone);
+        String name = entity.getName();
+        if (name != null) {
+            stmt.bindString(2, name);
+        }
+ 
+        String token = entity.getToken();
+        if (token != null) {
+            stmt.bindString(3, token);
         }
  
         String latitude = entity.getLatitude();
         if (latitude != null) {
-            stmt.bindString(3, latitude);
+            stmt.bindString(4, latitude);
         }
  
         String longitude = entity.getLongitude();
         if (longitude != null) {
-            stmt.bindString(4, longitude);
+            stmt.bindString(5, longitude);
+        }
+ 
+        String time = entity.getTime();
+        if (time != null) {
+            stmt.bindString(6, time);
         }
     }
 
     /** @inheritdoc */
     @Override
-    public String readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public UserLastKnownLocation readEntity(Cursor cursor, int offset) {
         UserLastKnownLocation entity = new UserLastKnownLocation( //
-            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // name
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // phone
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // latitude
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // longitude
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // token
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // latitude
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // longitude
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // time
         );
         return entity;
     }
@@ -101,23 +117,26 @@ public class UserLastKnownLocationDao extends AbstractDao<UserLastKnownLocation,
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, UserLastKnownLocation entity, int offset) {
-        entity.setName(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
-        entity.setPhone(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setLatitude(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setLongitude(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setToken(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setLatitude(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setLongitude(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setTime(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
      }
     
     /** @inheritdoc */
     @Override
-    protected String updateKeyAfterInsert(UserLastKnownLocation entity, long rowId) {
-        return entity.getPhone();
+    protected Long updateKeyAfterInsert(UserLastKnownLocation entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public String getKey(UserLastKnownLocation entity) {
+    public Long getKey(UserLastKnownLocation entity) {
         if(entity != null) {
-            return entity.getPhone();
+            return entity.getId();
         } else {
             return null;
         }

@@ -16,7 +16,7 @@ import android.content.Context;
 import android.location.LocationManager;
 
 import com.example.admin1.locationsharing.app.MyApplication;
-import com.example.admin1.locationsharing.mappers.LocationDataMapper;
+import com.example.admin1.locationsharing.mappers.UploadLocationsDataMapper;
 import com.example.admin1.locationsharing.responses.LocationSendingResponse;
 import com.example.admin1.locationsharing.utils.CustomLog;
 
@@ -33,7 +33,7 @@ public class BackgroundLocationService extends Service {
     private LocationManager mLocationManager = null;
 
 
-    private class LocationListener implements android.location.LocationListener,LocationDataMapper.OnTaskCompletedListener {
+    private class LocationListener implements android.location.LocationListener,UploadLocationsDataMapper.OnTaskCompletedListener {
         Location mLastLocation;
 
         public LocationListener(String provider) {
@@ -44,8 +44,8 @@ public class BackgroundLocationService extends Service {
         @Override
         public void onLocationChanged(Location location) {
             CustomLog.e(TAG, "onLocationChanged: " + location.getLatitude() +" "+location.getLongitude()+" "+location.getAccuracy());
-            LocationDataMapper locationDataMapper = new LocationDataMapper(MyApplication.getCurrentActivityContext());
-            locationDataMapper.sendUserLocation(this,""+location.getLatitude(), ""+location.getLongitude(),location.getAccuracy()+"");
+            UploadLocationsDataMapper uploadLocationsDataMapper = new UploadLocationsDataMapper(MyApplication.getCurrentActivityContext());
+            uploadLocationsDataMapper.sendUserLocation(this,""+location.getLatitude(), ""+location.getLongitude(),location.getAccuracy()+"");
             mLastLocation.set(location);
         }
 
