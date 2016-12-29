@@ -33,4 +33,5 @@
     <dimen name="margin_medium">5dp</dimen>
     <dimen name="margin_large">10dp</dimen>
     <dimen name="margin_xlarge">20dp</dimen>
+
 </resources>

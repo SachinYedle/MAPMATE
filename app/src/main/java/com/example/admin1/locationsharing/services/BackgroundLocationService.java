@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.content.Context;
 import android.location.LocationManager;
@@ -19,6 +20,8 @@ import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.mappers.UploadLocationsDataMapper;
 import com.example.admin1.locationsharing.responses.LocationSendingResponse;
 import com.example.admin1.locationsharing.utils.CustomLog;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import static com.example.admin1.locationsharing.utils.Constants.LOCATION_DISTANCE;
 import static com.example.admin1.locationsharing.utils.Constants.LOCATION_INTERVAL;
@@ -33,7 +36,7 @@ public class BackgroundLocationService extends Service {
     private LocationManager mLocationManager = null;
 
 
-    private class LocationListener implements android.location.LocationListener,UploadLocationsDataMapper.OnTaskCompletedListener {
+    private class LocationListener implements android.location.LocationListener,UploadLocationsDataMapper.OnTaskCompletedListener,GoogleApiClient.OnConnectionFailedListener {
         Location mLastLocation;
 
         public LocationListener(String provider) {
@@ -72,6 +75,11 @@ public class BackgroundLocationService extends Service {
         @Override
         public void onTaskFailed(String response) {
             CustomLog.i(TAG,"Location sending error"+response);
+        }
+
+        @Override
+        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+            CustomLog.e("ConnectionFailed",""+connectionResult.getErrorMessage());
         }
     }
 
@@ -123,7 +131,7 @@ public class BackgroundLocationService extends Service {
         if (mLocationManager != null) {
             for (int i = 0; i < mLocationListeners.length; i++) {
                 try {
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         return;
                     }
                     mLocationManager.removeUpdates(mLocationListeners[i]);

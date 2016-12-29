@@ -58,7 +58,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MapActivity extends DrawerActivity implements GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener,LocationSource {
+        LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener,LocationSource,GoogleMap.OnMapLoadedCallback,OnMapReadyCallback {
 
     private GoogleApiClient googleApiClient;
     private Location location;
@@ -100,27 +100,12 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     }
     public void getMyLocation() {
 
-        if (!checkGpsStatus()) {
+        /*if (!checkGpsStatus()) {
             Toast.makeText(this, "please enable gps location..", Toast.LENGTH_SHORT).show();
             return;
-        }
+        }*/
 
-        mapFragment.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap mgoogleMap) {
-
-        googleMap = mgoogleMap;
-                if (googleMap == null)
-                googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                if (ActivityCompat.checkSelfPermission(MyApplication.getInstance().getCurrentActivityContext(),
-                        android.Manifest.permission.ACCESS_FINE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    buildGoogleApiClient();
-
-                    googleMap.setMyLocationEnabled(true);
-                }
-            }
-        });
+        mapFragment.getMapAsync(this);
     }
 
     @Override
@@ -233,20 +218,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
                 .draggable(false));
 */
 
-        googleMap.setOnMarkerClickListener(this);
 
-        setFriendsLocationMarkers();
-
-        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-                CustomLog.d("Click","InfoWindow Click");
-                getUserLocations(marker);
-            }
-        });
-        if (googleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-        }
     }
     private DownloadLocationsDataMapper.OnTaskCompletedListener onTaskCompletedListener = new DownloadLocationsDataMapper.OnTaskCompletedListener() {
         @Override
@@ -408,5 +380,42 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     @Override
     public void deactivate() {
         mMapLocationListener = null;
+    }
+
+    @Override
+    public void onMapLoaded() {
+        MyApplication.getInstance().hideProgressDialog();
+        setFriendsLocationMarkers();
+
+        googleMap.setOnMarkerClickListener(this);
+
+        setFriendsLocationMarkers();
+
+        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                CustomLog.d("Click","InfoWindow Click");
+                getUserLocations(marker);
+            }
+        });
+        if (googleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+        }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        this.googleMap = googleMap;
+        if (googleMap == null) {
+            googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        }
+        if (ActivityCompat.checkSelfPermission(MyApplication.getInstance().getCurrentActivityContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            buildGoogleApiClient();
+            googleMap.setMyLocationEnabled(true);
+            googleMap.setOnMapLoadedCallback(this);
+        }
     }
 }

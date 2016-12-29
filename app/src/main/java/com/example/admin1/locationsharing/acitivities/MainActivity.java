@@ -33,6 +33,7 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -45,7 +46,7 @@ import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 import java.io.IOException;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int RC_SIGN_IN = 9001;
     private CallbackManager callbackManager;
@@ -60,7 +61,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initializeFacebookAuth();
         setContentView(R.layout.activity_main);
         MyApplication.getInstance().setCurrentActivityContext(MainActivity.this);
-        checkIsLoggedIn();
+
+        checkPermission();
+
+        Intent intent = new Intent(MainActivity.this,LocationActivity.class);
+        startActivity(intent);
+
+        //checkIsLoggedIn();
         checkPermission();
         initializeVariables();
         setUpListeners();
@@ -91,12 +98,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public boolean checkPermission() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ||
-                    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.READ_CONTACTS}, REQUSTED_CODE);
+                    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION}, REQUSTED_CODE);
             } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.READ_CONTACTS}, REQUSTED_CODE);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION}, REQUSTED_CODE);
             }
             return false;
         } else {
@@ -116,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED
                             || ActivityCompat.checkSelfPermission(this,
-                            Manifest.permission.READ_CONTACTS)
+                            Manifest.permission.ACCESS_COARSE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
                         Toast.makeText(MyApplication.getCurrentActivityContext(),"Permissions granted",Toast.LENGTH_SHORT).show();
                     }
@@ -156,10 +163,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void setUpGoogleLoginOption(){
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("441095881058-adjl4bl21uab4hemtra3r65uc486d3nv.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
+
         //.requestScopes(new Scope("googleapis.com/auth/contacts.readonly"))
+
         googleApiClient = new GoogleApiClient.Builder(MainActivity.this)
+                .enableAutoManage(this,this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
         googleApiClient.connect();
@@ -174,11 +185,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
-
+        CustomLog.e("MainActivity","Activity res");
         if (requestCode == RC_SIGN_IN) {
+
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            CustomLog.e("MainActivity","Activity res1"+result.isSuccess());
             if (result.isSuccess()) {
+                CustomLog.e("MainActivity","Activity res2");
                 handleGoogleSignInResult(result);
+
             }
         }
     }
@@ -188,9 +203,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
             String fullName = acct.getDisplayName();
-            String token = acct.getId();
-            CustomLog.i("google Tokenid ","token: "+token + "Acc"+acct.getIdToken());
+            String token = acct.getEmail();
+            CustomLog.i("MainActivity","token: "+acct.getIdToken());
             String email = acct.getEmail();
+            try {
+                GetGoogleCirclesList.setUp(acct.getIdToken());
+            } catch (IOException e) {
+                CustomLog.e("MainActivity","people Api Error"+e);
+            }
 
 
             //List<Contacts.People> peopleList = acct.getGrantedScopes();
@@ -252,6 +272,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         CustomLog.d("Google Access","Revoked");
                     }
                 });
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        CustomLog.e("MainActivity","OnConnectionFailed");
     }
 
 

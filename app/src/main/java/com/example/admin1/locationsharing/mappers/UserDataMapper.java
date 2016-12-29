@@ -75,11 +75,11 @@ public class UserDataMapper {
         preferencesData.setUserId(userAuthToken.getToken());
         CustomLog.d("UserDatMapper","Token: "+preferencesData.getUserId());
 
-        try {
+        /*try {
             GetGoogleCirclesList.setUp(preferencesData.getUserId());
         } catch (IOException e) {
             CustomLog.e("MainActivity","people Api Error"+e);
-        }
+        }*/
     }
 
 }
