@@ -7,6 +7,7 @@ import com.example.admin1.locationsharing.interfaces.PositiveClick;
 import com.example.admin1.locationsharing.services.LocationDataService;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.responses.LocationSendingResponse;
+import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 
@@ -29,6 +30,7 @@ public class UploadLocationsDataMapper {
 
         SharedPreferencesData preferencesData = new SharedPreferencesData(context);
         String token = preferencesData.getUserId();
+        //CustomLog.i("LocationSer","sendLocation"+preferencesData.getUserId());
         if (MyApplication.getInstance().isConnectedToInterNet()){
             this.onTaskCompletedListener = onTaskCompletedListener;
             LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(token);
@@ -47,10 +49,11 @@ public class UploadLocationsDataMapper {
                         onTaskCompletedListener.onTaskFailed("session expired");
                     } else if (response.code() == 504) {
                         onTaskCompletedListener.onTaskFailed("Unknown host");
+                    } else if (response.code() == 503) {
+                        onTaskCompletedListener.onTaskFailed("Server down");
                     } else if (response.isSuccessful()) {
                         onTaskCompletedListener.onTaskCompleted(response.body());
                     }
-
                 }
 
                 @Override

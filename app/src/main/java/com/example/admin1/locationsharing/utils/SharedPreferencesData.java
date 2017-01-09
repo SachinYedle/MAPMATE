@@ -24,6 +24,8 @@ public class SharedPreferencesData {
     private final String USER_COUNTRY_CODE = "userCountryCode";
     private final String IS_FIRST_TIME = "isFirstTime";
     private final String CONTACT_ID = "contactId";
+    private final String ACCESS_TOKEN = "accessToken";
+    private final String USER_EMAIL = "email";
 
     private final String SELECTED_USER_TOKEN = "selectedUserToken";
 
@@ -43,6 +45,15 @@ public class SharedPreferencesData {
         editor.commit();
     }
 
+    public void setEmail(String email) {
+        editor.putString(USER_EMAIL, email);
+        editor.commit();
+    }
+
+    public String getEmail() {
+        return sharedPreferences.getString(USER_EMAIL, "");
+    }
+
     public void setUserCountryCode(String userCountryCode) {
         editor.putString(USER_COUNTRY_CODE, userCountryCode);
         editor.commit();
@@ -53,6 +64,14 @@ public class SharedPreferencesData {
         editor.commit();
     }
 
+
+    public void setAccessToken(String accessToken) {
+        editor.putString(ACCESS_TOKEN, accessToken);
+        editor.commit();
+    }
+    public String getAccessToken(){
+        return sharedPreferences.getString(ACCESS_TOKEN, "");
+    }
     public void setContactId(int contactId) {
         editor.putInt(CONTACT_ID, contactId);
         editor.commit();

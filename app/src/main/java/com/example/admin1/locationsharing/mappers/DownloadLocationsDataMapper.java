@@ -66,6 +66,8 @@ public class DownloadLocationsDataMapper {
                         onTaskCompletedListener.onTaskFailed("session expired");
                     } else if (response.code() == 504) {
                         onTaskCompletedListener.onTaskFailed("Unknown host");
+                    } else if (response.code() == 503) {
+                        onTaskCompletedListener.onTaskFailed("Server down");
                     } else if (response.isSuccessful()) {
                         parseUserLocationsResponse(response.body());
                         onTaskCompletedListener.onTaskCompleted(response.body());

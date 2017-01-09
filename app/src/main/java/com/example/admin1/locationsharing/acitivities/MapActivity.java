@@ -66,7 +66,6 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     private GoogleMap googleMap;
     private LocationRequest locationRequest;
     private SharedPreferencesData sharedPreferencesData;
-    private LatLng myLatLngLocation;
     private static long back_pressed;
     private OnLocationChangedListener mMapLocationListener = null;
     @Override
@@ -76,9 +75,10 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         MyApplication.getInstance().setCurrentActivityContext(MapActivity.this);
         initializeVariables();
 
-        if(ActivityCompat.checkSelfPermission(MyApplication.getCurrentActivityContext(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
+        if(ActivityCompat.checkSelfPermission(MyApplication.getCurrentActivityContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             getMyLocation();
-
+        }else {
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"Please grant Location permissions",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -154,10 +154,6 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         }
 
     }
-
-
-
-
 
     public boolean checkGpsStatus() {
 
@@ -329,7 +325,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         GoogleMap.InfoWindowAdapter infoWindowAdapter = new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
-               return null;
+                return null;
             }
 
             @Override
@@ -416,6 +412,8 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
             buildGoogleApiClient();
             googleMap.setMyLocationEnabled(true);
             googleMap.setOnMapLoadedCallback(this);
+        }else {
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"Please grant Location permissions",Toast.LENGTH_SHORT).show();
         }
     }
 }

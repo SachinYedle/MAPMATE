@@ -30,6 +30,12 @@ public class UserLastknownLocationOperations {
         userLastKnownLocationDao.insert(userLastKnownLocation);
     }
 
+    public static void deleteTableData(Context context){
+        DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(context);
+        UserLastKnownLocationDao userLastKnownLocationDao = daoSession.getUserLastKnownLocationDao();
+        userLastKnownLocationDao.deleteAll();
+    }
+
     public static List<UserLastKnownLocation> getUserLastKnownLocation(Context context) {
         DaoSession daoSession = MyApplication.getInstance().getReadableDaoSession(context);
         UserLastKnownLocationDao userLastKnownLocationDao = daoSession.getUserLastKnownLocationDao();

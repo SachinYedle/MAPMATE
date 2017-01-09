@@ -5,7 +5,6 @@
       <module fileurl="file://$PROJECT_DIR$/LocationSharing.iml" filepath="$PROJECT_DIR$/LocationSharing.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/daogenerator/daogenerator.iml" filepath="$PROJECT_DIR$/daogenerator/daogenerator.iml" />
-      <module fileurl="file://$PROJECT_DIR$/googlepeopleapi/googlepeopleapi.iml" filepath="$PROJECT_DIR$/googlepeopleapi/googlepeopleapi.iml" />
     </modules>
   </component>
 </project>

@@ -37,20 +37,23 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.0.1'
+
     testCompile 'junit:junit:4.12'
     compile 'com.facebook.android:facebook-android-sdk:4.6.0'
     compile 'com.google.android.gms:play-services-auth:10.0.1'
     compile 'com.google.android.gms:play-services:10.0.1'
     compile 'com.squareup.retrofit2:retrofit:2.0.1'
     compile 'com.squareup.retrofit2:converter-gson:2.0.1'
-    compile 'com.squareup.retrofit2:converter-gson:2.0.1'
-    compile 'com.squareup.okhttp3:okhttp:3.2.0'
-    compile 'com.squareup.okio:okio:1.6.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
+    compile 'com.squareup.okhttp3:okhttp:3.0.0'
+    compile 'com.jakewharton.retrofit:retrofit1-okhttp3-client:1.0.2'
     compile 'de.greenrobot:greendao:2.1.0'
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.android.support:design:25.0.1'
     compile 'com.google.android.gms:play-services-plus:10.0.1'
+
+    compile ('com.google.api-client:google-api-client-android:1.22.0',{
+        exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+    })
     compile('com.google.api-client:google-api-client:1.22.0', {
         exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
     })
@@ -60,6 +63,5 @@ dependencies {
     compile('com.google.apis:google-api-services-people:v1-rev5-1.22.0', {
         exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
     })
-    compile project(':googlepeopleapi')
 }
 

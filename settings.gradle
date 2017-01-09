@@ -1,1 +1,1 @@
-include ':app', ':daogenerator', ':googlepeopleapi'
+include ':app', ':daogenerator'

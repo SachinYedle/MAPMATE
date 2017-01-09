@@ -2,7 +2,6 @@ package com.example.admin1.locationsharing.mappers;
 
 import android.content.Context;
 
-import com.example.GetGoogleCirclesList;
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.services.UserDataService;
 import com.example.admin1.locationsharing.app.MyApplication;
@@ -29,10 +28,10 @@ public class UserDataMapper {
         this.context = context;
     }
 
-    public void getUsersAuthToken(String email){
+    public void getUsersAuthToken(String accessToken){
         if (MyApplication.getInstance().isConnectedToInterNet()){
             UserDataService userDataService = MyApplication.getInstance().getUserDataService();
-            Call<UserAuthentication> call = userDataService.getUserAuthToken(email);
+            Call<UserAuthentication> call = userDataService.getUserAuthToken(accessToken);
             call.enqueue(userAuthToken);
         }else {
             PositiveClick positiveClick = new PositiveClick() {
@@ -54,6 +53,14 @@ public class UserDataMapper {
                 public void onResponse(Call<UserAuthentication> call,
                                        Response<UserAuthentication>
                                                response) {
+                    MyApplication.getInstance().hideProgressDialog();
+                    if (response.code() == 401) {
+                        CustomLog.e("User Authentication","Session Expired");
+                    } else if (response.code() == 504) {
+                        CustomLog.e("User Authentication","Unknown Host");
+                    } else if (response.code() == 503) {
+                        CustomLog.e("User Authentication","Server down");
+                    }
                     if (response.isSuccessful()) {
                         parseUsersAuthToken(response.body());
                         CustomLog.i("Response",""+response);
@@ -65,6 +72,7 @@ public class UserDataMapper {
 
                 @Override
                 public void onFailure(Call<UserAuthentication> call, Throwable t) {
+                    MyApplication.getInstance().hideProgressDialog();
                     CustomLog.e("UserAutToken callback","user info data service error");
                 }
             };
@@ -74,12 +82,6 @@ public class UserDataMapper {
         SharedPreferencesData preferencesData = new SharedPreferencesData(context);
         preferencesData.setUserId(userAuthToken.getToken());
         CustomLog.d("UserDatMapper","Token: "+preferencesData.getUserId());
-
-        /*try {
-            GetGoogleCirclesList.setUp(preferencesData.getUserId());
-        } catch (IOException e) {
-            CustomLog.e("MainActivity","people Api Error"+e);
-        }*/
     }
 
 }

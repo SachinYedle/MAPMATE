@@ -210,7 +210,7 @@ public class GetGoogleCirclesList {
                     // Step 1: Authorize -->
                     String authorizationUrl = new GoogleBrowserClientRequestUrl(clientId,
                             redirectUrl,
-                            Arrays.asList(scope))
+                            Arrays.asList(PeopleScopes.CONTACTS_READONLY))
                             .build();
 
                     // Point or redirect your user to the authorizationUrl.
