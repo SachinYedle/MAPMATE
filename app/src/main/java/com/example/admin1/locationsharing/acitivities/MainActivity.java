@@ -331,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(MyApplication.getCurrentActivityContext(), e.getMessage(), Toast.LENGTH_LONG).show();
             }*/
             //List<Contacts.People> peopleList = acct.getGrantedScopes();
-            new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(email);
+            new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(token);
             callToBackgroundLocationService();
 
             finish();
