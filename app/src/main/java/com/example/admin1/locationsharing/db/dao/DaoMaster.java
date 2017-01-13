@@ -8,7 +8,7 @@ import android.util.Log;
 import de.greenrobot.dao.AbstractDaoMaster;
 import de.greenrobot.dao.identityscope.IdentityScopeType;
 
-import com.example.admin1.locationsharing.db.dao.ContactsDao;
+import com.example.admin1.locationsharing.db.dao.FriendsDao;
 import com.example.admin1.locationsharing.db.dao.UserLastKnownLocationDao;
 import com.example.admin1.locationsharing.db.dao.UserLocationsDao;
 
@@ -21,14 +21,14 @@ public class DaoMaster extends AbstractDaoMaster {
 
     /** Creates underlying database table using DAOs. */
     public static void createAllTables(SQLiteDatabase db, boolean ifNotExists) {
-        ContactsDao.createTable(db, ifNotExists);
+        FriendsDao.createTable(db, ifNotExists);
         UserLastKnownLocationDao.createTable(db, ifNotExists);
         UserLocationsDao.createTable(db, ifNotExists);
     }
     
     /** Drops underlying database table using DAOs. */
     public static void dropAllTables(SQLiteDatabase db, boolean ifExists) {
-        ContactsDao.dropTable(db, ifExists);
+        FriendsDao.dropTable(db, ifExists);
         UserLastKnownLocationDao.dropTable(db, ifExists);
         UserLocationsDao.dropTable(db, ifExists);
     }
@@ -62,7 +62,7 @@ public class DaoMaster extends AbstractDaoMaster {
 
     public DaoMaster(SQLiteDatabase db) {
         super(db, SCHEMA_VERSION);
-        registerDaoClass(ContactsDao.class);
+        registerDaoClass(FriendsDao.class);
         registerDaoClass(UserLastKnownLocationDao.class);
         registerDaoClass(UserLocationsDao.class);
     }

@@ -30,8 +30,10 @@ import com.example.admin1.locationsharing.db.dao.operations.UserLocationsOperati
 import com.example.admin1.locationsharing.fragments.DrawerFragment;
 import com.example.admin1.locationsharing.interfaces.PositiveClick;
 import com.example.admin1.locationsharing.mappers.DownloadLocationsDataMapper;
+import com.example.admin1.locationsharing.mappers.FriendsDataMapper;
 import com.example.admin1.locationsharing.mappers.UploadLocationsDataMapper;
 import com.example.admin1.locationsharing.mappers.UserDataMapper;
+import com.example.admin1.locationsharing.responses.FriendsServiceResponse;
 import com.example.admin1.locationsharing.responses.LocationSendingResponse;
 import com.example.admin1.locationsharing.responses.UserLocationsResponse;
 import com.example.admin1.locationsharing.utils.CustomLog;
@@ -80,6 +82,8 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         }else {
             Toast.makeText(MyApplication.getCurrentActivityContext(),"Please grant Location permissions",Toast.LENGTH_SHORT).show();
         }
+        /** get friends data */
+        new FriendsDataMapper().getFriends(onGetFriendsDataListener);
     }
 
 
@@ -119,14 +123,25 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.add:
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                Navigator.navigateToContactsFragment(fragmentManager);
+                Navigator.navigateToFriendsActivity();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
 
+    FriendsDataMapper.OnTaskCompletedListener onGetFriendsDataListener = new FriendsDataMapper.OnTaskCompletedListener() {
+        @Override
+        public void onTaskCompleted(FriendsServiceResponse friendsServiceResponse) {
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"Friends data Addeed: " +
+                    friendsServiceResponse.isSuccess(),Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onTaskFailed(String response) {
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"Getting Friends data : "+response,Toast.LENGTH_SHORT).show();
+        }
+    };
     @Override
     protected void onStart() {
         super.onStart();
