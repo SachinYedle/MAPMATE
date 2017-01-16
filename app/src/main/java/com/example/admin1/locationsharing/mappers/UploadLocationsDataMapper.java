@@ -29,8 +29,8 @@ public class UploadLocationsDataMapper {
     public void sendUserLocation(OnTaskCompletedListener onTaskCompletedListener,String lat,String lon,String radius){
 
         SharedPreferencesData preferencesData = new SharedPreferencesData(context);
-        String token = preferencesData.getUserId();
-        //CustomLog.i("LocationSer","sendLocation"+preferencesData.getUserId());
+        String token = preferencesData.getUserToken();
+
         if (MyApplication.getInstance().isConnectedToInterNet()){
             this.onTaskCompletedListener = onTaskCompletedListener;
             LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(token);

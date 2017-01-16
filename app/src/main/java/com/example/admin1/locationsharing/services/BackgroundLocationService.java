@@ -173,21 +173,6 @@ public class BackgroundLocationService extends Service implements LocationListen
         if(isNewer && distance > DISTANCE_THRESHOLD){
             return true;
         }
-        /*// Check if new location more accurate. Accuracy is radius in meters, so less is better.
-        boolean isMoreAccurate = newLocation.getAccuracy() < oldLocation.getAccuracy();
-        if(isMoreAccurate && isNewer) {
-            // More accurate and newer is always better.
-            return true;
-        } else if(isMoreAccurate && !isNewer) {
-            // More accurate but not newer can lead to bad fix because of user movement.
-            // Let us set a threshold for the maximum tolerance of time difference.
-            long timeDifference = newLocation.getTime() - oldLocation.getTime();
-
-            // If time difference is not greater then allowed threshold we accept it.
-            if(timeDifference > -TIME_DIFFERENCE_THRESHOLD) {
-                return true;
-            }
-        }*/
         return false;
     }
 }

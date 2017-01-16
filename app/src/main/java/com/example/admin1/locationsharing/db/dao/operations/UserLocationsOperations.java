@@ -28,7 +28,7 @@ public class UserLocationsOperations {
         userLocations.setLatitude(userLocationData.getLat());
         userLocations.setTime(userLocationData.getTime());
         userLocations.setRadius(userLocationData.getTime());
-        userLocations.setToken(preferencesData.getSelectedUserToken());
+        userLocations.setToken(preferencesData.getSelectedUserEmail());
         userLocationsDao.insert(userLocations);
     }
     public static void  deleteUserLocations(Context context, Long key){

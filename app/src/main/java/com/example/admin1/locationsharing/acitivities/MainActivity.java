@@ -24,12 +24,7 @@ import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.mappers.UserDataMapper;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookSdk;
-import com.facebook.Profile;
-import com.facebook.appevents.AppEventsLogger;
-import com.facebook.login.LoginManager;
+
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -79,7 +74,6 @@ import static java.security.AccessController.getContext;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int RC_SIGN_IN = 9001;
-    private CallbackManager callbackManager;
     private SignInButton googleSignInButton;
     private Button googleSignOut;
     private EditText phoneEditText;
@@ -87,82 +81,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final int REQUSTED_CODE = 99;
     private final int REQUEST_AUTHORIZATION = 1002;
 
-/**
+    /**
      * Global instance of the HTTP transport.
      */
-
     private static HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
 
-/**
+    /**
      * Global instance of the JSON factory.
      */
-
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-
-
-/**
-     * Application name.
-     *//*
-
-    private static final String APPLICATION_NAME =
-            "People API Java Quickstart";
-
-    */
-/**
-     * Directory to store user credentials for this application.
-     *//*
-
-    private static java.io.File DATA_STORE_DIR */
-/*= new java.io.File(
-            System.getProperty("user.home"), ".credentials/people.googleapis.com-java-quickstart")*//*
-;
-
-    */
-/**
-     * Global instance of the {@link FileDataStoreFactory}.
-     *//*
-
-    private static FileDataStoreFactory DATA_STORE_FACTORY;
-    private static File dataDirectory;
-
-    */
-/**
-     * Global instance of the scopes required by this quickstart.
-     * <p>
-     * If modifying these scopes, delete your previously saved credentials
-     * at ~/.credentials/people.googleapis.com-java-quickstart
-     *//*
-
-    private static final List<String> SCOPES =
-            Arrays.asList(PeopleScopes.CONTACTS_READONLY);
-*/
-
-    /*static {
-        try {
-            //new com.google.api.client.http.javanet.NetHttpTransport();
-
-            DATA_STORE_DIR = new java.io.File(
-                    System.getProperty("user.home"), ".credentials/people-java-quickstart.json");
-
-            HTTP_TRANSPORT = new com.google.api.client.http.javanet.NetHttpTransport();
-            dataDirectory = new File(DATA_STORE_DIR, System.getProperty("user.home"));
-            //DATA_STORE_FACTORY = new FileDataStoreFactory(DATA_STORE_DIR);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            System.exit(1);
-        }
-    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initializeFacebookAuth();
         setContentView(R.layout.activity_main);
         MyApplication.getInstance().setCurrentActivityContext(MainActivity.this);
-
-
         checkIsLoggedIn();
-        //checkPermission();
         initializeVariables();
         setUpListeners();
         setUpGoogleLoginOption();
@@ -170,12 +104,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void checkIsLoggedIn() {
-
-        fillUserDataToDB();
-        callToBackgroundLocationService();
         SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
-        if (!preferencesData.getUserId().equals("")) {
-            Navigator.navigateToMapActivity();
+        if (!preferencesData.getEmail().equals("")) {
+
+            Navigator.getInstance().navigateToMapActivity();
         }
     }
 
@@ -194,17 +126,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         checkPermission();
-    }
-
-    public void initializeFacebookAuth() {
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        callbackManager = CallbackManager.Factory.create();
-        AppEventsLogger.activateApp(this);
-
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        accessToken.setCurrentAccessToken(null);
-        Profile.getCurrentProfile().setCurrentProfile(null);
-        LoginManager.getInstance().logOut();
     }
 
     public void callToBackgroundLocationService() {
@@ -249,21 +170,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //setDrawerLayout(MyApplication.getInstance().getCurrentActivityContext());
-       /* LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
-        FacebookCallback<LoginResult> facebookCallback = getFacebookCallback();
-        loginButton.registerCallback(callbackManager,facebookCallback);*/
         googleSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
         googleSignInButton.setSize(SignInButton.SIZE_STANDARD);
         googleSignOut = (Button) findViewById(R.id.btn_sign_out);
-        /*Button signIn = (Button)findViewById(R.id.sign_in);
-        signIn.setOnClickListener(this);
-        phoneEditText = (EditText)findViewById(R.id.phone);
-        sharedPreferencesData = new SharedPreferencesData(MainActivity.this);
-        String authToken = sharedPreferencesData.getUserId();
-        if(!authToken.equals("")){
-            CustomLog.i("Token",sharedPreferencesData.getUserId());
-            Navigator.navigateToMapActivity();
-        }*/
     }
 
     public void setUpListeners() {
@@ -294,10 +203,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
         CustomLog.e("MainActivity", "Activity res");
         if (requestCode == RC_SIGN_IN) {
-
             //revokeAccess();
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             CustomLog.e("MainActivity", "Activity res1" + result.isSuccess());
@@ -319,23 +226,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             GoogleSignInAccount acct = result.getSignInAccount();
             String fullName = acct.getDisplayName();
             String token = acct.getIdToken();
-            preferencesData.setAccessToken(token);
+            //preferencesData.setUserToken(token);
             CustomLog.i("MainActivity", "token: " + acct.getIdToken());
             String email = acct.getEmail();
             preferencesData.setEmail(email);
 
             getPeoplesList(acct.getEmail());
-            /*try {
-                getC();
-            } catch (IOException e) {
-                Toast.makeText(MyApplication.getCurrentActivityContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-            }*/
-            //List<Contacts.People> peopleList = acct.getGrantedScopes();
+
             new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(token);
             callToBackgroundLocationService();
 
             finish();
-            Navigator.navigateToMapActivity();
+            Navigator.getInstance().navigateToMapActivity();
 
             CustomLog.i("Name & Email", fullName + "&" + email);
             googleSignInButton.setVisibility(View.GONE);
@@ -425,9 +327,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_sign_out:
                 signOut();
                 break;
-            case R.id.sign_in:
-                //singInUserWithPhone();
-                break;
+
         }
     }
 
@@ -463,149 +363,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-
-    /*public FacebookCallback<LoginResult> getFacebookCallback(){
-        FacebookCallback<LoginResult> facebookCallback =  new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Toast.makeText(MyApplication.getInstance().getCurrentActivityContext(),"Login Successfull",Toast.LENGTH_SHORT).show();
-                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        CustomLog.d("Response", response.toString() + "\njson" + object.toString());
-                        try {
-                            String email = (String) object.get("email");
-                            Toast.makeText(MyApplication.getInstance().getCurrentActivityContext(), email, Toast.LENGTH_SHORT).show();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name,email,gender,birthday");
-                request.setParameters(parameters);
-                request.executeAsync();
-            }
-
-            @Override
-            public void onCancel() {
-                //CustomLog.e("OnCancel","Login Canceled");
-                Toast.makeText(MyApplication.getCurrentActivityContext(),"Login cancelled",Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Toast.makeText(MyApplication.getCurrentActivityContext(),"Something went Wrong Please try again",Toast.LENGTH_SHORT).show();
-                //CustomLog.e("OnError",error.toString()+"error");
-            }
-        };
-        return facebookCallback;
-    }*/
-
-
-    /*public void singInUserWithPhone(){
-        String userPhone = phoneEditText.getText().toString();
-
-        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(getApplicationContext().TELEPHONY_SERVICE);
-        String countryCode = telephonyManager.getNetworkCountryIso();
-        CustomLog.i("MainActivity",countryCode+"");
-        new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(userPhone);
-
-        if(sharedPreferencesData.getUserId().equals("")){
-            phoneEditText.setError("email not Valid");
-        }
-        else{
-            CustomLog.i("Token ",""+sharedPreferencesData.getUserId());
-            sharedPreferencesData.setUserPhone(userPhone);
-            //sharedPreferencesData.setUserCountryCode(countryCode);
-            //Navigator.navigateToMapActivity();
-        }
-    }*/
-    /*public static boolean isValidPhoneNumber(String phone) {
-        if (phone.length() < 6 || phone.length() > 13 || phone.equals("")) {
-            return false;
-        } else {
-            return android.util.Patterns.PHONE.matcher(phone).matches();
-        }
-    }*/
-
-
-    /**
-     * Creates an authorized Credential object.
-     *
-     * @return an authorized Credential object.
-     * @throws IOException
-     *//*
-    public static Credential authorize() throws IOException {
-        // Load client secrets.
-        InputStream in =
-                MainActivity.class.getResourceAsStream("/client_secret.json");
-        GoogleClientSecrets clientSecrets =
-                GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-
-        // Build flow and trigger user authorization request.
-        GoogleAuthorizationCodeFlow flow =
-                new GoogleAuthorizationCodeFlow.Builder(
-                        HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                        .setDataStoreFactory((DataStoreFactory) dataDirectory)
-                        .setAccessType("offline")
-                        .build();
-        Credential credential = new AuthorizationCodeInstalledApp(
-                flow, new LocalServerReceiver()).authorize(new SharedPreferencesData(MyApplication.getCurrentActivityContext()).getEmail());
-        System.out.println(
-                "Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
-        return credential;
-    }
-
-    *//**
-     * Build and return an authorized People client service.
-     *
-     * @return an authorized People client service
-     * @throws IOException
-     *//*
-    public static People getPeopleService() throws IOException {
-        Credential credential = authorize();
-        return new People.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-                .setApplicationName(APPLICATION_NAME)
-                .build();
-    }
-
-    public void getC() throws IOException {
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                try {
-                    People service = getPeopleService();
-
-                    // Request 10 connections.
-                    ListConnectionsResponse response = service.people().connections()
-                            .list("people/me")
-                            .setPageSize(10)
-                            .execute();
-
-                    // Print display name of connections if available.
-                    List<Person> connections = response.getConnections();
-                    if (connections != null && connections.size() > 0) {
-                        for (Person person : connections) {
-                            List<Name> names = person.getNames();
-                            if (names != null && names.size() > 0) {
-                                System.out.println("Name: " + person.getNames().get(0)
-                                        .getDisplayName());
-                            } else {
-                                System.out.println("No names available for connection.");
-                            }
-                        }
-                    } else {
-                        System.out.println("No connections found.");
-                    }
-                } catch (IOException e) {
-                    Log.d("Exception", e.getMessage());
-                }
-            }
-        }).start();
-
-    }*/
 }

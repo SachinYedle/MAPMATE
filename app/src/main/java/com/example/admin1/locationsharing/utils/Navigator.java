@@ -16,22 +16,29 @@ import com.example.admin1.locationsharing.app.MyApplication;
 
 public class Navigator {
 
-    public static void navigateToMapActivity(){
+    private static Navigator instance = null;
+
+    public static Navigator getInstance() {
+        if (instance == null) {
+            instance = new Navigator();
+        }
+        return instance;
+    }
+    public void navigateToMapActivity(){
         Intent intent = new Intent(MyApplication.getCurrentActivityContext(),MapActivity.class);
         MyApplication.getCurrentActivityContext().startActivity(intent);
     }
-    public static void navgateToSettingsToStartGPS(){
+    public void navgateToSettingsToStartGPS(){
         Intent callGPSSettingIntent = new Intent(
                 android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         MyApplication.getCurrentActivityContext().startActivity(callGPSSettingIntent);
     }
 
-    public static void navgateToSettingssToStartInternet(){
-        Intent callGPSSettingIntent = new Intent(
-                Settings.ACTION_DATE_SETTINGS);
+    public void navgateToSettingssToStartInternet(){
+        Intent callGPSSettingIntent = new Intent(Settings.ACTION_DATE_SETTINGS);
         MyApplication.getCurrentActivityContext().startActivity(callGPSSettingIntent);
     }
-    public static void navigateToFriendsActivity(){
+    public void navigateToFriendsActivity(){
         Intent intent = new Intent(MyApplication.getCurrentActivityContext(),FriendsActivity.class);
         MyApplication.getCurrentActivityContext().startActivity(intent);
     }

@@ -8,10 +8,7 @@
         android:gravity="center"
         android:orientation="vertical"
         android:background="@color/drawer_header_color"
-        android:paddingEnd="@dimen/drawer_header_padding"
-        android:paddingLeft="@dimen/drawer_header_padding"
-        android:paddingRight="@dimen/drawer_header_padding"
-        android:paddingStart="@dimen/drawer_header_padding">
+        android:padding="@dimen/drawer_header_padding">
         <TextView
             android:id="@+id/welcome_textView"
             style="@style/small_text_textview"
@@ -21,6 +18,7 @@
 
         <TextView
             android:id="@+id/drawer_user_name_textView"
+            android:layout_width="match_parent"
             android:gravity="center"
             style="@style/medium_text_textview"
             android:textColor="@android:color/white"/>

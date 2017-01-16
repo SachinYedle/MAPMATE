@@ -129,7 +129,6 @@ public class MyApplication extends Application {
                 .baseUrl(BuildConfig.HOST).build();
     }
     public LocationDataService getLocationDataService(final String token) {
-
         OkHttpClient httpClient = new OkHttpClient.Builder()
                 .addInterceptor(new Interceptor() {
                     @Override
@@ -316,6 +315,4 @@ public class MyApplication extends Application {
         });
         alertDialog.show();
     }
-
-
 }

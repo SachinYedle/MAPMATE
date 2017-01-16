@@ -45,7 +45,7 @@ public class DownloadLocationsDataMapper {
             PositiveClick positiveClick = new PositiveClick() {
                 @Override
                 public void onClick() {
-                    Navigator.navgateToSettingssToStartInternet();
+                    Navigator.getInstance().navgateToSettingssToStartInternet();
                 }
             };
             MyApplication.getInstance().showAlertWithPositiveNegativeButton(context.getString(R.string
@@ -87,7 +87,7 @@ public class DownloadLocationsDataMapper {
         DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(context);
         UserLocationsDao userLocationsDao = daoSession.getUserLocationsDao();
         SharedPreferencesData preferencesData = new SharedPreferencesData(context);
-        DeleteQuery<UserLocations> deleteQuery = userLocationsDao.queryBuilder().where(UserLocationsDao.Properties.Token.eq(preferencesData.getSelectedUserToken()))
+        DeleteQuery<UserLocations> deleteQuery = userLocationsDao.queryBuilder().where(UserLocationsDao.Properties.Token.eq(preferencesData.getSelectedUserEmail()))
                 .buildDelete();
         deleteQuery.executeDeleteWithoutDetachingEntities();
 

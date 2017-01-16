@@ -1,6 +1,7 @@
 package com.example.admin1.locationsharing.acitivities;
 
 import android.Manifest;
+import android.content.IntentSender;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.support.v4.app.FragmentManager;
@@ -40,9 +41,16 @@ import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
@@ -86,7 +94,6 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         new FriendsDataMapper().getFriends(onGetFriendsDataListener);
     }
 
-
     public void initializeVariables(){
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -103,12 +110,6 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         fragmentTransaction.commit();
     }
     public void getMyLocation() {
-
-        /*if (!checkGpsStatus()) {
-            Toast.makeText(this, "please enable gps location..", Toast.LENGTH_SHORT).show();
-            return;
-        }*/
-
         mapFragment.getMapAsync(this);
     }
 
@@ -123,7 +124,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.add:
-                Navigator.navigateToFriendsActivity();
+                Navigator.getInstance().navigateToFriendsActivity();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -167,32 +168,6 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
                 == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         }
-
-    }
-
-    public boolean checkGpsStatus() {
-
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            return true;
-        } else {
-            showGPSDisabledAlert();
-        }
-        return false;
-    }
-
-    private void showGPSDisabledAlert() {
-        PositiveClick positiveClick = new PositiveClick() {
-            @Override
-            public void onClick() {
-                Navigator.navgateToSettingsToStartGPS();
-            }
-        };
-        MyApplication.getInstance().showAlertWithPositiveNegativeButton(getString(R.string
-                .enable_gps_header), getString(R.string
-                .enable_gps_message), getString(R.string.cancel), getString(R.string
-                .enable_gps), positiveClick);
     }
 
     public void buildGoogleApiClient() {
@@ -204,6 +179,36 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         googleApiClient.connect();
     }
 
+    /* Show Location Access Dialog */
+    private void showSettingDialog() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);//Setting priotity of Location request to high
+        locationRequest.setInterval(30 * 1000);
+        locationRequest.setFastestInterval(5 * 1000);//5 sec Time interval for location update
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+        builder.setAlwaysShow(true); //this is the key ingredient to show dialog always when GPS is off
+
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(LocationSettingsResult result) {
+                final Status status = result.getStatus();
+                final LocationSettingsStates state = result.getLocationSettingsStates();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way to fix the
+                        // settings so we won't show the dialog.
+                        break;
+                }
+            }
+        });
+    }
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -231,11 +236,12 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
 
 
     }
+
     private DownloadLocationsDataMapper.OnTaskCompletedListener onTaskCompletedListener = new DownloadLocationsDataMapper.OnTaskCompletedListener() {
         @Override
         public void onTaskCompleted(UserLocationsResponse userLocationsResponse) {
             SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
-            String token = preferencesData.getSelectedUserToken();
+            String token = preferencesData.getSelectedUserEmail();
             CustomLog.i("Map Activity","Download Locations"+userLocationsResponse.getSuccess()+":"+token);
             drawRouteOfSelectedUser(token);
         }
@@ -253,7 +259,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         }
 
         SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
-        preferencesData.setSelectedUserToken(token);
+        preferencesData.setSelectedUserEmail(token);
 
         CustomLog.d("Marker id","ID:"+ token);
         DownloadLocationsDataMapper dataMapper = new DownloadLocationsDataMapper(MyApplication.getCurrentActivityContext());
@@ -275,15 +281,8 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
                         .draggable(false).title(""+locationList.get(i).getToken()));
                 builder.include(latLng);
             }
-            //LatLng latLng = getMyLatLngLocation();
-            /*SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
-            googleMap.addMarker(new MarkerOptions().position(latLng)
-                    .draggable(false).title(""+preferencesData.getUserId()));
-            */
-            //builder.include(latLng);
             googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 48));
         }
-
     }
 
     public void drawRouteOfSelectedUser(String token){
@@ -354,8 +353,8 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
                     userPhone.setText(userData.get(0).getName());
                 }
                 else {
-                    userId.setText( sharedPreferencesData.getUserId());
-                    userPhone.setText(sharedPreferencesData.getUserPhone());
+                    userId.setText( sharedPreferencesData.getFirstName());
+                    userPhone.setText(sharedPreferencesData.getEmail());
                 }
                 return view;
             }
@@ -376,7 +375,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
             }
             else {
                 finish();
-                Navigator.navigateToMapActivity();
+                Navigator.getInstance().navigateToMapActivity();
                 Toast.makeText(getBaseContext(), "Press once again to exit!", Toast.LENGTH_SHORT).show();
                 back_pressed = System.currentTimeMillis();
             }
@@ -397,11 +396,8 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     public void onMapLoaded() {
         MyApplication.getInstance().hideProgressDialog();
         setFriendsLocationMarkers();
-
         googleMap.setOnMarkerClickListener(this);
-
         setFriendsLocationMarkers();
-
         googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
@@ -416,7 +412,6 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
         this.googleMap = googleMap;
         if (googleMap == null) {
             googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);

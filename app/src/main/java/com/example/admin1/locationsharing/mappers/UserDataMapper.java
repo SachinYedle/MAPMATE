@@ -37,7 +37,7 @@ public class UserDataMapper {
             PositiveClick positiveClick = new PositiveClick() {
                 @Override
                 public void onClick() {
-                    Navigator.navgateToSettingssToStartInternet();
+                    Navigator.getInstance().navgateToSettingssToStartInternet();
                 }
             };
             MyApplication.getInstance().showAlertWithPositiveNegativeButton(context.getString(R.string
@@ -80,9 +80,8 @@ public class UserDataMapper {
     private void parseUsersAuthToken(UserAuthentication userAuthentication){
         UserAuthToken userAuthToken = userAuthentication.getUserAuthToken();
         SharedPreferencesData preferencesData = new SharedPreferencesData(context);
-        //preferencesData.setUserId(userAuthToken.getToken());
-        preferencesData.setUserId("e5b61e9b96aa44f4ae760f50215c5679");
-        CustomLog.d("UserDatMapper","Token: "+preferencesData.getUserId());
+        preferencesData.setUserToken(userAuthToken.getToken());
+        CustomLog.d("UserDatMapper","Token: "+preferencesData.getUserToken());
     }
 
 }

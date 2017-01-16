@@ -1,5 +1,8 @@
 package com.example.admin1.locationsharing.responses;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 
 /**
@@ -7,7 +10,11 @@ import java.util.ArrayList;
  */
 
 public class FriendsServiceResponse {
+    @SerializedName("success")
+    @Expose
     private boolean success;
+    @SerializedName("data")
+    @Expose
     private ArrayList<FriendsResponse> friendsResponseList;
 
     public void setFriendsResponseList(ArrayList<FriendsResponse> friendsResponseList) {

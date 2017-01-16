@@ -2,6 +2,7 @@ package com.example.admin1.locationsharing.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.hardware.camera2.params.StreamConfigurationMap;
 
 /**
  * Created by admin1 on 30/11/16.
@@ -13,22 +14,17 @@ public class SharedPreferencesData {
     private SharedPreferences sharedPreferences;
     private Context context;
 
-
     private final String PREF_NAME = "com.example.admin1.locationsharing";
     // Preferences can only be accessed by the application
     private final int PRIVATE_MODE = 0;
 
     //Variable Names saved in preferences
-    private final String USER_ID = "userID";
-    private final String USER_PHONE = "userPhone";
-    private final String USER_COUNTRY_CODE = "userCountryCode";
+    private final String USER_TOKEN = "userToken";
     private final String IS_FIRST_TIME = "isFirstTime";
-    private final String CONTACT_ID = "contactId";
-    private final String ACCESS_TOKEN = "accessToken";
-    private final String USER_EMAIL = "email";
-
-    private final String SELECTED_USER_TOKEN = "selectedUserToken";
-
+    private final String EMAIL = "email";
+    private final String SELECTED_USER_EMAIL = "selectedUserEmail";
+    private final String FIRST_NAME = "firstName";
+    private final String LAST_NAME = "lastName";
 
     public SharedPreferencesData(Context context) {
         this.context = context;
@@ -36,26 +32,13 @@ public class SharedPreferencesData {
         editor = sharedPreferences.edit();
     }
 
-    public void setUserId(String userId) {
-       editor.putString(USER_ID, userId);
-        editor.commit();
-    }
-    public void setUserPhone(String userPhone) {
-        editor.putString(USER_PHONE, userPhone);
+    public void setUserToken(String userToken) {
+        editor.putString(USER_TOKEN, userToken);
         editor.commit();
     }
 
     public void setEmail(String email) {
-        editor.putString(USER_EMAIL, email);
-        editor.commit();
-    }
-
-    public String getEmail() {
-        return sharedPreferences.getString(USER_EMAIL, "");
-    }
-
-    public void setUserCountryCode(String userCountryCode) {
-        editor.putString(USER_COUNTRY_CODE, userCountryCode);
+        editor.putString(EMAIL, email);
         editor.commit();
     }
 
@@ -64,46 +47,42 @@ public class SharedPreferencesData {
         editor.commit();
     }
 
-
-    public void setAccessToken(String accessToken) {
-        editor.putString(ACCESS_TOKEN, accessToken);
-        editor.commit();
-    }
-    public String getAccessToken(){
-        return sharedPreferences.getString(ACCESS_TOKEN, "");
-    }
-    public void setContactId(int contactId) {
-        editor.putInt(CONTACT_ID, contactId);
+    public void setSelectedUserEmail(String selectedUserEmail) {
+        editor.putString(SELECTED_USER_EMAIL, selectedUserEmail);
         editor.commit();
     }
 
-    public void setSelectedUserToken(String selectedUserToken) {
-        editor.putString(SELECTED_USER_TOKEN, selectedUserToken);
+    public void setFirstName(String firstName) {
+        editor.putString(FIRST_NAME, firstName);
         editor.commit();
     }
 
-
-    public String getSelectedUserToken() {
-        return sharedPreferences.getString(SELECTED_USER_TOKEN, "");
+    public void setLastName(String lastName) {
+        editor.putString(LAST_NAME, lastName);
+        editor.commit();
     }
 
-    public int getContactId() {
-        return sharedPreferences.getInt(CONTACT_ID,0);
+    public String getEmail() {
+        return sharedPreferences.getString(EMAIL, "");
     }
 
-    public String getUserCountryCode() {
-        return sharedPreferences.getString(USER_COUNTRY_CODE,"");
+    public String getUserToken() {
+        return sharedPreferences.getString(USER_TOKEN, "");
     }
 
+    public String getSelectedUserEmail() {
+        return sharedPreferences.getString(SELECTED_USER_EMAIL, "");
+    }
     public boolean getIsFirstTime() {
         return sharedPreferences.getBoolean(IS_FIRST_TIME,false);
     }
 
-    public String getUserId() {
-        return sharedPreferences.getString(USER_ID,"");
+    public String getFirstName() {
+        return sharedPreferences.getString(FIRST_NAME,"");
     }
-    public String getUserPhone() {
-        return sharedPreferences.getString(USER_PHONE,"");
+
+    public String getLastName() {
+        return sharedPreferences.getString(LAST_NAME,"");
     }
 }
 

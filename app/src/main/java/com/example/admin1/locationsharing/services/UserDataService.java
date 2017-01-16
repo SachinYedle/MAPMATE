@@ -15,5 +15,5 @@ public interface UserDataService {
 
     @FormUrlEncoded
     @POST("know_where/api/v1/auth")
-    Call<UserAuthentication> getUserAuthToken(@Field("email") String email);
+    Call<UserAuthentication> getUserAuthToken(@Field("access_token") String access_token);
 }
