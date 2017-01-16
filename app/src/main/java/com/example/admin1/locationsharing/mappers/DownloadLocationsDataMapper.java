@@ -39,7 +39,7 @@ public class DownloadLocationsDataMapper {
             this.onTaskCompletedListener = onTaskCompletedListener;
             MyApplication.getInstance().showProgressDialog(context.getString(R.string.loading_data),context.getString(R.string.please_wait));
             LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(token);
-            Call<UserLocationsResponse> call = locationDataService.getUserLocations();
+            Call<UserLocationsResponse> call = locationDataService.getUserLocations(new SharedPreferencesData(context).getEmail());
             call.enqueue(UserLocationsResponse);
         }else {
             PositiveClick positiveClick = new PositiveClick() {
@@ -96,7 +96,6 @@ public class DownloadLocationsDataMapper {
             CustomLog.i("ParseData",userLocations.getLat());
             UserLocationsOperations.addUserLocations(MyApplication.getCurrentActivityContext(),userLocations);
         }
-
     }
     public interface OnTaskCompletedListener {
         void onTaskCompleted(UserLocationsResponse userLocationsResponse);

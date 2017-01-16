@@ -144,9 +144,9 @@ public class BackgroundLocationService extends Service implements LocationListen
 
     /**
      * Time difference threshold set for Three minute.
-     *//*
-        static final int TIME_DIFFERENCE_THRESHOLD = 3 * 60 * 1000;
-    */
+     */
+        //static final int TIME_DIFFERENCE_THRESHOLD = 3 * 60 * 1000;
+
     /**
      * Decide if new location is better than older by following some basic criteria.
      * This algorithm can be as simple or complicated as your needs dictate it.

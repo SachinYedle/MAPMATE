@@ -28,7 +28,15 @@ public class UserDataMapper {
         this.context = context;
     }
 
-    public void getUsersAuthToken(String accessToken){
+    public interface OnLoginListener {
+        void onTaskCompleted(UserAuthentication userAuthenticationResponse);
+
+        void onTaskFailed(String request);
+    }
+
+    private OnLoginListener onLoginListener;
+    public void getUsersAuthToken(OnLoginListener onLoginListener, String accessToken){
+        this.onLoginListener = onLoginListener;
         if (MyApplication.getInstance().isConnectedToInterNet()){
             UserDataService userDataService = MyApplication.getInstance().getUserDataService();
             Call<UserAuthentication> call = userDataService.getUserAuthToken(accessToken);
@@ -55,14 +63,18 @@ public class UserDataMapper {
                                                response) {
                     MyApplication.getInstance().hideProgressDialog();
                     if (response.code() == 401) {
+                        onLoginListener.onTaskFailed("Session Expired");
                         CustomLog.e("User Authentication","Session Expired");
                     } else if (response.code() == 504) {
+                        onLoginListener.onTaskFailed("Unknown Host");
                         CustomLog.e("User Authentication","Unknown Host");
                     } else if (response.code() == 503) {
+                        onLoginListener.onTaskFailed("Server down");
                         CustomLog.e("User Authentication","Server down");
                     }
                     if (response.isSuccessful()) {
                         parseUsersAuthToken(response.body());
+                        onLoginListener.onTaskCompleted(response.body());
                         CustomLog.i("Response",""+response);
                     } else {
                         CustomLog.e("UserAutToken callback","user info data service error");
@@ -73,7 +85,8 @@ public class UserDataMapper {
                 @Override
                 public void onFailure(Call<UserAuthentication> call, Throwable t) {
                     MyApplication.getInstance().hideProgressDialog();
-                    CustomLog.e("UserAutToken callback","user info data service error");
+                    onLoginListener.onTaskFailed("Nextwork Error");
+                    CustomLog.e("UserAutToken callback","Network error");
                 }
             };
 
@@ -81,6 +94,8 @@ public class UserDataMapper {
         UserAuthToken userAuthToken = userAuthentication.getUserAuthToken();
         SharedPreferencesData preferencesData = new SharedPreferencesData(context);
         preferencesData.setUserToken(userAuthToken.getToken());
+        preferencesData.setFirstName(userAuthToken.getFirstName());
+        preferencesData.setLastName(userAuthToken.getLastName());
         CustomLog.d("UserDatMapper","Token: "+preferencesData.getUserToken());
     }
 

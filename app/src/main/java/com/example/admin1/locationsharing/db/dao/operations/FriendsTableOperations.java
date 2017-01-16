@@ -41,6 +41,14 @@ public class FriendsTableOperations {
         return friendsDao.loadAll();
     }
 
+    public List<Friends> getFriendWithEmail(String email) {
+        DaoSession daoSession = MyApplication.getInstance().getReadableDaoSession(MyApplication.getCurrentActivityContext());
+        FriendsDao friendsDao = daoSession.getFriendsDao();
+        QueryBuilder<Friends> queryBuilder = friendsDao.queryBuilder();
+        queryBuilder.distinct().where(FriendsDao.Properties.Friend_email.eq(email));
+        return queryBuilder.list();
+    }
+
     public void insertFriends(Friends friends){
         DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(MyApplication.getCurrentActivityContext());
         FriendsDao friendsDao = daoSession.getFriendsDao();

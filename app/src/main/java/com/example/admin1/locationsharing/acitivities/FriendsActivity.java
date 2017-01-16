@@ -6,10 +6,12 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.adapters.FriendsRecyclerViewAdapter;
@@ -17,8 +19,14 @@ import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.db.dao.Friends;
 import com.example.admin1.locationsharing.db.dao.operations.FriendsTableOperations;
 import com.example.admin1.locationsharing.interfaces.ItemClickListener;
+import com.example.admin1.locationsharing.mappers.FriendsDataMapper;
 import com.example.admin1.locationsharing.pojo.FriendsData;
+import com.example.admin1.locationsharing.responses.FriendRequestAcceptResponse;
+import com.example.admin1.locationsharing.responses.FriendRequestResponse;
 import com.example.admin1.locationsharing.responses.FriendsResponse;
+import com.example.admin1.locationsharing.responses.FriendsServiceResponse;
+import com.example.admin1.locationsharing.utils.CustomLog;
+import com.example.admin1.locationsharing.utils.Navigator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +58,6 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
 
     private void getFriendsData(){
         MyApplication.getInstance().showProgressDialog("Loading data...","please wait");
-        FriendsTableOperations.getInstance().deleteFriendsTableData();
         List<Friends> friendsList = FriendsTableOperations.getInstance().getFriends();
         friendsDataList = new ArrayList<FriendsData>();
         setFriendsDataList(friendsList);
@@ -66,7 +73,7 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
                 friendsData.setStatus(" ");
             }else if(Integer.parseInt(friends.getRequester_id()) == Integer.parseInt(friends.getFriend_id())){
                 friendsData.setStatus("accept");
-            }else if(Integer.parseInt(friends.getRequester_id()) == Integer.parseInt(friends.getFriend_id())){
+            }else if(Integer.parseInt(friends.getRequester_id()) != Integer.parseInt(friends.getFriend_id())){
                 friendsData.setStatus("requested");
             }
             friendsDataList.add(friendsData);
@@ -90,12 +97,85 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.friends_activity_add_btn:
+                if(validateEmail()){
+                   new FriendsDataMapper().sendRequest(sendRequestListener,emailEditText.getText().toString());
+                }
                 break;
         }
     }
+    private boolean isEmailValid(CharSequence target) {
+        return target != null && android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+    }
 
+    private boolean validateEmail() {
+        boolean isValid = true;
+        String email = emailEditText.getText().toString().trim();
+        if (TextUtils.isEmpty(email)) {
+            emailEditText.setError("Email Required");
+            isValid = false;
+        } else {
+            if (!isEmailValid(email)) {
+                emailEditText.setText("");
+                emailEditText.setError("Email invalid");
+                isValid = false;
+            }
+        }
+        return isValid;
+    }
     @Override
     public void onItemClick(View view, int position) {
-
+        FriendsData friendsData = friendsDataList.get(position);
+        if(friendsData.getStatus().equals("accept")){
+            List<Friends> friendData = FriendsTableOperations.getInstance().getFriendWithEmail(friendsData.getFriendsEmail());
+            int friendRequestId = friendData.get(0).getFriend_request_id();
+            int friendId = Integer.parseInt(friendData.get(0).getFriend_id());
+            new FriendsDataMapper().acceptFriendRequest(onRequestAcceptedListener,friendRequestId,friendId);
+        }
     }
+    FriendsDataMapper.OnRequestAcceptedListener onRequestAcceptedListener = new FriendsDataMapper.OnRequestAcceptedListener() {
+        @Override
+        public void onTaskCompleted(FriendRequestAcceptResponse friendRequestAcceptResponse) {
+            if(friendRequestAcceptResponse.isSuccess()){
+                Toast.makeText(MyApplication.getCurrentActivityContext(),"Accepted",Toast.LENGTH_SHORT).show();
+                new FriendsDataMapper().getFriends(onGetFriendsDataListener);
+            }
+        }
+
+        @Override
+        public void onTaskFailed(String response) {
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"Error: "+response,Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    FriendsDataMapper.OnTaskCompletedListener onGetFriendsDataListener = new FriendsDataMapper.OnTaskCompletedListener() {
+        @Override
+        public void onTaskCompleted(FriendsServiceResponse friendsServiceResponse) {
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"Friends data Addeed: " +
+                    friendsServiceResponse.isSuccess(),Toast.LENGTH_SHORT).show();
+            finish();
+            Navigator.getInstance().navigateToFriendsActivity();
+        }
+
+        @Override
+        public void onTaskFailed(String response) {
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"Getting Friends data : "+response,Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    FriendsDataMapper.OnRequestSentListener sendRequestListener = new FriendsDataMapper.OnRequestSentListener() {
+        @Override
+        public void onTaskCompleted(FriendRequestResponse friendRequestResponse) {
+            if(friendRequestResponse.isSuccess()){
+                Toast.makeText(MyApplication.getCurrentActivityContext(),"Request Sent",Toast.LENGTH_SHORT).show();
+                new FriendsDataMapper().getFriends(onGetFriendsDataListener);
+            }else if(!friendRequestResponse.isSuccess()){
+                emailEditText.setError(friendRequestResponse.getData());
+            }
+        }
+
+        @Override
+        public void onTaskFailed(String response) {
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"Error: "+response,Toast.LENGTH_SHORT).show();
+        }
+    };
 }

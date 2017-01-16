@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
 import com.example.admin1.locationsharing.db.dao.operations.UserLastknownLocationOperations;
+import com.example.admin1.locationsharing.responses.UserAuthentication;
 import com.example.admin1.locationsharing.services.BackgroundLocationService;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.mappers.UserDataMapper;
@@ -233,11 +234,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             getPeoplesList(acct.getEmail());
 
-            new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(token);
+            new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(onLoginListener,token);
             callToBackgroundLocationService();
-
-            finish();
-            Navigator.getInstance().navigateToMapActivity();
 
             CustomLog.i("Name & Email", fullName + "&" + email);
             googleSignInButton.setVisibility(View.GONE);
@@ -248,6 +246,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private UserDataMapper.OnLoginListener onLoginListener = new UserDataMapper.OnLoginListener() {
+        @Override
+        public void onTaskCompleted(UserAuthentication userAuthenticationResponse) {
+            finish();
+            Navigator.getInstance().navigateToMapActivity();
+        }
+
+        @Override
+        public void onTaskFailed(String request) {
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"Error :"+request,Toast.LENGTH_SHORT).show();
+        }
+    };
     public void getPeoplesList(final String email) {
 
         final List<String> SCOPES =

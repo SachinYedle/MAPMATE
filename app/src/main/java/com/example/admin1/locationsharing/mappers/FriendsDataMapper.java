@@ -5,9 +5,12 @@ import android.content.Context;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.db.dao.Friends;
 import com.example.admin1.locationsharing.db.dao.operations.FriendsTableOperations;
+import com.example.admin1.locationsharing.responses.FriendRequestAcceptResponse;
+import com.example.admin1.locationsharing.responses.FriendRequestResponse;
 import com.example.admin1.locationsharing.responses.FriendsResponse;
 import com.example.admin1.locationsharing.responses.FriendsServiceResponse;
 import com.example.admin1.locationsharing.services.LocationDataService;
+import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 
 import java.util.List;
@@ -27,8 +30,18 @@ public class FriendsDataMapper {
         void onTaskCompleted(FriendsServiceResponse friendsServiceResponse);
         void onTaskFailed(String response);
     }
+    public interface OnRequestSentListener {
+        void onTaskCompleted(FriendRequestResponse friendRequestResponse);
+        void onTaskFailed(String response);
+    }
+    public interface OnRequestAcceptedListener {
+        void onTaskCompleted(FriendRequestAcceptResponse friendRequestAcceptResponse);
+        void onTaskFailed(String response);
+    }
 
     private OnTaskCompletedListener onTaskCompletedListener;
+    private OnRequestAcceptedListener onRequestAcceptedListener;
+    private OnRequestSentListener onRequestSentListener;
     public FriendsDataMapper(){
         context = MyApplication.getCurrentActivityContext();
     }
@@ -84,73 +97,73 @@ public class FriendsDataMapper {
             FriendsTableOperations.getInstance().insertFriends(friends);
         }
     }
-    public void acceptFriendRequest(OnTaskCompletedListener onTaskCompletedListener,int friendRequestId, int friendId){
+    public void acceptFriendRequest(OnRequestAcceptedListener onRequestAcceptedListener,int friendRequestId, int friendId){
         SharedPreferencesData preferencesData = new SharedPreferencesData(context);
         String token = preferencesData.getUserToken();
         if (MyApplication.getInstance().isConnectedToInterNet()){
-            this.onTaskCompletedListener = onTaskCompletedListener;
+            this.onRequestAcceptedListener = onRequestAcceptedListener;
             LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(token);
-            Call<FriendsServiceResponse> call = locationDataService.acceptRequest(friendRequestId,friendId);
+            Call<FriendRequestAcceptResponse> call = locationDataService.acceptRequest(friendRequestId,friendId);
             call.enqueue(acceptRequestCallback);
         }
     }
 
-    public void checkIfEmailRegistered(OnTaskCompletedListener onTaskCompletedListener,String email){
+    public void sendRequest(OnRequestSentListener onRequestSentListener,String email){
         SharedPreferencesData preferencesData = new SharedPreferencesData(context);
         String token = preferencesData.getUserToken();
         if (MyApplication.getInstance().isConnectedToInterNet()){
-            this.onTaskCompletedListener = onTaskCompletedListener;
+            this.onRequestSentListener = onRequestSentListener;
             LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(token);
-            Call<FriendsServiceResponse> call = locationDataService.checkIfEmailExists(email);
-            call.enqueue(checkIfExistCallback);
+            Call<FriendRequestResponse> call = locationDataService.sendRequest(email);
+            call.enqueue(sendRequestCallback);
         }
     }
 
-    private Callback<FriendsServiceResponse> acceptRequestCallback = new
-            Callback<FriendsServiceResponse>() {
+    private Callback<FriendRequestAcceptResponse> acceptRequestCallback = new
+            Callback<FriendRequestAcceptResponse>() {
                 @Override
-                public void onResponse(Call<FriendsServiceResponse> call,
-                                       Response<FriendsServiceResponse>
+                public void onResponse(Call<FriendRequestAcceptResponse> call,
+                                       Response<FriendRequestAcceptResponse>
                                                response) {
                     MyApplication.getInstance().hideProgressDialog();
                     if (response.code() == 401) {
-                        onTaskCompletedListener.onTaskFailed("session expired");
+                        onRequestAcceptedListener.onTaskFailed("session expired");
                     } else if (response.code() == 504) {
-                        onTaskCompletedListener.onTaskFailed("Unknown host");
+                        onRequestAcceptedListener.onTaskFailed("Unknown host");
                     } else if (response.code() == 503) {
-                        onTaskCompletedListener.onTaskFailed("Server down");
+                        onRequestAcceptedListener.onTaskFailed("Server down");
                     } else if (response.isSuccessful()) {
-                        onTaskCompletedListener.onTaskCompleted(response.body());
+                        onRequestAcceptedListener.onTaskCompleted(response.body());
                     }
                 }
                 @Override
-                public void onFailure(Call<FriendsServiceResponse> call, Throwable t) {
+                public void onFailure(Call<FriendRequestAcceptResponse> call, Throwable t) {
                     MyApplication.getInstance().hideProgressDialog();
-                    onTaskCompletedListener.onTaskFailed("Network error");
+                    onRequestAcceptedListener.onTaskFailed("Network error");
                 }
             };
 
-    private Callback<FriendsServiceResponse> checkIfExistCallback = new
-            Callback<FriendsServiceResponse>() {
+    private Callback<FriendRequestResponse> sendRequestCallback = new
+            Callback<FriendRequestResponse>() {
                 @Override
-                public void onResponse(Call<FriendsServiceResponse> call,
-                                       Response<FriendsServiceResponse>
+                public void onResponse(Call<FriendRequestResponse> call,
+                                       Response<FriendRequestResponse>
                                                response) {
                     MyApplication.getInstance().hideProgressDialog();
                     if (response.code() == 401) {
-                        onTaskCompletedListener.onTaskFailed("session expired");
+                        onRequestSentListener.onTaskFailed("session expired");
                     } else if (response.code() == 504) {
-                        onTaskCompletedListener.onTaskFailed("Unknown host");
+                        onRequestSentListener.onTaskFailed("Unknown host");
                     } else if (response.code() == 503) {
-                        onTaskCompletedListener.onTaskFailed("Server down");
+                        onRequestSentListener.onTaskFailed("Server down");
                     } else if (response.isSuccessful()) {
-                        onTaskCompletedListener.onTaskCompleted(response.body());
+                        onRequestSentListener.onTaskCompleted(response.body());
                     }
                 }
                 @Override
-                public void onFailure(Call<FriendsServiceResponse> call, Throwable t) {
+                public void onFailure(Call<FriendRequestResponse> call, Throwable t) {
                     MyApplication.getInstance().hideProgressDialog();
-                    onTaskCompletedListener.onTaskFailed("Network error");
+                    onRequestSentListener.onTaskFailed("Network error");
                 }
             };
 }

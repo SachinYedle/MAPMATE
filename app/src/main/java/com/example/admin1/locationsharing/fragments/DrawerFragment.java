@@ -22,7 +22,7 @@ public class DrawerFragment extends Fragment {
         View view = inflater.inflate(R.layout.drawer_layout,container,false);
         TextView userNameText = (TextView) view.findViewById(R.id.drawer_user_name_textView);
         SharedPreferencesData preferencesData = new SharedPreferencesData(getActivity());
-        userNameText.setText(preferencesData.getFirstName());
+        userNameText.setText(preferencesData.getFirstName()+ " "+preferencesData.getLastName());
         return view;
     }
 }

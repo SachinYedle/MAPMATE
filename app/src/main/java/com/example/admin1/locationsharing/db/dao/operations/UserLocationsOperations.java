@@ -27,7 +27,7 @@ public class UserLocationsOperations {
         userLocations.setLongitude(userLocationData.getLon());
         userLocations.setLatitude(userLocationData.getLat());
         userLocations.setTime(userLocationData.getTime());
-        userLocations.setRadius(userLocationData.getTime());
+        userLocations.setRadius(userLocationData.getRadius());
         userLocations.setToken(preferencesData.getSelectedUserEmail());
         userLocationsDao.insert(userLocations);
     }

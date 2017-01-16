@@ -1,6 +1,8 @@
 package com.example.admin1.locationsharing.services;
 
 import com.example.admin1.locationsharing.db.dao.UserLocations;
+import com.example.admin1.locationsharing.responses.FriendRequestAcceptResponse;
+import com.example.admin1.locationsharing.responses.FriendRequestResponse;
 import com.example.admin1.locationsharing.responses.FriendsServiceResponse;
 import com.example.admin1.locationsharing.responses.LocationSendingResponse;
 import com.example.admin1.locationsharing.responses.UserLocationsResponse;
@@ -10,6 +12,7 @@ import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 /**
@@ -24,7 +27,7 @@ public interface LocationDataService {
                                                    @Field("radius") String radius);
 
     @GET("know_where/api/v1/user/location")
-    Call<UserLocationsResponse> getUserLocations();
+    Call<UserLocationsResponse> getUserLocations(@Header("email") String email);
 
 
     @GET("know_where/api/v1/user/friends")
@@ -32,8 +35,9 @@ public interface LocationDataService {
 
     @FormUrlEncoded
     @POST("know_where/api/v1/user/friends")
-    Call<FriendsServiceResponse> checkIfEmailExists(@Field("friend_email") String email);
+    Call<FriendRequestResponse> sendRequest(@Field("friend_email") String email);
 
+    @FormUrlEncoded
     @POST("know_where/api/v1/user/update_friends")
-    Call<FriendsServiceResponse> acceptRequest(@Body int friendRequestId,@Body int friendId);
+    Call<FriendRequestAcceptResponse> acceptRequest(@Field("friend_request_id") int friendRequestId, @Field("friend_id") int friendId);
 }
