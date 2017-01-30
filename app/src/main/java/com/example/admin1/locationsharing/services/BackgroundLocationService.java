@@ -8,23 +8,23 @@ import android.Manifest;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.content.Context;
-import android.location.LocationManager;
-import android.widget.Toast;
-
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.mappers.UploadLocationsDataMapper;
 import com.example.admin1.locationsharing.responses.LocationSendingResponse;
 import com.example.admin1.locationsharing.utils.CustomLog;
-
-import static com.example.admin1.locationsharing.utils.Constants.DISTANCE_THRESHOLD;
-import static com.example.admin1.locationsharing.utils.Constants.LOCATION_DISTANCE;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import static com.example.admin1.locationsharing.utils.Constants.LOCATION_INTERVAL;
 
 /**
@@ -32,10 +32,13 @@ import static com.example.admin1.locationsharing.utils.Constants.LOCATION_INTERV
  *
  * @author cblack
  */
-public class BackgroundLocationService extends Service implements LocationListener {
-    private static final String TAG = "LocationSer";
-    private LocationManager mLocationManager = null;
+public class BackgroundLocationService extends Service implements LocationListener,
+        OnConnectionFailedListener, ConnectionCallbacks {
+    private static final String TAG = "LocationService";
+    private LocationRequest locationRequest;
     private Location oldLocation = null;
+    private GoogleApiClient googleApiClient;
+
     @Override
     public IBinder onBind(Intent arg0) {
         return null;
@@ -45,8 +48,8 @@ public class BackgroundLocationService extends Service implements LocationListen
     public int onStartCommand(Intent intent, int flags, int startId) {
         CustomLog.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
-        initializeLocationManager();
-        requestLocationUpdates(LOCATION_INTERVAL,LOCATION_DISTANCE);
+        buildGoogleApiClient();
+        googleApiClient.connect();
         return START_STICKY;
     }
 
@@ -55,124 +58,80 @@ public class BackgroundLocationService extends Service implements LocationListen
         CustomLog.e(TAG, "onCreate");
     }
 
-    private void requestLocationUpdates(int locationTimeInterval, float locationDistance){
+    /**
+     * Builds a GoogleApiClient. Uses the {@code #addApi} method to request the
+     * LocationServices API.
+     */
+    protected synchronized void buildGoogleApiClient() {
+        CustomLog.i(TAG, "Building GoogleApiClient");
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        createLocationRequest();
+    }
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-            CustomLog.d(TAG,"Location Request:"+getProviderName());
+    protected void createLocationRequest() {
+        CustomLog.i(TAG, "createlocationRequest");
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(LOCATION_INTERVAL);
+        locationRequest.setFastestInterval(LOCATION_INTERVAL / 2);
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+    }
 
-            mLocationManager.requestLocationUpdates(getProviderName(), locationTimeInterval,
-                    locationDistance, this);
-
-        }else {
-            Toast.makeText(MyApplication.getCurrentActivityContext(),"Please grant Location permissions",Toast.LENGTH_SHORT).show();
+    protected void startLocationUpdates() {
+        CustomLog.i(TAG, "StartLocationUpdates");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         }
     }
 
-    String getProviderName() {
-        LocationManager locationManager = (LocationManager) this
-                .getSystemService(Context.LOCATION_SERVICE);
-
-        Criteria criteria = new Criteria();
-        criteria.setPowerRequirement(Criteria.POWER_LOW); // Chose your desired power consumption level.
-        criteria.setAccuracy(Criteria.ACCURACY_FINE); // Choose your accuracy requirement.
-        criteria.setSpeedRequired(true); // Chose if speed for first location fix is required.
-        criteria.setAltitudeRequired(false); // Choose if you use altitude.
-        criteria.setBearingRequired(false); // Choose if you use bearing.
-        criteria.setCostAllowed(false); // Choose if this provider can waste money :-)
-
-        // Provide your criteria and flag enabledOnly that tells
-        // LocationManager only to return active providers.
-        return locationManager.getBestProvider(criteria, true);
+    protected void stopLocationUpdates() {
+        CustomLog.i(TAG, "StopLocationUpdates");
+        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
     }
 
     @Override
     public void onDestroy() {
-        CustomLog.d(TAG,"OnDestroy");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            mLocationManager.removeUpdates(this);
-        }else {
-            Toast.makeText(MyApplication.getCurrentActivityContext(),"Please grant Location permissions",Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void initializeLocationManager() {
-        CustomLog.e(TAG, "initializeLocationManager");
-        if (mLocationManager == null) {
-            mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        }
+        CustomLog.i(TAG, "onDestroy");
+        googleApiClient.disconnect();
+        stopLocationUpdates();
     }
 
     @Override
     public void onLocationChanged(Location location) {
         CustomLog.e(TAG, "onLocationChanged: " + location.getLatitude() + " " + location.getLongitude() + " " + location.getAccuracy());
-        //if(isBetterLocation(oldLocation,location)){
-            //Toast.makeText(MyApplication.getCurrentActivityContext(),"onLocationChanged: " + location.getLatitude() + " " + location.getLongitude() + " " + location.getAccuracy(),Toast.LENGTH_SHORT).show();
-            UploadLocationsDataMapper uploadLocationsDataMapper = new UploadLocationsDataMapper(MyApplication.getCurrentActivityContext());
-            uploadLocationsDataMapper.sendUserLocation(onTaskCompletedListener, "" + location.getLatitude(), "" + location.getLongitude(), location.getAccuracy() + "");
-            oldLocation = location;
-        //}
+        UploadLocationsDataMapper uploadLocationsDataMapper = new UploadLocationsDataMapper(MyApplication.getCurrentActivityContext());
+        uploadLocationsDataMapper.sendUserLocation(onTaskCompletedListener, "" + location.getLatitude(), "" + location.getLongitude(), location.getAccuracy() + "");
+        oldLocation = location;
     }
 
-    @Override
-    public void onStatusChanged(String provider, int i, Bundle bundle) {
-        CustomLog.e(TAG, "onStatusChanged: " + provider);
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        CustomLog.e(TAG, "onProviderEnabled: " + provider);
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        CustomLog.e(TAG, "onProviderDisabled: " + provider);
-    }
 
     private UploadLocationsDataMapper.OnTaskCompletedListener onTaskCompletedListener = new UploadLocationsDataMapper.OnTaskCompletedListener() {
         @Override
         public void onTaskCompleted(LocationSendingResponse locationSendingResponse) {
-            CustomLog.i(TAG,"Location updated");
+            CustomLog.i(TAG, "FriendLocation updated");
         }
 
         @Override
         public void onTaskFailed(String response) {
-            CustomLog.i(TAG,"Location sending error"+response);
+            CustomLog.i(TAG, "FriendLocation sending error" + response);
         }
     };
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        CustomLog.i(TAG, "onConnected");
+        startLocationUpdates();
+    }
 
-    /**
-     * Time difference threshold set for Three minute.
-     */
-        //static final int TIME_DIFFERENCE_THRESHOLD = 3 * 60 * 1000;
+    @Override
+    public void onConnectionSuspended(int i) {
+        googleApiClient.connect();
+    }
 
-    /**
-     * Decide if new location is better than older by following some basic criteria.
-     * This algorithm can be as simple or complicated as your needs dictate it.
-     * Try experimenting and get your best location strategy algorithm.
-     *
-     * @param oldLocation Old location used for comparison.
-     * @param newLocation Newly acquired location compared to old one.
-     * @return If new location is more accurate and suits your criteria more than the old one.
-     */
-    boolean isBetterLocation(Location oldLocation, Location newLocation) {
-        // If there is no old location, of course the new location is better.
-        if(oldLocation == null) {
-            CustomLog.d(TAG,"Old location null");
-            return true;
-        }
-
-        // check for distance change if it is more than interval distance
-        float distance = oldLocation.distanceTo(newLocation);
-        CustomLog.d(TAG,"distance: "+distance);
-        //Toast.makeText(MyApplication.getCurrentActivityContext(),"Distance: "+distance,Toast.LENGTH_SHORT).show();
-        // Check if new location is newer in time.
-        boolean isNewer = newLocation.getTime() > oldLocation.getTime();
-
-        if(isNewer && distance > DISTANCE_THRESHOLD){
-            return true;
-        }
-        return false;
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        CustomLog.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + connectionResult.getErrorCode());
     }
 }

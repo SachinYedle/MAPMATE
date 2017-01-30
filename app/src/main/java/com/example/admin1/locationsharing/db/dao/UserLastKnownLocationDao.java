@@ -24,8 +24,8 @@ public class UserLastKnownLocationDao extends AbstractDao<UserLastKnownLocation,
     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property Name = new Property(1, String.class, "name", false, "NAME");
-        public final static Property Token = new Property(2, String.class, "token", false, "TOKEN");
+        public final static Property Friend_first_name = new Property(1, String.class, "friend_first_name", false, "FRIEND_FIRST_NAME");
+        public final static Property Email = new Property(2, String.class, "email", false, "EMAIL");
         public final static Property Latitude = new Property(3, String.class, "latitude", false, "LATITUDE");
         public final static Property Longitude = new Property(4, String.class, "longitude", false, "LONGITUDE");
         public final static Property Time = new Property(5, String.class, "time", false, "TIME");
@@ -45,8 +45,8 @@ public class UserLastKnownLocationDao extends AbstractDao<UserLastKnownLocation,
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"USER_LAST_KNOWN_LOCATION\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "\"NAME\" TEXT," + // 1: name
-                "\"TOKEN\" TEXT," + // 2: token
+                "\"FRIEND_FIRST_NAME\" TEXT," + // 1: friend_first_name
+                "\"EMAIL\" TEXT," + // 2: email
                 "\"LATITUDE\" TEXT," + // 3: latitude
                 "\"LONGITUDE\" TEXT," + // 4: longitude
                 "\"TIME\" TEXT);"); // 5: time
@@ -68,14 +68,14 @@ public class UserLastKnownLocationDao extends AbstractDao<UserLastKnownLocation,
             stmt.bindLong(1, id);
         }
  
-        String name = entity.getName();
-        if (name != null) {
-            stmt.bindString(2, name);
+        String friend_first_name = entity.getFriend_first_name();
+        if (friend_first_name != null) {
+            stmt.bindString(2, friend_first_name);
         }
  
-        String token = entity.getToken();
-        if (token != null) {
-            stmt.bindString(3, token);
+        String email = entity.getEmail();
+        if (email != null) {
+            stmt.bindString(3, email);
         }
  
         String latitude = entity.getLatitude();
@@ -105,8 +105,8 @@ public class UserLastKnownLocationDao extends AbstractDao<UserLastKnownLocation,
     public UserLastKnownLocation readEntity(Cursor cursor, int offset) {
         UserLastKnownLocation entity = new UserLastKnownLocation( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // token
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // friend_first_name
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // email
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // latitude
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // longitude
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // time
@@ -118,8 +118,8 @@ public class UserLastKnownLocationDao extends AbstractDao<UserLastKnownLocation,
     @Override
     public void readEntity(Cursor cursor, UserLastKnownLocation entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setToken(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setFriend_first_name(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setEmail(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setLatitude(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setLongitude(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setTime(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));

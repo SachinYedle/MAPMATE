@@ -31,6 +31,7 @@ import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
 import com.example.admin1.locationsharing.db.dao.UserLocations;
+import com.example.admin1.locationsharing.db.dao.operations.FriendsTableOperations;
 import com.example.admin1.locationsharing.db.dao.operations.UserLastknownLocationOperations;
 import com.example.admin1.locationsharing.db.dao.operations.UserLocationsOperations;
 import com.example.admin1.locationsharing.fragments.DrawerFragment;
@@ -69,8 +70,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class MapActivity extends DrawerActivity implements GoogleApiClient.OnConnectionFailedListener,
         LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener,LocationSource,GoogleMap.OnMapLoadedCallback,OnMapReadyCallback {
@@ -82,6 +90,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     private LocationRequest locationRequest;
     private SharedPreferencesData sharedPreferencesData;
     private static long back_pressed;
+    private boolean isRouteVisible;
     private OnLocationChangedListener mMapLocationListener = null;
     private static final String BROADCAST_ACTION = "android.location.PROVIDERS_CHANGED";
     private static final int REQUEST_CHECK_SETTINGS = 0x1;
@@ -143,8 +152,9 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
     FriendsDataMapper.OnTaskCompletedListener onGetFriendsDataListener = new FriendsDataMapper.OnTaskCompletedListener() {
         @Override
         public void onTaskCompleted(FriendsServiceResponse friendsServiceResponse) {
-            Toast.makeText(MyApplication.getCurrentActivityContext(),"Friends data Addeed: " +
-                    friendsServiceResponse.isSuccess(),Toast.LENGTH_SHORT).show();
+            /*Toast.makeText(MyApplication.getCurrentActivityContext(),"Friends data Addeed: " +
+                    friendsServiceResponse.isSuccess(),Toast.LENGTH_SHORT).show();*/
+            setFriendsLocationMarkers();
         }
 
         @Override
@@ -178,7 +188,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) || locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             CustomLog.e("About GPS", "GPS is Enabled in your device");
         } else {
-            //If GPS turned OFF show Location Dialog
+            //If GPS turned OFF show FriendLocation Dialog
             showLocationSettingDialog();
             CustomLog.e("About GPS", "GPS is Disabled in your device");
         }
@@ -223,73 +233,74 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         CustomLog.d("MapActivity","Radius"+location.getAccuracy());
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         /*googleMap.addMarker(new MarkerOptions().position(latLng)
-                .draggable(false));
-        */
+                .draggable(false));*/
     }
 
     private DownloadLocationsDataMapper.OnTaskCompletedListener onTaskCompletedListener = new DownloadLocationsDataMapper.OnTaskCompletedListener() {
         @Override
         public void onTaskCompleted(UserLocationsResponse userLocationsResponse) {
             SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
-            String token = preferencesData.getSelectedUserEmail();
-            CustomLog.i("Map Activity","Download Locations"+userLocationsResponse.getSuccess()+":"+token);
-            drawRouteOfSelectedUser(token);
+            String email = preferencesData.getSelectedUserEmail();
+            CustomLog.i("Map Activity","Download Locations"+userLocationsResponse.getSuccess()+":"+email);
+            drawRouteOfSelectedUser(email);
         }
 
         @Override
         public void onTaskFailed(String response) {
-            Toast.makeText(MyApplication.getCurrentActivityContext(),"Location download Failed "+response,Toast.LENGTH_SHORT).show();
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"FriendLocation download Failed "+response,Toast.LENGTH_SHORT).show();
         }
     };
     public void getUserLocations(Marker marker){
-        String token = null;
+        String email = null;
         if(marker.getTitle() !=null ){
             String [] tokenArrray = marker.getTitle().split(" ");
-            token = tokenArrray[tokenArrray.length -1];
+            email = tokenArrray[tokenArrray.length -1];
         }
 
         SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
-        preferencesData.setSelectedUserEmail(token);
+        preferencesData.setSelectedUserEmail(email);
 
-        CustomLog.d("Marker id","ID:"+ token);
+        CustomLog.d("Marker id","Email:"+ email);
         DownloadLocationsDataMapper dataMapper = new DownloadLocationsDataMapper(MyApplication.getCurrentActivityContext());
-
-        dataMapper.getLocations(onTaskCompletedListener,token);
+        dataMapper.getLocations(onTaskCompletedListener,FriendsTableOperations.getInstance().getFriendId(email));
     }
 
     public void setFriendsLocationMarkers(){
+        googleMap.clear();
+        isRouteVisible = false;
         MyApplication.getInstance().hideProgressDialog();
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        List<UserLastKnownLocation> locationList = UserLastknownLocationOperations.getUserLastKnownLocation(MyApplication.getCurrentActivityContext());
+        List<UserLastKnownLocation> locationList = UserLastknownLocationOperations.getInstance().getUserLastKnownLocation();
         if(locationList.size() >= 0){
             for (int i=0;i<locationList.size();i++){
-                Double latitude = Double.parseDouble(locationList.get(i).getLatitude());
-                Double longitude = Double.parseDouble(locationList.get(i).getLongitude());
+                if(locationList.get(i).getLatitude() != null && locationList.get(i).getLongitude() != null){
+                    Double latitude = Double.parseDouble(locationList.get(i).getLatitude());
+                    Double longitude = Double.parseDouble(locationList.get(i).getLongitude());
 
-                LatLng latLng = new LatLng(latitude, longitude);
-                googleMap.addMarker(new MarkerOptions().position(latLng)
-                        .draggable(false).title(""+locationList.get(i).getToken()));
-                builder.include(latLng);
+                    LatLng latLng = new LatLng(latitude, longitude);
+                    googleMap.addMarker(new MarkerOptions().position(latLng)
+                            .draggable(false).title(""+locationList.get(i).getEmail()));
+                    builder.include(latLng);
+                }
             }
             googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 48));
         }
     }
 
-    public void drawRouteOfSelectedUser(String token){
+    public void drawRouteOfSelectedUser(String email){
         googleMap.clear();
-
-        CustomLog.i("Map Activity","draw route");
+        isRouteVisible = true;
         ArrayList<LatLng> points = new ArrayList<LatLng>();
         PolylineOptions lineOptions = new PolylineOptions();
-        List<UserLocations> locations = UserLocationsOperations.getUserLocations(MyApplication.getCurrentActivityContext(),token);
-        CustomLog.i("Map Activity","draw route size"+locations.size());
+        List<UserLocations> locations = UserLocationsOperations.getInstance()
+                .getUserLocations(email);
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (int i = 0; i < locations.size(); i++) {
             double lat = Double.parseDouble(locations.get(i).getLatitude());
             double lng = Double.parseDouble(locations.get(i).getLongitude());
             LatLng position = new LatLng(lat, lng);
-            CustomLog.i("Data",lat+" "+lng+" "+locations.get(i).getToken());
+            CustomLog.i("Data",lat+" "+lng+" "+locations.get(i).getEmail());
             builder.include(position);
             points.add(position);
         }
@@ -312,19 +323,20 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
                     .position(position)
                     .title("End")
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.end)));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 48));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 15));
         }
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        String email = null;
+        if(marker.getTitle() !=null ){
+            String [] tokenArrray = marker.getTitle().split(" ");
+            email = tokenArrray[tokenArrray.length -1];
+        }
 
-        String latitude = ""+marker.getPosition().latitude;
-        String  longitude = ""+marker.getPosition().longitude;
-
-        final List<UserLastKnownLocation> userData = UserLastknownLocationOperations
-                .getUserWithLatLng(MyApplication.getCurrentActivityContext(), latitude,longitude);
-
+        final List<UserLastKnownLocation> userData = UserLastknownLocationOperations.getInstance()
+                .getUserLastKnownLocationWithEmail(email);
         GoogleMap.InfoWindowAdapter infoWindowAdapter = new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
@@ -338,8 +350,24 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
                 TextView userId = (TextView)view.findViewById(R.id.user_id);
                 TextView userPhone = (TextView)view.findViewById(R.id.user_phone);
                 if(userData.size() > 0){
-                    userId.setText(userData.get(0).getToken());
-                    userPhone.setText(userData.get(0).getName());
+                    userId.setText(userData.get(0).getEmail());
+                    String dateStr = userData.get(0).getTime();
+                    DateFormat readFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+
+                    DateFormat writeFormat = new SimpleDateFormat("dd-MMM-yy hh:mm:ss aa");
+                    writeFormat.setTimeZone(TimeZone.getTimeZone("IST"));
+                    Date date = null;
+                    try {
+                        date = readFormat.parse( dateStr );
+                    } catch ( ParseException e ) {
+                        e.printStackTrace();
+                    }
+
+                    String formattedDate = "";
+                    if( date != null ) {
+                        formattedDate = writeFormat.format( date );
+                    }
+                    userPhone.setText(formattedDate);
                 }
                 else {
                     userId.setText( sharedPreferencesData.getFirstName());
@@ -351,23 +379,17 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         googleMap.setInfoWindowAdapter(infoWindowAdapter);
         return false;
     }
-
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-
-        if (getFragmentManager().getBackStackEntryCount() > 0) {
-            getFragmentManager().popBackStack();
-        } else {
-            if (back_pressed + 2000 > System.currentTimeMillis()){
-                super.onBackPressed();
-            }
-            else {
-                finish();
-                Navigator.getInstance().navigateToMapActivity();
-                Toast.makeText(getBaseContext(), "Press once again to exit!", Toast.LENGTH_SHORT).show();
-                back_pressed = System.currentTimeMillis();
-            }
+        if(isRouteVisible){
+            setFriendsLocationMarkers();
+        }
+        if (back_pressed + 2000 > System.currentTimeMillis()){
+            super.onBackPressed();
+        }
+        else {
+            Toast.makeText(getBaseContext(), "Press once again to exit!", Toast.LENGTH_SHORT).show();
+            back_pressed = System.currentTimeMillis();
         }
     }
 
@@ -411,7 +433,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
             googleMap.setMyLocationEnabled(true);
             googleMap.setOnMapLoadedCallback(this);
         }else {
-            Toast.makeText(MyApplication.getCurrentActivityContext(),"Please grant Location permissions",Toast.LENGTH_SHORT).show();
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"Please grant FriendLocation permissions",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -421,14 +443,14 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            //If Action is Location
+            //If Action is FriendLocation
             if (intent.getAction().matches(BROADCAST_ACTION)) {
                 LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
                 //Check if GPS/locations is turned ON or OFF
                 if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) || locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                     CustomLog.e("About GPS", "GPS is Enabled in your device");
                 } else {
-                    //If GPS turned OFF show Location Dialog
+                    //If GPS turned OFF show FriendLocation Dialog
                     showLocationSettingDialog();
                     CustomLog.e("About GPS", "GPS is Disabled in your device");
                 }
@@ -436,10 +458,10 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
         }
     };
 
-    /* Show Location Access Dialog */
+    /* Show FriendLocation Access Dialog */
     private void showLocationSettingDialog() {
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);//Setting priotity of Location request to high
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);//Setting priotity of FriendLocation request to high
         locationRequest.setInterval(30 * 1000);
         locationRequest.setFastestInterval(5 * 1000);//5 sec Time interval for location update
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
@@ -459,7 +481,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
                         // requests here.
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        // Location settings are not satisfied. But could be fixed by showing the user
+                        // FriendLocation settings are not satisfied. But could be fixed by showing the user
                         // a dialog.
                         try {
                             // Show the dialog by calling startResolutionForResult(),
@@ -471,7 +493,7 @@ public class MapActivity extends DrawerActivity implements GoogleApiClient.OnCon
                         }
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        // Location settings are not satisfied. However, we have no way to fix the
+                        // FriendLocation settings are not satisfied. However, we have no way to fix the
                         // settings so we won't show the dialog.
                         break;
                 }

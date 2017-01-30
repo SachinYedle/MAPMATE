@@ -24,7 +24,7 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property Token = new Property(1, String.class, "token", false, "TOKEN");
+        public final static Property Email = new Property(1, String.class, "email", false, "EMAIL");
         public final static Property Latitude = new Property(2, String.class, "latitude", false, "LATITUDE");
         public final static Property Longitude = new Property(3, String.class, "longitude", false, "LONGITUDE");
         public final static Property Radius = new Property(4, String.class, "radius", false, "RADIUS");
@@ -45,7 +45,7 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"USER_LOCATIONS\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "\"TOKEN\" TEXT," + // 1: token
+                "\"EMAIL\" TEXT," + // 1: email
                 "\"LATITUDE\" TEXT," + // 2: latitude
                 "\"LONGITUDE\" TEXT," + // 3: longitude
                 "\"RADIUS\" TEXT," + // 4: radius
@@ -68,9 +68,9 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
             stmt.bindLong(1, id);
         }
  
-        String token = entity.getToken();
-        if (token != null) {
-            stmt.bindString(2, token);
+        String email = entity.getEmail();
+        if (email != null) {
+            stmt.bindString(2, email);
         }
  
         String latitude = entity.getLatitude();
@@ -105,7 +105,7 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
     public UserLocations readEntity(Cursor cursor, int offset) {
         UserLocations entity = new UserLocations( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // token
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // email
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // latitude
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // longitude
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // radius
@@ -118,7 +118,7 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
     @Override
     public void readEntity(Cursor cursor, UserLocations entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setToken(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setEmail(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setLatitude(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setLongitude(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setRadius(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));

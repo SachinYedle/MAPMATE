@@ -39,6 +39,7 @@ public class UserDataMapper {
         this.onLoginListener = onLoginListener;
         if (MyApplication.getInstance().isConnectedToInterNet()){
             UserDataService userDataService = MyApplication.getInstance().getUserDataService();
+            MyApplication.getInstance().showProgressDialog("Please wait","Logging in...");
             Call<UserAuthentication> call = userDataService.getUserAuthToken(accessToken);
             call.enqueue(userAuthToken);
         }else {

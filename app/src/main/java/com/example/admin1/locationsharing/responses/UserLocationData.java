@@ -12,6 +12,11 @@ public class UserLocationData {
     @Expose
     private String time;
 
+
+    @SerializedName("friend_id")
+    @Expose
+    private String friendId;
+
     @SerializedName("lat")
     @Expose
     private String lat;
@@ -23,6 +28,14 @@ public class UserLocationData {
     @SerializedName("radius")
     @Expose
     private String radius;
+
+    @SerializedName("status")
+    @Expose
+    private String status;
+
+    @SerializedName("user_id")
+    @Expose
+    private String userId;
 
     public void setTime(String time) {
         this.time = time;
@@ -54,5 +67,29 @@ public class UserLocationData {
 
     public String getTime() {
         return time;
+    }
+
+    public String getFriendId() {
+        return friendId;
+    }
+
+    public void setFriendId(String friendId) {
+        this.friendId = friendId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

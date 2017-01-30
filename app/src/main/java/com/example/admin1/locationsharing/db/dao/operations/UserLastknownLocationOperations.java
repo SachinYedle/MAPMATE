@@ -16,34 +16,43 @@ import de.greenrobot.dao.query.QueryBuilder;
  */
 
 public class UserLastknownLocationOperations {
-    public static List<UserLastKnownLocation> getUserLastKnownLocation(Context context, String token) {
-        DaoSession daoSession = MyApplication.getInstance().getReadableDaoSession(context);
+
+    private static UserLastknownLocationOperations instance = null;
+    public static UserLastknownLocationOperations getInstance() {
+        if (instance == null) {
+            instance = new UserLastknownLocationOperations();
+        }
+        return instance;
+    }
+
+    public List<UserLastKnownLocation> getUserLastKnownLocationWithEmail(String email) {
+        DaoSession daoSession = MyApplication.getInstance().getReadableDaoSession(MyApplication.getCurrentActivityContext());
         UserLastKnownLocationDao userLastKnownLocationDao = daoSession.getUserLastKnownLocationDao();
         QueryBuilder<UserLastKnownLocation> queryBuilder = userLastKnownLocationDao.queryBuilder();
-        queryBuilder.distinct().where(UserLastKnownLocationDao.Properties.Token.eq(token));
+        queryBuilder.distinct().where(UserLastKnownLocationDao.Properties.Email.eq(email));
         return queryBuilder.list();
     }
 
-    public static void insertUsersLastKnownLocation(Context context,UserLastKnownLocation userLastKnownLocation){
-        DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(context);
+    public void insertUsersLastKnownLocation(UserLastKnownLocation userLastKnownLocation){
+        DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(MyApplication.getCurrentActivityContext());
         UserLastKnownLocationDao userLastKnownLocationDao = daoSession.getUserLastKnownLocationDao();
         userLastKnownLocationDao.insert(userLastKnownLocation);
     }
 
-    public static void deleteTableData(Context context){
-        DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(context);
+    public void deleteUserLastKnownData(){
+        DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(MyApplication.getCurrentActivityContext());
         UserLastKnownLocationDao userLastKnownLocationDao = daoSession.getUserLastKnownLocationDao();
         userLastKnownLocationDao.deleteAll();
     }
 
-    public static List<UserLastKnownLocation> getUserLastKnownLocation(Context context) {
-        DaoSession daoSession = MyApplication.getInstance().getReadableDaoSession(context);
+    public List<UserLastKnownLocation> getUserLastKnownLocation() {
+        DaoSession daoSession = MyApplication.getInstance().getReadableDaoSession(MyApplication.getCurrentActivityContext());
         UserLastKnownLocationDao userLastKnownLocationDao = daoSession.getUserLastKnownLocationDao();
         return userLastKnownLocationDao.loadAll();
     }
 
-    public static List<UserLastKnownLocation> getUserWithLatLng(Context context, String latitude,String longitude) {
-        DaoSession daoSession = MyApplication.getInstance().getReadableDaoSession(context);
+    public List<UserLastKnownLocation> getUserWithLatLng(String latitude,String longitude) {
+        DaoSession daoSession = MyApplication.getInstance().getReadableDaoSession(MyApplication.getCurrentActivityContext());
         UserLastKnownLocationDao userLastKnownLocationDao = daoSession.getUserLastKnownLocationDao();
         QueryBuilder<UserLastKnownLocation> queryBuilder = userLastKnownLocationDao.queryBuilder();
         queryBuilder.distinct().where(UserLastKnownLocationDao.Properties.Latitude.eq(latitude),UserLastKnownLocationDao.Properties.Longitude.eq(longitude));

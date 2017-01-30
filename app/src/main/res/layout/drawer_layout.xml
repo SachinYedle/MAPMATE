@@ -11,6 +11,7 @@
         android:padding="@dimen/drawer_header_padding">
         <TextView
             android:id="@+id/welcome_textView"
+            android:layout_width="match_parent"
             style="@style/small_text_textview"
             android:text="@string/welcome"
             android:gravity="center"

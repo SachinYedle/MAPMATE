@@ -4,7 +4,9 @@ import android.content.Context;
 
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.db.dao.Friends;
+import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
 import com.example.admin1.locationsharing.db.dao.operations.FriendsTableOperations;
+import com.example.admin1.locationsharing.db.dao.operations.UserLastknownLocationOperations;
 import com.example.admin1.locationsharing.responses.FriendRequestAcceptResponse;
 import com.example.admin1.locationsharing.responses.FriendRequestResponse;
 import com.example.admin1.locationsharing.responses.FriendsResponse;
@@ -70,7 +72,7 @@ public class FriendsDataMapper {
                         onTaskCompletedListener.onTaskFailed("Unknown host");
                     } else if (response.code() == 503) {
                         onTaskCompletedListener.onTaskFailed("Server down");
-                    } else if (response.isSuccessful()) {
+                    } else if (response.isSuccessful() && response.code() == 200) {
                         parseFriendsData(response.body());
                         onTaskCompletedListener.onTaskCompleted(response.body());
                     }
@@ -84,17 +86,28 @@ public class FriendsDataMapper {
 
     private void parseFriendsData(FriendsServiceResponse friendsServiceResponse){
         FriendsTableOperations.getInstance().deleteFriendsTableData();
+        UserLastknownLocationOperations.getInstance().deleteUserLastKnownData();
         List<FriendsResponse> friendsResponseList = friendsServiceResponse.getFriendsResponseList();
         FriendsResponse friendsResponse;
         for (int i = 0; i < friendsResponseList.size(); i++){
             friendsResponse = friendsResponseList.get(i);
             Friends friends = new Friends();
             friends.setFriend_email(friendsResponse.getFriendEmail());
+            friends.setFriend_first_name(friendsResponse.getFriendFirstName());
             friends.setFriend_id(friendsResponse.getFriendId());
             friends.setStatus(""+friendsResponse.getStatus());
             friends.setFriend_request_id(Integer.parseInt(friendsResponse.getFriendRequestId()));
             friends.setRequester_id(friendsResponse.getRequesterId());
             FriendsTableOperations.getInstance().insertFriends(friends);
+            if(friendsResponse.getStatus() == 1){
+                UserLastKnownLocation userLastKnownLocation = new UserLastKnownLocation ();
+                userLastKnownLocation.setFriend_first_name(friendsResponse.getFriendFirstName());
+                userLastKnownLocation.setEmail(friendsResponse.getFriendEmail());
+                userLastKnownLocation.setLatitude(friendsResponse.getFriendLocation().getLat());
+                userLastKnownLocation.setLongitude(friendsResponse.getFriendLocation().getLon());
+                userLastKnownLocation.setTime(friendsResponse.getUpdatedAt());
+                UserLastknownLocationOperations.getInstance().insertUsersLastKnownLocation(userLastKnownLocation);
+            }
         }
     }
     public void acceptFriendRequest(OnRequestAcceptedListener onRequestAcceptedListener,int friendRequestId, int friendId){
@@ -132,7 +145,7 @@ public class FriendsDataMapper {
                         onRequestAcceptedListener.onTaskFailed("Unknown host");
                     } else if (response.code() == 503) {
                         onRequestAcceptedListener.onTaskFailed("Server down");
-                    } else if (response.isSuccessful()) {
+                    } else if (response.isSuccessful() && response.code() == 200) {
                         onRequestAcceptedListener.onTaskCompleted(response.body());
                     }
                 }
@@ -156,7 +169,7 @@ public class FriendsDataMapper {
                         onRequestSentListener.onTaskFailed("Unknown host");
                     } else if (response.code() == 503) {
                         onRequestSentListener.onTaskFailed("Server down");
-                    } else if (response.isSuccessful()) {
+                    } else if (response.isSuccessful() && response.code() == 200) {
                         onRequestSentListener.onTaskCompleted(response.body());
                     }
                 }

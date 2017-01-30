@@ -7,8 +7,8 @@ package com.example.admin1.locationsharing.db.dao;
 public class UserLastKnownLocation {
 
     private Long id;
-    private String name;
-    private String token;
+    private String friend_first_name;
+    private String email;
     private String latitude;
     private String longitude;
     private String time;
@@ -20,10 +20,10 @@ public class UserLastKnownLocation {
         this.id = id;
     }
 
-    public UserLastKnownLocation(Long id, String name, String token, String latitude, String longitude, String time) {
+    public UserLastKnownLocation(Long id, String friend_first_name, String email, String latitude, String longitude, String time) {
         this.id = id;
-        this.name = name;
-        this.token = token;
+        this.friend_first_name = friend_first_name;
+        this.email = email;
         this.latitude = latitude;
         this.longitude = longitude;
         this.time = time;
@@ -37,20 +37,20 @@ public class UserLastKnownLocation {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFriend_first_name() {
+        return friend_first_name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFriend_first_name(String friend_first_name) {
+        this.friend_first_name = friend_first_name;
     }
 
-    public String getToken() {
-        return token;
+    public String getEmail() {
+        return email;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getLatitude() {

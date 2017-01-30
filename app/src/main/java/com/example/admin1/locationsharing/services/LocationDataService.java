@@ -14,6 +14,8 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * Created by admin1 on 19/12/16.
@@ -26,8 +28,8 @@ public interface LocationDataService {
                                                    @Field("lon") String lon,
                                                    @Field("radius") String radius);
 
-    @GET("know_where/api/v1/user/location")
-    Call<UserLocationsResponse> getUserLocations(@Header("email") String email);
+    @GET("know_where/api/v1/user/friend_location")
+    Call<UserLocationsResponse> getUserLocations(@Query("friend_id") int friendId);
 
 
     @GET("know_where/api/v1/user/friends")

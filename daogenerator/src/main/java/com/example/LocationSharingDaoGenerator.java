@@ -16,6 +16,7 @@ public class LocationSharingDaoGenerator {
         Entity entity = schema.addEntity("Friends");
         entity.addIdProperty().primaryKey().autoincrement();
         entity.addStringProperty("friend_email");
+        entity.addStringProperty("friend_first_name");
         entity.addStringProperty("friend_id");
         entity.addIntProperty("friend_request_id");
         entity.addStringProperty("requester_id");
@@ -25,7 +26,7 @@ public class LocationSharingDaoGenerator {
     public static void addUserLocationsTable(Schema schema){
         Entity entity = schema.addEntity("UserLocations");
         entity.addIdProperty().primaryKey().autoincrement();
-        entity.addStringProperty("token");
+        entity.addStringProperty("email");
         entity.addStringProperty("latitude");
         entity.addStringProperty("longitude");
         entity.addStringProperty("radius");
@@ -34,8 +35,8 @@ public class LocationSharingDaoGenerator {
     public static void addUserLastKnownLocationTable(Schema schema){
         Entity entity = schema.addEntity("UserLastKnownLocation");
         entity.addIdProperty().primaryKey().autoincrement();
-        entity.addStringProperty("name");
-        entity.addStringProperty("token");
+        entity.addStringProperty("friend_first_name");
+        entity.addStringProperty("email");
         entity.addStringProperty("latitude");
         entity.addStringProperty("longitude");
         entity.addStringProperty("time");

@@ -98,7 +98,12 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
         switch (view.getId()){
             case R.id.friends_activity_add_btn:
                 if(validateEmail()){
-                   new FriendsDataMapper().sendRequest(sendRequestListener,emailEditText.getText().toString());
+                    if(FriendsTableOperations.getInstance().getFriendWithEmail(emailEditText.getText().toString()).size() <= 0){
+                        new FriendsDataMapper().sendRequest(sendRequestListener,emailEditText.getText().toString());
+                    }else {
+                        emailEditText.setError("User Already added");
+                    }
+
                 }
                 break;
         }
@@ -150,8 +155,8 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
     FriendsDataMapper.OnTaskCompletedListener onGetFriendsDataListener = new FriendsDataMapper.OnTaskCompletedListener() {
         @Override
         public void onTaskCompleted(FriendsServiceResponse friendsServiceResponse) {
-            Toast.makeText(MyApplication.getCurrentActivityContext(),"Friends data Addeed: " +
-                    friendsServiceResponse.isSuccess(),Toast.LENGTH_SHORT).show();
+            /*Toast.makeText(MyApplication.getCurrentActivityContext(),"Friends data Addeed: " +
+                    friendsServiceResponse.isSuccess(),Toast.LENGTH_SHORT).show();*/
             finish();
             Navigator.getInstance().navigateToFriendsActivity();
         }

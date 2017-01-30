@@ -25,10 +25,11 @@ public class FriendsDao extends AbstractDao<Friends, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Friend_email = new Property(1, String.class, "friend_email", false, "FRIEND_EMAIL");
-        public final static Property Friend_id = new Property(2, String.class, "friend_id", false, "FRIEND_ID");
-        public final static Property Friend_request_id = new Property(3, Integer.class, "friend_request_id", false, "FRIEND_REQUEST_ID");
-        public final static Property Requester_id = new Property(4, String.class, "requester_id", false, "REQUESTER_ID");
-        public final static Property Status = new Property(5, String.class, "status", false, "STATUS");
+        public final static Property Friend_first_name = new Property(2, String.class, "friend_first_name", false, "FRIEND_FIRST_NAME");
+        public final static Property Friend_id = new Property(3, String.class, "friend_id", false, "FRIEND_ID");
+        public final static Property Friend_request_id = new Property(4, Integer.class, "friend_request_id", false, "FRIEND_REQUEST_ID");
+        public final static Property Requester_id = new Property(5, String.class, "requester_id", false, "REQUESTER_ID");
+        public final static Property Status = new Property(6, String.class, "status", false, "STATUS");
     };
 
 
@@ -46,10 +47,11 @@ public class FriendsDao extends AbstractDao<Friends, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"FRIENDS\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"FRIEND_EMAIL\" TEXT," + // 1: friend_email
-                "\"FRIEND_ID\" TEXT," + // 2: friend_id
-                "\"FRIEND_REQUEST_ID\" INTEGER," + // 3: friend_request_id
-                "\"REQUESTER_ID\" TEXT," + // 4: requester_id
-                "\"STATUS\" TEXT);"); // 5: status
+                "\"FRIEND_FIRST_NAME\" TEXT," + // 2: friend_first_name
+                "\"FRIEND_ID\" TEXT," + // 3: friend_id
+                "\"FRIEND_REQUEST_ID\" INTEGER," + // 4: friend_request_id
+                "\"REQUESTER_ID\" TEXT," + // 5: requester_id
+                "\"STATUS\" TEXT);"); // 6: status
     }
 
     /** Drops the underlying database table. */
@@ -73,24 +75,29 @@ public class FriendsDao extends AbstractDao<Friends, Long> {
             stmt.bindString(2, friend_email);
         }
  
+        String friend_first_name = entity.getFriend_first_name();
+        if (friend_first_name != null) {
+            stmt.bindString(3, friend_first_name);
+        }
+ 
         String friend_id = entity.getFriend_id();
         if (friend_id != null) {
-            stmt.bindString(3, friend_id);
+            stmt.bindString(4, friend_id);
         }
  
         Integer friend_request_id = entity.getFriend_request_id();
         if (friend_request_id != null) {
-            stmt.bindLong(4, friend_request_id);
+            stmt.bindLong(5, friend_request_id);
         }
  
         String requester_id = entity.getRequester_id();
         if (requester_id != null) {
-            stmt.bindString(5, requester_id);
+            stmt.bindString(6, requester_id);
         }
  
         String status = entity.getStatus();
         if (status != null) {
-            stmt.bindString(6, status);
+            stmt.bindString(7, status);
         }
     }
 
@@ -106,10 +113,11 @@ public class FriendsDao extends AbstractDao<Friends, Long> {
         Friends entity = new Friends( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // friend_email
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // friend_id
-            cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // friend_request_id
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // requester_id
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // status
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // friend_first_name
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // friend_id
+            cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4), // friend_request_id
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // requester_id
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6) // status
         );
         return entity;
     }
@@ -119,10 +127,11 @@ public class FriendsDao extends AbstractDao<Friends, Long> {
     public void readEntity(Cursor cursor, Friends entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setFriend_email(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setFriend_id(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setFriend_request_id(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
-        entity.setRequester_id(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setStatus(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setFriend_first_name(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setFriend_id(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setFriend_request_id(cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4));
+        entity.setRequester_id(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setStatus(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
      }
     
     /** @inheritdoc */

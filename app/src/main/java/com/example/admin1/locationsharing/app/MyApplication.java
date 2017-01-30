@@ -40,12 +40,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class MyApplication extends Application {
-    private static SharedPreferencesData sharedPreferencesData;
+    private SharedPreferencesData sharedPreferencesData;
     private Retrofit retrofit;
     private static Context applicationContext;
     private static MyApplication instance;
     private static Context context;
-    private GoogleMap googleMap;
     private DaoMaster.DevOpenHelper devOpenHelper;
     private ProgressDialog mProgressDialog;
 

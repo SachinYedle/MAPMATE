@@ -19,28 +19,31 @@ import de.greenrobot.dao.query.QueryBuilder;
 
 public class UserLocationsOperations {
 
-    public static void addUserLocations(Context context, UserLocationData userLocationData){
-        DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(context);
+    private static UserLocationsOperations instance = null;
+    public static UserLocationsOperations getInstance() {
+        if (instance == null) {
+            instance = new UserLocationsOperations();
+        }
+        return instance;
+    }
+    public void addUserLocations(UserLocationData userLocationData){
+        DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(MyApplication.getCurrentActivityContext());
         UserLocationsDao userLocationsDao = daoSession.getUserLocationsDao();
-        SharedPreferencesData preferencesData = new SharedPreferencesData(context);
+        SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
         UserLocations userLocations = new UserLocations();
         userLocations.setLongitude(userLocationData.getLon());
         userLocations.setLatitude(userLocationData.getLat());
         userLocations.setTime(userLocationData.getTime());
         userLocations.setRadius(userLocationData.getRadius());
-        userLocations.setToken(preferencesData.getSelectedUserEmail());
+        userLocations.setEmail(preferencesData.getSelectedUserEmail());
+        userLocations.setTime(userLocationData.getTime());
         userLocationsDao.insert(userLocations);
     }
-    public static void  deleteUserLocations(Context context, Long key){
-        DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(context);
-        UserLocationsDao userLocationsDao = daoSession.getUserLocationsDao();
-        userLocationsDao.deleteByKey(key);
-    }
-    public static List<UserLocations> getUserLocations(Context context, String token){
-        DaoSession daoSession = MyApplication.getInstance().getReadableDaoSession(context);
+    public List<UserLocations> getUserLocations(String email){
+        DaoSession daoSession = MyApplication.getInstance().getReadableDaoSession(MyApplication.getCurrentActivityContext());
         UserLocationsDao userLocationsDao = daoSession.getUserLocationsDao();
         QueryBuilder<UserLocations> queryBuilder = userLocationsDao.queryBuilder();
-        queryBuilder.where(UserLocationsDao.Properties.Token.eq(token));
+        queryBuilder.where(UserLocationsDao.Properties.Email.eq(email));
         return queryBuilder.list();
     }
 }

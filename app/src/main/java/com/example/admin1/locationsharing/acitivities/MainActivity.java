@@ -101,28 +101,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initializeVariables();
         setUpListeners();
         setUpGoogleLoginOption();
-
     }
 
     public void checkIsLoggedIn() {
         SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
         if (!preferencesData.getEmail().equals("")) {
-
             Navigator.getInstance().navigateToMapActivity();
+            finish();
         }
     }
 
-    public void fillUserDataToDB(){
-        UserLastknownLocationOperations.deleteTableData(MyApplication.getCurrentActivityContext());
-        UserLastKnownLocation lastloc = new UserLastKnownLocation(null, "Sachin", "640beedae0c841a395fb2abca53df01c", "17.4107389", "78.4149535", "2016-12-27 06:29:39");
-        UserLastknownLocationOperations.insertUsersLastKnownLocation(MyApplication.getCurrentActivityContext(), lastloc);
-        lastloc = new UserLastKnownLocation(null, "Sunand", "fbf5ea9008ce4ad3ab7fe5fcc20453e7", "17.5307389", "78.5449535", "2016-12-27 06:29:39");
-        UserLastknownLocationOperations.insertUsersLastKnownLocation(MyApplication.getCurrentActivityContext(), lastloc);
-        lastloc = new UserLastKnownLocation(null, "Venky", "ec22012fc9704663a6b558da37f7d01a", "17.4907389", "78.5949535", "2016-12-27 06:29:39");
-        UserLastknownLocationOperations.insertUsersLastKnownLocation(MyApplication.getCurrentActivityContext(), lastloc);
-        lastloc = new UserLastKnownLocation(null, "riktam", "dbf3178155d944dd9f609e93de30b00c", "17.5107389", "78.3949535", "2016-12-27 06:29:39");
-        UserLastknownLocationOperations.insertUsersLastKnownLocation(MyApplication.getCurrentActivityContext(), lastloc);
-    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -152,18 +140,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUSTED_CODE:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    if (ActivityCompat.checkSelfPermission(this,
-                            Manifest.permission.ACCESS_FINE_LOCATION)
-                            == PackageManager.PERMISSION_GRANTED) {
-                        Toast.makeText(MyApplication.getCurrentActivityContext(), "Permissions granted", Toast.LENGTH_SHORT).show();
-                    }
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //do whatever want to do when permission granted
                 } else {
-                    Toast.makeText(this, "Permissions denied", Toast.LENGTH_LONG).show();
+                    finish();
                 }
-                return;
         }
     }
 
@@ -204,13 +185,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        CustomLog.e("MainActivity", "Activity res");
         if (requestCode == RC_SIGN_IN) {
-            //revokeAccess();
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            CustomLog.e("MainActivity", "Activity res1" + result.isSuccess());
             if (result.isSuccess()) {
-                CustomLog.e("MainActivity", "Activity res2");
                 handleGoogleSignInResult(result);
 
             }
@@ -221,23 +198,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void handleGoogleSignInResult(GoogleSignInResult result) {
-        Log.d("MainActivity", "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
             GoogleSignInAccount acct = result.getSignInAccount();
             String fullName = acct.getDisplayName();
             String token = acct.getIdToken();
-            //preferencesData.setUserToken(token);
-            CustomLog.i("MainActivity", "token: " + acct.getIdToken());
             String email = acct.getEmail();
+            preferencesData.setFirstName(fullName);
             preferencesData.setEmail(email);
 
-            getPeoplesList(acct.getEmail());
+            //getPeoplesList(acct.getEmail());
 
             new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(onLoginListener,token);
-            callToBackgroundLocationService();
 
-            CustomLog.i("Name & Email", fullName + "&" + email);
             googleSignInButton.setVisibility(View.GONE);
             googleSignOut.setVisibility(View.VISIBLE);
         } else {
@@ -249,8 +222,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private UserDataMapper.OnLoginListener onLoginListener = new UserDataMapper.OnLoginListener() {
         @Override
         public void onTaskCompleted(UserAuthentication userAuthenticationResponse) {
-            finish();
+            callToBackgroundLocationService();
             Navigator.getInstance().navigateToMapActivity();
+            finish();
         }
 
         @Override
@@ -277,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 credential.setSelectedAccount(
                         new Account(email, "com.google"));
                 People service = new People.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-                        .setApplicationName("Location Sharing App" /* whatever you like */)
+                        .setApplicationName("FriendLocation Sharing App" /* whatever you like */)
                         .build();
                 // All the person details
                 //Person meProfile = service.people().get("people/me").execute();
@@ -371,6 +345,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         CustomLog.e("MainActivity", "OnConnectionFailed");
     }
-
 
 }

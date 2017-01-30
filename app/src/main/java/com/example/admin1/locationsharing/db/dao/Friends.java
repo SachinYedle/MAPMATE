@@ -8,6 +8,7 @@ public class Friends {
 
     private Long id;
     private String friend_email;
+    private String friend_first_name;
     private String friend_id;
     private Integer friend_request_id;
     private String requester_id;
@@ -20,9 +21,10 @@ public class Friends {
         this.id = id;
     }
 
-    public Friends(Long id, String friend_email, String friend_id, Integer friend_request_id, String requester_id, String status) {
+    public Friends(Long id, String friend_email, String friend_first_name, String friend_id, Integer friend_request_id, String requester_id, String status) {
         this.id = id;
         this.friend_email = friend_email;
+        this.friend_first_name = friend_first_name;
         this.friend_id = friend_id;
         this.friend_request_id = friend_request_id;
         this.requester_id = requester_id;
@@ -43,6 +45,14 @@ public class Friends {
 
     public void setFriend_email(String friend_email) {
         this.friend_email = friend_email;
+    }
+
+    public String getFriend_first_name() {
+        return friend_first_name;
+    }
+
+    public void setFriend_first_name(String friend_first_name) {
+        this.friend_first_name = friend_first_name;
     }
 
     public String getFriend_id() {

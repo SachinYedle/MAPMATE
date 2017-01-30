@@ -12,7 +12,6 @@ public class SharedPreferencesData {
 
     private SharedPreferences.Editor editor;
     private SharedPreferences sharedPreferences;
-    private Context context;
 
     private final String PREF_NAME = "com.example.admin1.locationsharing";
     // Preferences can only be accessed by the application
@@ -27,7 +26,6 @@ public class SharedPreferencesData {
     private final String LAST_NAME = "lastName";
 
     public SharedPreferencesData(Context context) {
-        this.context = context;
         sharedPreferences = context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
         editor = sharedPreferences.edit();
     }
