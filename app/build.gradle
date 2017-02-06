@@ -10,7 +10,6 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -39,27 +38,14 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.0.1'
     testCompile 'junit:junit:4.12'
     compile 'com.google.android.gms:play-services-auth:10.0.1'
-    compile 'com.google.android.gms:play-services:10.0.1'
+    compile 'com.google.android.gms:play-services-maps:10.0.1'
+    compile 'com.google.android.gms:play-services-location:10.0.1'
     compile 'com.squareup.retrofit2:retrofit:2.0.1'
     compile 'com.squareup.retrofit2:converter-gson:2.0.1'
     compile 'com.squareup.okhttp3:okhttp:3.0.0'
     compile 'com.jakewharton.retrofit:retrofit1-okhttp3-client:1.0.2'
     compile 'de.greenrobot:greendao:2.1.0'
-    compile 'com.android.support:multidex:1.0.1'
     compile 'com.android.support:design:25.0.1'
-    compile 'com.google.android.gms:play-services-plus:10.0.1'
-
-    compile ('com.google.api-client:google-api-client-android:1.22.0',{
-        exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
-    })
-    compile('com.google.api-client:google-api-client:1.22.0', {
-        exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
-    })
-    compile('com.google.oauth-client:google-oauth-client-jetty:1.22.0', {
-        exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
-    })
-    compile('com.google.apis:google-api-services-people:v1-rev5-1.22.0', {
-        exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
-    })
+    compile 'com.android.support:recyclerview-v7:25.0.1'
 }
 

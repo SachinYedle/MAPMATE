@@ -1,24 +1,19 @@
 package com.example.admin1.locationsharing.acitivities;
 
 import android.Manifest;
-import android.accounts.Account;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.admin1.locationsharing.R;
-import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
-import com.example.admin1.locationsharing.db.dao.operations.UserLastknownLocationOperations;
 import com.example.admin1.locationsharing.responses.UserAuthentication;
 import com.example.admin1.locationsharing.services.BackgroundLocationService;
 import com.example.admin1.locationsharing.app.MyApplication;
@@ -26,50 +21,17 @@ import com.example.admin1.locationsharing.mappers.UserDataMapper;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
 
-import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.store.DataStoreFactory;
-import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.people.v1.People;
-import com.google.api.services.people.v1.PeopleScopes;
-import com.google.api.services.people.v1.model.EmailAddress;
-import com.google.api.services.people.v1.model.Gender;
-import com.google.api.services.people.v1.model.ListConnectionsResponse;
-import com.google.api.services.people.v1.model.Name;
-import com.google.api.services.people.v1.model.Person;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.List;
-
-import static java.security.AccessController.getContext;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
@@ -77,20 +39,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int RC_SIGN_IN = 9001;
     private SignInButton googleSignInButton;
     private Button googleSignOut;
-    private EditText phoneEditText;
     private GoogleApiClient googleApiClient;
     private final int REQUSTED_CODE = 99;
     private final int REQUEST_AUTHORIZATION = 1002;
 
-    /**
-     * Global instance of the HTTP transport.
-     */
-    private static HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
-
-    /**
-     * Global instance of the JSON factory.
-     */
-    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+//    /**
+//     * Global instance of the HTTP transport.
+//     */
+//    private static HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
+//
+//    /**
+//     * Global instance of the JSON factory.
+//     */
+//    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         } else if (requestCode == REQUEST_AUTHORIZATION) {
             SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
-            getPeoplesList(preferencesData.getEmail());
+            //getPeoplesList(preferencesData.getEmail());
         }
     }
 
@@ -232,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(MyApplication.getCurrentActivityContext(),"Error :"+request,Toast.LENGTH_SHORT).show();
         }
     };
-    public void getPeoplesList(final String email) {
+    /*public void getPeoplesList(final String email) {
 
         final List<String> SCOPES =
                 Arrays.asList(PeopleScopes.CONTACTS,PeopleScopes.PLUS_LOGIN);
@@ -242,16 +203,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
 
 
-                /*String scope = "oauth2:"+ "<profile scope>"+"<circles scope>"+.....maybe more...
+                *//*String scope = "oauth2:"+ "<profile scope>"+"<circles scope>"+.....maybe more...
                 // Replace <> part with scope URLs from Google Domain API scopes page
-                String token = GoogleAuthUtil.getToken(this, accountName , scope);*/
+                String token = GoogleAuthUtil.getToken(this, accountName , scope);*//*
                 // On worker thread
                 GoogleAccountCredential credential =
                         GoogleAccountCredential.usingOAuth2(MainActivity.this, SCOPES);
                 credential.setSelectedAccount(
                         new Account(email, "com.google"));
                 People service = new People.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-                        .setApplicationName("FriendLocation Sharing App" /* whatever you like */)
+                        .setApplicationName("FriendLocation Sharing App" *//* whatever you like *//*)
                         .build();
                 // All the person details
                 //Person meProfile = service.people().get("people/me").execute();
@@ -301,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
-
+*/
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
