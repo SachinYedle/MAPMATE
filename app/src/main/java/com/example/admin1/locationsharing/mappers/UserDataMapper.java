@@ -3,7 +3,7 @@ package com.example.admin1.locationsharing.mappers;
 import android.content.Context;
 
 import com.example.admin1.locationsharing.R;
-import com.example.admin1.locationsharing.services.UserDataService;
+import com.example.admin1.locationsharing.retrofitservices.UserDataService;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.interfaces.PositiveClick;
 import com.example.admin1.locationsharing.responses.UserAuthToken;
@@ -11,8 +11,6 @@ import com.example.admin1.locationsharing.responses.UserAuthentication;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
-
-import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -97,6 +95,7 @@ public class UserDataMapper {
         preferencesData.setUserToken(userAuthToken.getToken());
         preferencesData.setFirstName(userAuthToken.getFirstName());
         preferencesData.setLastName(userAuthToken.getLastName());
+        preferencesData.setId(userAuthToken.getId());
         CustomLog.d("UserDatMapper","Token: "+preferencesData.getUserToken());
     }
 

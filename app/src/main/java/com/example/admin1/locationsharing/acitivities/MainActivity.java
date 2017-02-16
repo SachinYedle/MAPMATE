@@ -3,6 +3,7 @@ package com.example.admin1.locationsharing.acitivities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void checkIsLoggedIn() {
         SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
         if (!preferencesData.getEmail().equals("")) {
+            callToBackgroundLocationService();
             Navigator.getInstance().navigateToMapActivity();
             finish();
         }
@@ -165,9 +167,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String fullName = acct.getDisplayName();
             String token = acct.getIdToken();
             String email = acct.getEmail();
+            Uri personPhoto = acct.getPhotoUrl();
+
             preferencesData.setFirstName(fullName);
             preferencesData.setEmail(email);
 
+            CustomLog.i("Main Activity","Token: "+acct.getIdToken());
             //getPeoplesList(acct.getEmail());
 
             new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(onLoginListener,token);

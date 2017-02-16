@@ -5,14 +5,13 @@ import android.content.Context;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.db.dao.Friends;
 import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
-import com.example.admin1.locationsharing.db.dao.operations.FriendsTableOperations;
-import com.example.admin1.locationsharing.db.dao.operations.UserLastknownLocationOperations;
+import com.example.admin1.locationsharing.db.operations.FriendsTableOperations;
+import com.example.admin1.locationsharing.db.operations.UserLastknownLocationOperations;
 import com.example.admin1.locationsharing.responses.FriendRequestAcceptResponse;
 import com.example.admin1.locationsharing.responses.FriendRequestResponse;
 import com.example.admin1.locationsharing.responses.FriendsResponse;
 import com.example.admin1.locationsharing.responses.FriendsServiceResponse;
-import com.example.admin1.locationsharing.services.LocationDataService;
-import com.example.admin1.locationsharing.utils.CustomLog;
+import com.example.admin1.locationsharing.retrofitservices.LocationDataService;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 
 import java.util.List;

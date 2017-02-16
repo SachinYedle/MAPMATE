@@ -24,6 +24,16 @@ public class SharedPreferencesData {
     private final String SELECTED_USER_EMAIL = "selectedUserEmail";
     private final String FIRST_NAME = "firstName";
     private final String LAST_NAME = "lastName";
+    private final String ID = "id";
+
+    public void setId(int id) {
+        editor.putInt(ID, id);
+        editor.commit();
+    }
+
+    public int getId() {
+        return sharedPreferences.getInt(ID, 0);
+    }
 
     public SharedPreferencesData(Context context) {
         sharedPreferences = context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);

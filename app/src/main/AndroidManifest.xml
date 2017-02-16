@@ -39,7 +39,6 @@
         <activity android:name=".acitivities.MapActivity" />
         <activity android:name=".acitivities.DrawerActivity" />
 
-
         <receiver android:name=".receiver.BootCompletedIntentReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

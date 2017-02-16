@@ -1,18 +1,18 @@
 package com.example.admin1.locationsharing.mappers;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.db.dao.DaoSession;
 import com.example.admin1.locationsharing.db.dao.UserLocations;
 import com.example.admin1.locationsharing.db.dao.UserLocationsDao;
-import com.example.admin1.locationsharing.db.dao.operations.UserLocationsOperations;
+import com.example.admin1.locationsharing.db.operations.UserLocationsOperations;
 import com.example.admin1.locationsharing.interfaces.PositiveClick;
-import com.example.admin1.locationsharing.responses.LocationSendingResponse;
 import com.example.admin1.locationsharing.responses.UserLocationData;
 import com.example.admin1.locationsharing.responses.UserLocationsResponse;
-import com.example.admin1.locationsharing.services.LocationDataService;
+import com.example.admin1.locationsharing.retrofitservices.LocationDataService;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.Navigator;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
@@ -94,6 +94,9 @@ public class DownloadLocationsDataMapper {
                 .buildDelete();
         deleteQuery.executeDeleteWithoutDetachingEntities();
 
+        if (userLocationsList.size() <= 0) {
+            Toast.makeText(MyApplication.getCurrentActivityContext(),"No Locations are available",Toast.LENGTH_SHORT).show();
+        }
         for (int i = 0; i<userLocationsList.size(); i++){
             UserLocationData userLocations = userLocationsList.get(i);
             CustomLog.i("ParseData",userLocations.getLat());

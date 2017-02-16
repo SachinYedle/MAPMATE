@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+        <style name="NoActionBar" parent="@style/Theme.AppCompat.Light">
+                <item name="windowNoTitle">true</item>
+                <item name="windowActionBar">false</item>
+                <item name="colorPrimary">@color/colorPrimary</item>
+                <item name="colorPrimaryDark">@color/colorPrimary</item>
+                <item name="colorAccent">@color/white</item>
+                <item name="android:statusBarColor">@color/colorPrimary</item>
+                <item name="android:textColor">@color/white</item>
+                <item name="android:textColorHint">@color/white</item>
+                <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        </style>
+
+        <style name="TextInputLayoutHintStyle" parent="TextAppearance.Design.Hint">
+                <item name="android:textSize">@dimen/text_size_small</item>
+                <item name="android:textColor">@color/white</item>
+                <item name="android:textColorHint">@color/white</item>
+        </style>
+        <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+                <item name="color">@android:color/white</item>
+        </style>
+        <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+                <item name="android:textColor">@color/black</item>
+        </style>
+</resources>

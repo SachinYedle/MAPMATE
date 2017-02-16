@@ -2,13 +2,9 @@ package com.example.admin1.locationsharing.mappers;
 
 import android.content.Context;
 
-import com.example.admin1.locationsharing.R;
-import com.example.admin1.locationsharing.interfaces.PositiveClick;
-import com.example.admin1.locationsharing.services.LocationDataService;
+import com.example.admin1.locationsharing.retrofitservices.LocationDataService;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.responses.LocationSendingResponse;
-import com.example.admin1.locationsharing.utils.CustomLog;
-import com.example.admin1.locationsharing.utils.Navigator;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 
 import retrofit2.Call;

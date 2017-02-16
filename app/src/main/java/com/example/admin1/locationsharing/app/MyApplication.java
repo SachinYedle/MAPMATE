@@ -12,15 +12,14 @@ import android.os.Environment;
 
 import com.example.admin1.locationsharing.BuildConfig;
 import com.example.admin1.locationsharing.R;
-import com.example.admin1.locationsharing.services.LocationDataService;
-import com.example.admin1.locationsharing.services.UserDataService;
+import com.example.admin1.locationsharing.retrofitservices.LocationDataService;
+import com.example.admin1.locationsharing.retrofitservices.UserDataService;
 import com.example.admin1.locationsharing.db.dao.DaoMaster;
 import com.example.admin1.locationsharing.db.dao.DaoSession;
 import com.example.admin1.locationsharing.interfaces.PositiveClick;
 import com.example.admin1.locationsharing.utils.Constants;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
-import com.google.android.gms.maps.GoogleMap;
 
 import java.io.File;
 import java.io.FileInputStream;
