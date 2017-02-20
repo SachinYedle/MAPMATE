@@ -48,8 +48,7 @@ public class FriendsDataMapper {
     }
 
     public void getFriends(OnTaskCompletedListener onTaskCompletedListener){
-        SharedPreferencesData preferencesData = new SharedPreferencesData(context);
-        String token = preferencesData.getUserToken();
+        String token = MyApplication.getInstance().sharedPreferencesData.getUserToken();
         if (MyApplication.getInstance().isConnectedToInterNet()){
             this.onTaskCompletedListener = onTaskCompletedListener;
             LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(token);
@@ -110,8 +109,7 @@ public class FriendsDataMapper {
         }
     }
     public void acceptFriendRequest(OnRequestAcceptedListener onRequestAcceptedListener,int friendRequestId, int friendId){
-        SharedPreferencesData preferencesData = new SharedPreferencesData(context);
-        String token = preferencesData.getUserToken();
+        String token = MyApplication.getInstance().sharedPreferencesData.getUserToken();
         if (MyApplication.getInstance().isConnectedToInterNet()){
             this.onRequestAcceptedListener = onRequestAcceptedListener;
             LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(token);
@@ -121,8 +119,7 @@ public class FriendsDataMapper {
     }
 
     public void sendRequest(OnRequestSentListener onRequestSentListener,String email){
-        SharedPreferencesData preferencesData = new SharedPreferencesData(context);
-        String token = preferencesData.getUserToken();
+        String token = MyApplication.getInstance().sharedPreferencesData.getUserToken();
         if (MyApplication.getInstance().isConnectedToInterNet()){
             this.onRequestSentListener = onRequestSentListener;
             LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(token);

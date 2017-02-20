@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.example.admin1.locationsharing.R;
+import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 
 
@@ -21,8 +22,7 @@ public class DrawerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.drawer_layout,container,false);
         TextView userNameText = (TextView) view.findViewById(R.id.drawer_user_name_textView);
-        SharedPreferencesData preferencesData = new SharedPreferencesData(getActivity());
-        userNameText.setText(preferencesData.getFirstName()+" "+preferencesData.getLastName());
+        userNameText.setText(MyApplication.getInstance().sharedPreferencesData.getFirstName()+" "+ MyApplication.getInstance().sharedPreferencesData.getLastName());
         return view;
     }
 }

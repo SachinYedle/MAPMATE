@@ -38,7 +38,7 @@ public class DownloadLocationsDataMapper {
         if (MyApplication.getInstance().isConnectedToInterNet()){
             this.onTaskCompletedListener = onTaskCompletedListener;
             MyApplication.getInstance().showProgressDialog(context.getString(R.string.loading_data),context.getString(R.string.please_wait));
-            LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(new SharedPreferencesData(context).getUserToken());
+            LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(MyApplication.getInstance().sharedPreferencesData.getUserToken());
             Call<UserLocationsResponse> call = locationDataService.getUserLocations(Integer.parseInt(friendId));
             call.enqueue(UserLocationsResponse);
         }else {
@@ -88,9 +88,8 @@ public class DownloadLocationsDataMapper {
 
         DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(context);
         UserLocationsDao userLocationsDao = daoSession.getUserLocationsDao();
-        SharedPreferencesData preferencesData = new SharedPreferencesData(context);
         DeleteQuery<UserLocations> deleteQuery = userLocationsDao.queryBuilder()
-                .where(UserLocationsDao.Properties.Email.eq(preferencesData.getSelectedUserEmail()))
+                .where(UserLocationsDao.Properties.Email.eq(MyApplication.getInstance().sharedPreferencesData.getSelectedUserEmail()))
                 .buildDelete();
         deleteQuery.executeDeleteWithoutDetachingEntities();
 

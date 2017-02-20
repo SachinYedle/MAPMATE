@@ -33,6 +33,9 @@
     <string name="text_with_bullet">Text with a \u2022</string>
     <string name="search">Search</string>
 
+    <string name="plus_sign">\u002B</string>
+    <string name="minus_sign">\u2212</string>
+
 
 
 

@@ -91,12 +91,12 @@ public class UserDataMapper {
 
     private void parseUsersAuthToken(UserAuthentication userAuthentication){
         UserAuthToken userAuthToken = userAuthentication.getUserAuthToken();
-        SharedPreferencesData preferencesData = new SharedPreferencesData(context);
-        preferencesData.setUserToken(userAuthToken.getToken());
-        preferencesData.setFirstName(userAuthToken.getFirstName());
-        preferencesData.setLastName(userAuthToken.getLastName());
-        preferencesData.setId(userAuthToken.getId());
-        CustomLog.d("UserDatMapper","Token: "+preferencesData.getUserToken());
+
+        MyApplication.getInstance().sharedPreferencesData.setUserToken(userAuthToken.getToken());
+        MyApplication.getInstance().sharedPreferencesData.setFirstName(userAuthToken.getFirstName());
+        MyApplication.getInstance().sharedPreferencesData.setLastName(userAuthToken.getLastName());
+        MyApplication.getInstance().sharedPreferencesData.setId(userAuthToken.getId());
+        CustomLog.d("UserDatMapper","Token: "+MyApplication.getInstance().sharedPreferencesData.getUserToken());
     }
 
 }

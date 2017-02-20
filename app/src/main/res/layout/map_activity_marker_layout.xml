@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/custom_marker_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/marker_mask">
-    <ImageView android:layout_width="30dp"
-        android:layout_height="30dp"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/custom_marker_view"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center">
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:visibility="gone"
+        android:src="@drawable/map_marker_blue"/>
+
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/map_marker_imageView"
-        android:scaleType="center"
-        android:layout_gravity="center_horizontal"
-        android:contentDescription="@null"/>
-</FrameLayout>
+        android:layout_width="20dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="2dp"
+        android:layout_height="20dp" />
+</RelativeLayout>

@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
+import android.widget.Toast;
 
 import com.example.admin1.locationsharing.BuildConfig;
 import com.example.admin1.locationsharing.R;
@@ -39,7 +40,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class MyApplication extends Application {
-    private SharedPreferencesData sharedPreferencesData;
+    public SharedPreferencesData sharedPreferencesData;
     private Retrofit retrofit;
     private static Context applicationContext;
     private static MyApplication instance;
@@ -86,7 +87,7 @@ public class MyApplication extends Application {
     }
     public void initializeVariables(){
         instance = this;
-        sharedPreferencesData = new SharedPreferencesData(this);
+        sharedPreferencesData = new SharedPreferencesData();
         applicationContext = this.getApplicationContext();
 
     }
@@ -178,6 +179,10 @@ public class MyApplication extends Application {
             instance = new MyApplication();
         }
         return instance;
+    }
+
+    public void showToast(String message){
+        Toast.makeText(getCurrentActivityContext(),message,Toast.LENGTH_LONG).show();
     }
 
     public void showProgressDialog() {

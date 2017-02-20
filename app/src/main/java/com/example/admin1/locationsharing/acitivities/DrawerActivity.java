@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.admin1.locationsharing.R;
+import com.example.admin1.locationsharing.app.MyApplication;
 
 public class DrawerActivity extends AppCompatActivity {
 
@@ -25,6 +26,13 @@ public class DrawerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSavedInstanceState = savedInstanceState;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MyApplication.getInstance().setCurrentActivityContext(DrawerActivity.this);
+
     }
 
     /**

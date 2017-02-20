@@ -66,8 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void checkIsLoggedIn() {
-        SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
-        if (!preferencesData.getEmail().equals("")) {
+        if (!MyApplication.getInstance().sharedPreferencesData.getEmail().equals("")) {
             callToBackgroundLocationService();
             Navigator.getInstance().navigateToMapActivity();
             finish();
@@ -77,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
+        MyApplication.getInstance().setCurrentActivityContext(MainActivity.this);
         checkPermission();
     }
 
@@ -155,22 +155,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         } else if (requestCode == REQUEST_AUTHORIZATION) {
-            SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
-            //getPeoplesList(preferencesData.getEmail());
+            //getPeoplesList(MyApplication.getInstance().sharedPreferencesData.getEmail());
         }
     }
 
     private void handleGoogleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
-            SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
             GoogleSignInAccount acct = result.getSignInAccount();
             String fullName = acct.getDisplayName();
             String token = acct.getIdToken();
             String email = acct.getEmail();
             Uri personPhoto = acct.getPhotoUrl();
-
-            preferencesData.setFirstName(fullName);
-            preferencesData.setEmail(email);
+            CustomLog.d("MainActivity","url: "+personPhoto);
+            MyApplication.getInstance().sharedPreferencesData.setFirstName(fullName);
+            MyApplication.getInstance().sharedPreferencesData.setEmail(email);
 
             CustomLog.i("Main Activity","Token: "+acct.getIdToken());
             //getPeoplesList(acct.getEmail());
@@ -180,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             googleSignInButton.setVisibility(View.GONE);
             googleSignOut.setVisibility(View.VISIBLE);
         } else {
-            Toast.makeText(MyApplication.getCurrentActivityContext(), "Something went Wrong Please try again", Toast.LENGTH_SHORT).show();
+            MyApplication.getInstance().showToast("Something went Wrong Please try again");
             CustomLog.e("Login", "Unsuccesfull");
         }
     }
@@ -195,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onTaskFailed(String request) {
-            Toast.makeText(MyApplication.getCurrentActivityContext(),"Error :"+request,Toast.LENGTH_SHORT).show();
+            MyApplication.getInstance().showToast("Error :"+request);
         }
     };
     /*public void getPeoplesList(final String email) {

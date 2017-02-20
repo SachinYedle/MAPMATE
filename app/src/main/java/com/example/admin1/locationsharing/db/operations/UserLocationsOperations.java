@@ -27,13 +27,12 @@ public class UserLocationsOperations {
     public void addUserLocations(UserLocationData userLocationData){
         DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(MyApplication.getCurrentActivityContext());
         UserLocationsDao userLocationsDao = daoSession.getUserLocationsDao();
-        SharedPreferencesData preferencesData = new SharedPreferencesData(MyApplication.getCurrentActivityContext());
         UserLocations userLocations = new UserLocations();
         userLocations.setLongitude(userLocationData.getLon());
         userLocations.setLatitude(userLocationData.getLat());
         userLocations.setTime(userLocationData.getTime());
         userLocations.setRadius(userLocationData.getRadius());
-        userLocations.setEmail(preferencesData.getSelectedUserEmail());
+        userLocations.setEmail(MyApplication.getInstance().sharedPreferencesData.getSelectedUserEmail());
         userLocations.setTime(userLocationData.getTime());
         userLocationsDao.insert(userLocations);
     }

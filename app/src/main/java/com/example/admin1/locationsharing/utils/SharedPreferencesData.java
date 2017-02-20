@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.camera2.params.StreamConfigurationMap;
 
+import com.example.admin1.locationsharing.app.MyApplication;
+
 /**
  * Created by admin1 on 30/11/16.
  */
@@ -35,8 +37,8 @@ public class SharedPreferencesData {
         return sharedPreferences.getInt(ID, 0);
     }
 
-    public SharedPreferencesData(Context context) {
-        sharedPreferences = context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
+    public SharedPreferencesData() {
+        sharedPreferences = MyApplication.getInstance().getSharedPreferences(PREF_NAME, PRIVATE_MODE);
         editor = sharedPreferences.edit();
     }
 
