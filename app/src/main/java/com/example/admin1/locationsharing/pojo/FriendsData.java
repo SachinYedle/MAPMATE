@@ -6,7 +6,16 @@ package com.example.admin1.locationsharing.pojo;
 
 public class FriendsData {
     private String friendsEmail;
+    private String friendFirstName;
     private String status;
+
+    public void setFriendFirstName(String friendFirstName) {
+        this.friendFirstName = friendFirstName;
+    }
+
+    public String getFriendFirstName() {
+        return friendFirstName;
+    }
 
     public void setFriendsEmail(String friendsEmail) {
         this.friendsEmail = friendsEmail;

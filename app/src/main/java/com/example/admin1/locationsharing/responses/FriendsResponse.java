@@ -24,19 +24,54 @@ public class FriendsResponse {
     @Expose
     private String friendRequestId;
 
-    @SerializedName("location")
+    @SerializedName("lat")
     @Expose
-    private FriendLocation friendLocation;
+    private String lat;
+
+    @SerializedName("lon")
+    @Expose
+    private String lon;
 
     @SerializedName("requester_id")
     @Expose
     private String requesterId;
+
+    @SerializedName("last_known_time")
+    @Expose
+    private String lastKnownTime;
+
     @SerializedName("status")
     @Expose
     private int status;
     @SerializedName("updated_at")
     @Expose
     private String updatedAt;
+
+
+    public String getLastKnownTime() {
+        return lastKnownTime;
+    }
+
+    public void setLastKnownTime(String lastKnownTime) {
+        this.lastKnownTime = lastKnownTime;
+    }
+
+
+    public String getLat() {
+        return lat;
+    }
+
+    public String getLon() {
+        return lon;
+    }
+
+    public void setLat(String lat) {
+        this.lat = lat;
+    }
+
+    public void setLon(String lon) {
+        this.lon = lon;
+    }
 
     public void setFriendEmail(String friendEmail) {
         this.friendEmail = friendEmail;
@@ -84,14 +119,6 @@ public class FriendsResponse {
 
     public String getFriendFirstName() {
         return friendFirstName;
-    }
-
-    public void setFriendLocation(FriendLocation friendLocation) {
-        this.friendLocation = friendLocation;
-    }
-
-    public FriendLocation getFriendLocation() {
-        return friendLocation;
     }
 
     public void setUpdatedAt(String updatedAt) {

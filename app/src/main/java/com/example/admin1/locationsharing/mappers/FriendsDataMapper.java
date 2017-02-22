@@ -101,9 +101,10 @@ public class FriendsDataMapper {
                 UserLastKnownLocation userLastKnownLocation = new UserLastKnownLocation ();
                 userLastKnownLocation.setFriend_first_name(friendsResponse.getFriendFirstName());
                 userLastKnownLocation.setEmail(friendsResponse.getFriendEmail());
-                userLastKnownLocation.setLatitude(friendsResponse.getFriendLocation().getLat());
-                userLastKnownLocation.setLongitude(friendsResponse.getFriendLocation().getLon());
+                userLastKnownLocation.setLatitude(friendsResponse.getLat());
+                userLastKnownLocation.setLongitude(friendsResponse.getLon());
                 userLastKnownLocation.setTime(friendsResponse.getUpdatedAt());
+                userLastKnownLocation.setLast_known_time(friendsResponse.getLastKnownTime());
                 UserLastknownLocationOperations.getInstance().insertUsersLastKnownLocation(userLastKnownLocation);
             }
         }

@@ -23,10 +23,21 @@
     <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="color">@android:color/white</item>
     </style>
-    <style name="ProgressDialogStyle" parent="Theme.AppCompat.Light.Dialog"/>
 
-    <style name="AlertDialogStyle" parent="Theme.AppCompat.Light.Dialog"/>
-    
+    <style name="ProgressDialogStyle" parent="Theme.AppCompat.Light.Dialog" />
+
+    <style name="AlertDialogStyle" parent="Theme.AppCompat.Light.Dialog" />
+
+    <style name="Switch" parent="Theme.AppCompat.Light">
+        <!-- active thumb & track color (30% transparency) -->
+        <item name="colorControlActivated">@color/colorPrimary</item>
+
+        <!-- inactive thumb color -->
+        <item name="colorSwitchThumbNormal">#f1f1f1</item>
+        <!-- inactive track color (30% transparency) -->
+        <item name="android:colorForeground">#42221f1f</item>
+    </style>
+
     <style name="small_text_textview">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -34,6 +45,7 @@
         <item name="android:textSize">@dimen/button_text_size</item>
         <item name="android:textColor">@color/phone_text_color</item>
     </style>
+
     <style name="medium_text_textview">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -47,10 +59,12 @@
         <item name="actionMenuTextColor">@android:color/white</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
     </style>
+
     <style name="home_screen_divider_style">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/padding_x_small</item>
-        <item name="android:background"> #eaeded </item>
+        <item name="android:background">#eaeded</item>
         <item name="android:layout_marginLeft">@dimen/margin_medium</item>
-        <item name="android:layout_marginRight">@dimen/margin_medium</item></style>
+        <item name="android:layout_marginRight">@dimen/margin_medium</item>
+    </style>
 </resources>

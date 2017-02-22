@@ -56,6 +56,7 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
         friendsRecyclerView = (RecyclerView) findViewById(R.id.friends_activity_recyclerView);
         emailTextView = (TextView) findViewById(R.id.friends_activity_email_editText);
         addFriendsTextView = (TextView) findViewById(R.id.friends_activity_add_btn);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Friends");
@@ -80,7 +81,7 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
                 if (!searchView.isIconified()) {
                     searchView.setIconified(true);
                 }
-                myActionMenuItem.collapseActionView();
+                onQueryTextChange(query);
                 return false;
             }
 
@@ -127,6 +128,7 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
             FriendsData friendsData = new FriendsData();
             Friends friends = friendsList.get(i);
             friendsData.setFriendsEmail(friends.getFriend_email());
+            friendsData.setFriendFirstName(friends.getFriend_first_name());
             if (Integer.parseInt(friends.getStatus()) == 1) {
                 friendsData.setStatus("remove");
             } else if (Integer.parseInt(friends.getRequester_id()) == Integer.parseInt(friends.getFriend_id())) {

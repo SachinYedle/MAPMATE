@@ -34,12 +34,11 @@ public class SetFriendsMarkers {
         return instance;
     }
 
-    public void setFriendsLocationMarkers(GoogleMap googleMap, Menu menu, GoogleMap.OnInfoWindowClickListener onInfoWindowClickListener) {
+    public void setFriendsLocationMarkers(GoogleMap googleMap, Menu menu) {
         googleMap.clear();
         DrawRouteFunctionality.getInstance().setRouteVisible(false);
         MenuItem item = menu.findItem(R.id.map_menu_item_my_location);
         item.setVisible(true);
-        googleMap.setOnInfoWindowClickListener(onInfoWindowClickListener);
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         List<UserLastKnownLocation> locationList = UserLastknownLocationOperations.getInstance().getUserLastKnownLocation();
         if (locationList.size() > 0) {

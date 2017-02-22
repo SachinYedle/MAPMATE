@@ -48,14 +48,14 @@ public class BackgroundLocationService extends Service implements LocationListen
     public int onStartCommand(Intent intent, int flags, int startId) {
         CustomLog.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
-        buildGoogleApiClient();
-        googleApiClient.connect();
         return START_STICKY;
     }
 
     @Override
     public void onCreate() {
         CustomLog.e(TAG, "onCreate");
+        buildGoogleApiClient();
+        googleApiClient.connect();
     }
 
     /**

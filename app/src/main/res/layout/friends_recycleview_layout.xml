@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:padding="@dimen/padding_large"
-    android:gravity="center"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:padding="@dimen/padding_large">
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_tick_mark_imageView"
         android:layout_width="50dp"
@@ -15,20 +16,37 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:layout_gravity="center_vertical"
         android:layout_weight="1"
-        android:paddingStart="@dimen/padding_large"
+        android:orientation="vertical"
         android:paddingLeft="@dimen/padding_large"
-        android:layout_gravity="center_vertical">
+        android:paddingStart="@dimen/padding_large">
+
+        <TextView
+            android:id="@+id/friends_recyclerView_name_textView"
+            style="@style/medium_text_textview"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
         <TextView
             android:id="@+id/friends_recyclerView_email_textView"
-            android:maxLines="1"
+            style="@style/medium_text_textview"
             android:ellipsize="end"
-            style="@style/medium_text_textview"/>
-        <TextView
-            android:textColor="@color/red"
-            android:layout_gravity="end"
-            android:id="@+id/friends_recyclerView_status_textView"
-            style="@style/medium_text_textview"/>
+            android:maxLines="1"
+            android:textSize="@dimen/text_size_medium" />
+
     </LinearLayout>
+
+    <Switch
+        android:id="@+id/friends_recycler_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_gravity="end"
+        android:theme="@style/Switch"/>
+    <TextView
+        android:id="@+id/friends_recyclerView_status_textView"
+        style="@style/medium_text_textview"
+        android:layout_weight="0"
+        android:textColor="@color/red" />
 </LinearLayout>

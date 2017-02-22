@@ -9,6 +9,7 @@ public class UserLastKnownLocation {
     private Long id;
     private String friend_first_name;
     private String email;
+    private String last_known_time;
     private String latitude;
     private String longitude;
     private String time;
@@ -20,10 +21,11 @@ public class UserLastKnownLocation {
         this.id = id;
     }
 
-    public UserLastKnownLocation(Long id, String friend_first_name, String email, String latitude, String longitude, String time) {
+    public UserLastKnownLocation(Long id, String friend_first_name, String email, String last_known_time, String latitude, String longitude, String time) {
         this.id = id;
         this.friend_first_name = friend_first_name;
         this.email = email;
+        this.last_known_time = last_known_time;
         this.latitude = latitude;
         this.longitude = longitude;
         this.time = time;
@@ -51,6 +53,14 @@ public class UserLastKnownLocation {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getLast_known_time() {
+        return last_known_time;
+    }
+
+    public void setLast_known_time(String last_known_time) {
+        this.last_known_time = last_known_time;
     }
 
     public String getLatitude() {

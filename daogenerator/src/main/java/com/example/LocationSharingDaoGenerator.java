@@ -6,7 +6,7 @@ import de.greenrobot.daogenerator.Schema;
 
 public class LocationSharingDaoGenerator {
     public static void main(String[] args) throws Exception {
-        Schema schema = new Schema(1, "com.example.admin1.locationsharing.db.dao");
+        Schema schema = new Schema(2, "com.example.admin1.locationsharing.db.dao");
         addFriendsTable(schema);
         addUserLastKnownLocationTable(schema);
         addUserLocationsTable(schema);
@@ -37,6 +37,7 @@ public class LocationSharingDaoGenerator {
         entity.addIdProperty().primaryKey().autoincrement();
         entity.addStringProperty("friend_first_name");
         entity.addStringProperty("email");
+        entity.addStringProperty("last_known_time");
         entity.addStringProperty("latitude");
         entity.addStringProperty("longitude");
         entity.addStringProperty("time");

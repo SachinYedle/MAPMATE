@@ -3,6 +3,8 @@ package com.example.admin1.locationsharing.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -11,8 +13,10 @@ import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.admin1.locationsharing.R;
@@ -53,8 +57,12 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<FriendsRecy
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        holder.nameTextView.setText(friendsArrayList.get(position).getFriendFirstName());
         holder.emailTextView.setText(highlightText(friendsArrayList.get(position).getFriendsEmail()));
         holder.statusTextView.setText(friendsArrayList.get(position).getStatus());
+        if(friendsArrayList.get(position).getStatus().equals("add")){
+            holder.statusTextView.setVisibility(View.GONE);
+        }
     }
 
     public void setFilter(ArrayList<FriendsData> friendsList, String searchText) {
@@ -97,14 +105,14 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<FriendsRecy
         }
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView emailTextView, statusTextView;
-
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        private TextView emailTextView, statusTextView,nameTextView;
         public ViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             emailTextView = (TextView) itemView.findViewById(R.id.friends_recyclerView_email_textView);
             statusTextView = (TextView) itemView.findViewById(R.id.friends_recyclerView_status_textView);
+            nameTextView = (TextView) itemView.findViewById(R.id.friends_recyclerView_name_textView);
             statusTextView.setOnClickListener(this);
         }
 

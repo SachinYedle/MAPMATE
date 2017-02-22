@@ -45,9 +45,9 @@ public class DrawRouteFunctionality {
         MyApplication.getInstance().showProgressDialog("Drawing path", "please wait...");
         googleMap.clear();
         setRouteVisible(true);
-        googleMap.setOnInfoWindowClickListener(null);
         MenuItem item = menu.findItem(R.id.map_menu_item_my_location);
         item.setVisible(false);
+        googleMap.setOnInfoWindowClickListener(null);
         ArrayList<LatLng> points = new ArrayList<LatLng>();
         PolylineOptions lineOptions = new PolylineOptions();
         List<UserLocations> locations = UserLocationsOperations.getInstance()

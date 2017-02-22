@@ -176,6 +176,7 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
         public void onTaskCompleted(UserLocationsResponse userLocationsResponse) {
             String email = MyApplication.getInstance().sharedPreferencesData.getSelectedUserEmail();
             CustomLog.i("Map Activity", "Download Locations" + userLocationsResponse.getSuccess() + ":" + email);
+            googleMap.setOnInfoWindowClickListener(null);
             DrawRouteFunctionality.getInstance().drawRouteOfSelectedUser(email,googleMap,menu);
         }
 
@@ -198,7 +199,8 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
     }
 
     private void setFriendsMarker(){
-        SetFriendsMarkers.getInstance().setFriendsLocationMarkers(googleMap,menu,this);
+        googleMap.setOnInfoWindowClickListener(this);
+        SetFriendsMarkers.getInstance().setFriendsLocationMarkers(googleMap,menu);
     }
     @Override
     public boolean onMarkerClick(Marker marker) {
@@ -226,7 +228,7 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
                     TextView userPhone = (TextView) view.findViewById(R.id.user_phone);
                     if (userData.size() > 0) {
                         userId.setText(userData.get(0).getFriend_first_name());
-                        String dateString = userData.get(0).getTime();
+                        String dateString = userData.get(0).getLast_known_time();
                         userPhone.setText(TimeInAgoFormat.getInstance().timeInAgoFormat(dateString));
                     } else {
                         userId.setText(MyApplication.getInstance().sharedPreferencesData.getFirstName());
@@ -365,6 +367,8 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        getUserLocations(marker);
+        if(!marker.getTitle().contains("ago")){
+            getUserLocations(marker);
+        }
     }
 }
