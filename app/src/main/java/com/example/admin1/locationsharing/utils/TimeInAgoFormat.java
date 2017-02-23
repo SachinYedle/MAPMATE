@@ -1,5 +1,6 @@
 package com.example.admin1.locationsharing.utils;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -34,13 +35,12 @@ public class TimeInAgoFormat {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
         return parseDate(currentDate, previousDate);
     }
 
     public String parseDate(Date currentDate, Date createDate) {
 
-        String result = "now";
+        String result = "just now";
         long difference = Math.abs(currentDate.getTime() - createDate.getTime());
 
         long secondsInMilli = 1000;

@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.admin1.locationsharing.R;
+import com.example.admin1.locationsharing.interfaces.PositiveClick;
 import com.example.admin1.locationsharing.responses.UserAuthentication;
 import com.example.admin1.locationsharing.services.BackgroundLocationService;
 import com.example.admin1.locationsharing.app.MyApplication;
@@ -166,14 +167,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String token = acct.getIdToken();
             String email = acct.getEmail();
             Uri personPhoto = acct.getPhotoUrl();
-            CustomLog.d("MainActivity","url: "+personPhoto);
+            CustomLog.d("MainActivity", "url: " + personPhoto);
             MyApplication.getInstance().sharedPreferencesData.setFirstName(fullName);
             MyApplication.getInstance().sharedPreferencesData.setEmail(email);
 
-            CustomLog.i("Main Activity","Token: "+acct.getIdToken());
+            CustomLog.i("Main Activity", "Token: " + acct.getIdToken());
             //getPeoplesList(acct.getEmail());
 
-            new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(onLoginListener,token);
+            new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(onLoginListener, token);
 
             googleSignInButton.setVisibility(View.GONE);
             googleSignOut.setVisibility(View.VISIBLE);
@@ -193,9 +194,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onTaskFailed(String request) {
-            MyApplication.getInstance().showToast("Error :"+request);
+            MyApplication.getInstance().showToast("Error :" + request);
         }
     };
+
     /*public void getPeoplesList(final String email) {
 
         final List<String> SCOPES =
@@ -270,7 +272,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.sign_in_button:
-                signInWithGoogle();
+                if (MyApplication.getInstance().isConnectedToInterNet()) {
+                    signInWithGoogle();
+                } else {
+                    PositiveClick positiveClick = new PositiveClick() {
+                        @Override
+                        public void onClick() {
+                            Navigator.getInstance().navgateToSettingssToStartInternet();
+                        }
+                    };
+                    MyApplication.getInstance().showAlertWithPositiveNegativeButton(getString(R.string
+                            .enable_data_header), getString(R.string
+                            .enable_data_message), getString(R.string.cancel), getString(R.string
+                            .enable_data), positiveClick);
+                }
                 break;
             case R.id.btn_sign_out:
                 signOut();

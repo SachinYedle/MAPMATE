@@ -2,9 +2,12 @@ package com.example.admin1.locationsharing.mappers;
 
 import android.content.Context;
 
+import com.example.admin1.locationsharing.R;
+import com.example.admin1.locationsharing.interfaces.PositiveClick;
 import com.example.admin1.locationsharing.retrofitservices.LocationDataService;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.responses.LocationSendingResponse;
+import com.example.admin1.locationsharing.utils.Navigator;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 
 import retrofit2.Call;
@@ -18,21 +21,34 @@ import retrofit2.Response;
 public class UploadLocationsDataMapper {
     private Context context;
     private OnTaskCompletedListener onTaskCompletedListener;
-    public UploadLocationsDataMapper(Context context){
+
+    public UploadLocationsDataMapper(Context context) {
         this.context = context;
     }
 
-    public void sendUserLocation(OnTaskCompletedListener onTaskCompletedListener,String lat,String lon,String radius){
+    public void sendUserLocation(OnTaskCompletedListener onTaskCompletedListener, String lat, String lon, String radius) {
 
         String token = MyApplication.getInstance().sharedPreferencesData.getUserToken();
 
-        if (MyApplication.getInstance().isConnectedToInterNet()){
+        if (MyApplication.getInstance().isConnectedToInterNet()) {
             this.onTaskCompletedListener = onTaskCompletedListener;
             LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(token);
-            Call<LocationSendingResponse> call = locationDataService.sendUserLocation(lat,lon,radius);
+            Call<LocationSendingResponse> call = locationDataService.sendUserLocation(lat, lon, radius);
             call.enqueue(locationSendingResponseCallback);
+        } else {
+            PositiveClick positiveClick = new PositiveClick() {
+                @Override
+                public void onClick() {
+                    Navigator.getInstance().navgateToSettingssToStartInternet();
+                }
+            };
+            MyApplication.getInstance().showAlertWithPositiveNegativeButton(context.getString(R.string
+                    .enable_data_header), context.getString(R.string
+                    .enable_data_message), context.getString(R.string.cancel), context.getString(R.string
+                    .enable_data), positiveClick);
         }
     }
+
     private Callback<LocationSendingResponse> locationSendingResponseCallback = new
             Callback<LocationSendingResponse>() {
 
@@ -59,6 +75,7 @@ public class UploadLocationsDataMapper {
 
     public interface OnTaskCompletedListener {
         void onTaskCompleted(LocationSendingResponse locationSendingResponse);
+
         void onTaskFailed(String response);
     }
 }

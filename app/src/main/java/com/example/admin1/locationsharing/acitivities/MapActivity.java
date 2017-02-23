@@ -17,7 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.app.MyApplication;
@@ -49,7 +48,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Marker;
-import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 
 import java.util.List;
 
@@ -111,7 +109,7 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.toolbar_menu, menu);
+        inflater.inflate(R.menu.map_toolbar_menu, menu);
         this.menu = menu;
         return super.onCreateOptionsMenu(menu);
     }
@@ -126,6 +124,10 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
             case R.id.map_menu_item_my_location:
                 DownloadLocationsDataMapper dataMapper = new DownloadLocationsDataMapper(MyApplication.getCurrentActivityContext());
                 dataMapper.getLocations(onTaskCompletedListener, MyApplication.getInstance().sharedPreferencesData.getId() + "");
+                break;
+            case R.id.map_menu_item_refresh:
+                new FriendsDataMapper().getFriends(onGetFriendsDataListener);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -139,7 +141,7 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
 
         @Override
         public void onTaskFailed(String response) {
-            MyApplication.getInstance().showToast("Getting Friends data : " + response);
+            MyApplication.getInstance().showToast("Error: " + response);
         }
     };
 
@@ -182,7 +184,7 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
 
         @Override
         public void onTaskFailed(String response) {
-            MyApplication.getInstance().showToast("FriendLocation download Failed " + response);
+            MyApplication.getInstance().showToast("Error: " + response);
         }
     };
 
@@ -274,7 +276,8 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
             googleMap.setOnMapLoadedCallback(this);
 
         } else {
-            MyApplication.getInstance().showToast("Please grant FriendLocation permissions");
+            finish();
+            MyApplication.getInstance().showToast("Please grant Location permissions");
         }
     }
 

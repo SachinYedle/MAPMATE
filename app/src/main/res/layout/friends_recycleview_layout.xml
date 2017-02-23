@@ -7,7 +7,7 @@
     android:padding="@dimen/padding_large">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profile_tick_mark_imageView"
+        android:id="@+id/friends_profile_imageView"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_weight="0"

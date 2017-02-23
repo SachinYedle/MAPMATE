@@ -42,10 +42,13 @@ public class DrawRouteFunctionality {
     }
 
     public void drawRouteOfSelectedUser(String email, GoogleMap googleMap, Menu menu) {
+        MyApplication.getInstance().hideProgressDialog();
         MyApplication.getInstance().showProgressDialog("Drawing path", "please wait...");
         googleMap.clear();
         setRouteVisible(true);
         MenuItem item = menu.findItem(R.id.map_menu_item_my_location);
+        item.setVisible(false);
+        item = menu.findItem(R.id.map_menu_item_refresh);
         item.setVisible(false);
         googleMap.setOnInfoWindowClickListener(null);
         ArrayList<LatLng> points = new ArrayList<LatLng>();
@@ -59,6 +62,10 @@ public class DrawRouteFunctionality {
             double lng = Double.parseDouble(locations.get(i).getLongitude());
             LatLng position = new LatLng(lat, lng);
             CustomLog.i("Data", lat + " " + lng + " " + locations.get(i).getEmail());
+            googleMap.addMarker(new MarkerOptions()
+                    .position(position)
+                    .title(TimeInAgoFormat.getInstance().timeInAgoFormat(locations.get(0).getTime()))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.small_blue_marker)));
             builder.include(position);
             points.add(position);
         }
@@ -74,21 +81,13 @@ public class DrawRouteFunctionality {
     }
 
     private void addStartAndEndMarkers(GoogleMap googleMap, List<UserLocations> locations) {
-        double lat = Double.parseDouble(locations.get(locations.size() - 1).getLatitude());
-        double lng = Double.parseDouble(locations.get(locations.size() - 1).getLongitude());
+        double lat = Double.parseDouble(locations.get(0).getLatitude());
+        double lng = Double.parseDouble(locations.get(0).getLongitude());
         LatLng position = new LatLng(lat, lng);
         googleMap.setOnInfoWindowClickListener(null);
         googleMap.addMarker(new MarkerOptions()
                 .position(position)
-                .title("Start At: " + TimeInAgoFormat.getInstance().timeInAgoFormat(locations.get(locations.size() - 1).getTime()))
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.start)));
-        lat = Double.parseDouble(locations.get(0).getLatitude());
-        lng = Double.parseDouble(locations.get(0).getLongitude());
-        position = new LatLng(lat, lng);
-        googleMap.addMarker(new MarkerOptions()
-                .position(position)
                 .title("End At: " + TimeInAgoFormat.getInstance().timeInAgoFormat(locations.get(0).getTime()))
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.end)));
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.small_red_marker)));
     }
-
 }

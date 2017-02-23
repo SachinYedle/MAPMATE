@@ -35,8 +35,9 @@ public class BitMapMerging {
         ColorGenerator generator = ColorGenerator.MATERIAL;
         int color = generator.getRandomColor();
         CustomLog.i("Color","color:"+color);
+        String nameFirstLetter = name.charAt(0) + "".toUpperCase();
         TextDrawable drawable = TextDrawable.builder()
-                .buildRect(name.charAt(0) + "", color);
+                .buildRect(nameFirstLetter, color);
         View view = ((Activity) MyApplication.getCurrentActivityContext()).getLayoutInflater().inflate(R.layout.map_activity_marker_layout, null);
         ImageView image = (ImageView) view.findViewById(R.id.map_marker_imageView);
         image.setImageBitmap(drawableToBitmap(drawable));
@@ -55,7 +56,7 @@ public class BitMapMerging {
         return bitmap;
     }
 
-    public static Bitmap drawableToBitmap(Drawable drawable) {
+    public Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable) drawable).getBitmap();
         }

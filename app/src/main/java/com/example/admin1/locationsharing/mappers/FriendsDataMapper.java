@@ -2,16 +2,19 @@ package com.example.admin1.locationsharing.mappers;
 
 import android.content.Context;
 
+import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.db.dao.Friends;
 import com.example.admin1.locationsharing.db.dao.UserLastKnownLocation;
 import com.example.admin1.locationsharing.db.operations.FriendsTableOperations;
 import com.example.admin1.locationsharing.db.operations.UserLastknownLocationOperations;
+import com.example.admin1.locationsharing.interfaces.PositiveClick;
 import com.example.admin1.locationsharing.responses.FriendRequestAcceptResponse;
 import com.example.admin1.locationsharing.responses.FriendRequestResponse;
 import com.example.admin1.locationsharing.responses.FriendsResponse;
 import com.example.admin1.locationsharing.responses.FriendsServiceResponse;
 import com.example.admin1.locationsharing.retrofitservices.LocationDataService;
+import com.example.admin1.locationsharing.utils.Navigator;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 
 import java.util.List;
@@ -29,34 +32,52 @@ public class FriendsDataMapper {
 
     public interface OnTaskCompletedListener {
         void onTaskCompleted(FriendsServiceResponse friendsServiceResponse);
+
         void onTaskFailed(String response);
     }
+
     public interface OnRequestSentListener {
         void onTaskCompleted(FriendRequestResponse friendRequestResponse);
+
         void onTaskFailed(String response);
     }
+
     public interface OnRequestAcceptedListener {
         void onTaskCompleted(FriendRequestAcceptResponse friendRequestAcceptResponse);
+
         void onTaskFailed(String response);
     }
 
     private OnTaskCompletedListener onTaskCompletedListener;
     private OnRequestAcceptedListener onRequestAcceptedListener;
     private OnRequestSentListener onRequestSentListener;
-    public FriendsDataMapper(){
+
+    public FriendsDataMapper() {
         context = MyApplication.getCurrentActivityContext();
     }
 
-    public void getFriends(OnTaskCompletedListener onTaskCompletedListener){
+    public void getFriends(OnTaskCompletedListener onTaskCompletedListener) {
         String token = MyApplication.getInstance().sharedPreferencesData.getUserToken();
-        if (MyApplication.getInstance().isConnectedToInterNet()){
+        if (MyApplication.getInstance().isConnectedToInterNet()) {
             this.onTaskCompletedListener = onTaskCompletedListener;
             LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(token);
-            MyApplication.getInstance().showProgressDialog("Loading friends data","please wait");
+            MyApplication.getInstance().showProgressDialog("Loading friends data", "please wait");
             Call<FriendsServiceResponse> call = locationDataService.getFriends();
             call.enqueue(getFriendsServiceResponseCallback);
+        } else {
+            PositiveClick positiveClick = new PositiveClick() {
+                @Override
+                public void onClick() {
+                    Navigator.getInstance().navgateToSettingssToStartInternet();
+                }
+            };
+            MyApplication.getInstance().showAlertWithPositiveNegativeButton(context.getString(R.string
+                    .enable_data_header), context.getString(R.string
+                    .enable_data_message), context.getString(R.string.cancel), context.getString(R.string
+                    .enable_data), positiveClick);
         }
     }
+
     private Callback<FriendsServiceResponse> getFriendsServiceResponseCallback = new
             Callback<FriendsServiceResponse>() {
                 @Override
@@ -75,6 +96,7 @@ public class FriendsDataMapper {
                         onTaskCompletedListener.onTaskCompleted(response.body());
                     }
                 }
+
                 @Override
                 public void onFailure(Call<FriendsServiceResponse> call, Throwable t) {
                     MyApplication.getInstance().hideProgressDialog();
@@ -82,23 +104,23 @@ public class FriendsDataMapper {
                 }
             };
 
-    private void parseFriendsData(FriendsServiceResponse friendsServiceResponse){
+    private void parseFriendsData(FriendsServiceResponse friendsServiceResponse) {
         FriendsTableOperations.getInstance().deleteFriendsTableData();
         UserLastknownLocationOperations.getInstance().deleteUserLastKnownData();
         List<FriendsResponse> friendsResponseList = friendsServiceResponse.getFriendsResponseList();
         FriendsResponse friendsResponse;
-        for (int i = 0; i < friendsResponseList.size(); i++){
+        for (int i = 0; i < friendsResponseList.size(); i++) {
             friendsResponse = friendsResponseList.get(i);
             Friends friends = new Friends();
             friends.setFriend_email(friendsResponse.getFriendEmail());
             friends.setFriend_first_name(friendsResponse.getFriendFirstName());
             friends.setFriend_id(friendsResponse.getFriendId());
-            friends.setStatus(""+friendsResponse.getStatus());
+            friends.setStatus("" + friendsResponse.getStatus());
             friends.setFriend_request_id(Integer.parseInt(friendsResponse.getFriendRequestId()));
             friends.setRequester_id(friendsResponse.getRequesterId());
             FriendsTableOperations.getInstance().insertFriends(friends);
-            if(friendsResponse.getStatus() == 1){
-                UserLastKnownLocation userLastKnownLocation = new UserLastKnownLocation ();
+            if (friendsResponse.getStatus() == 1) {
+                UserLastKnownLocation userLastKnownLocation = new UserLastKnownLocation();
                 userLastKnownLocation.setFriend_first_name(friendsResponse.getFriendFirstName());
                 userLastKnownLocation.setEmail(friendsResponse.getFriendEmail());
                 userLastKnownLocation.setLatitude(friendsResponse.getLat());
@@ -109,19 +131,20 @@ public class FriendsDataMapper {
             }
         }
     }
-    public void acceptFriendRequest(OnRequestAcceptedListener onRequestAcceptedListener,int friendRequestId, int friendId){
+
+    public void acceptFriendRequest(OnRequestAcceptedListener onRequestAcceptedListener, int friendRequestId, int friendId) {
         String token = MyApplication.getInstance().sharedPreferencesData.getUserToken();
-        if (MyApplication.getInstance().isConnectedToInterNet()){
+        if (MyApplication.getInstance().isConnectedToInterNet()) {
             this.onRequestAcceptedListener = onRequestAcceptedListener;
             LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(token);
-            Call<FriendRequestAcceptResponse> call = locationDataService.acceptRequest(friendRequestId,friendId);
+            Call<FriendRequestAcceptResponse> call = locationDataService.acceptRequest(friendRequestId, friendId);
             call.enqueue(acceptRequestCallback);
         }
     }
 
-    public void sendRequest(OnRequestSentListener onRequestSentListener,String email){
+    public void sendRequest(OnRequestSentListener onRequestSentListener, String email) {
         String token = MyApplication.getInstance().sharedPreferencesData.getUserToken();
-        if (MyApplication.getInstance().isConnectedToInterNet()){
+        if (MyApplication.getInstance().isConnectedToInterNet()) {
             this.onRequestSentListener = onRequestSentListener;
             LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(token);
             Call<FriendRequestResponse> call = locationDataService.sendRequest(email);
@@ -146,6 +169,7 @@ public class FriendsDataMapper {
                         onRequestAcceptedListener.onTaskCompleted(response.body());
                     }
                 }
+
                 @Override
                 public void onFailure(Call<FriendRequestAcceptResponse> call, Throwable t) {
                     MyApplication.getInstance().hideProgressDialog();
@@ -170,6 +194,7 @@ public class FriendsDataMapper {
                         onRequestSentListener.onTaskCompleted(response.body());
                     }
                 }
+
                 @Override
                 public void onFailure(Call<FriendRequestResponse> call, Throwable t) {
                     MyApplication.getInstance().hideProgressDialog();

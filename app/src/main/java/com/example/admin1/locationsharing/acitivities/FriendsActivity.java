@@ -72,7 +72,7 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
     public boolean onCreateOptionsMenu(Menu menu) {
 
         getMenuInflater().inflate(R.menu.friends_activity_menu, menu);
-        final MenuItem myActionMenuItem = menu.findItem(R.id.action_search);
+        final MenuItem myActionMenuItem = menu.findItem(R.id.friends_menu_item_action_search);
         final SearchView searchView = (SearchView) myActionMenuItem.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -81,7 +81,10 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
                 if (!searchView.isIconified()) {
                     searchView.setIconified(true);
                 }
-                onQueryTextChange(query);
+                if(filter(friendsDataList, query).size()<=0){
+                    addfriend();
+                }
+                myActionMenuItem.collapseActionView();
                 return false;
             }
 
@@ -124,21 +127,27 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void setFriendsDataList(List<Friends> friendsList) {
-        for (int i = 0; i < friendsList.size(); i++) {
-            FriendsData friendsData = new FriendsData();
-            Friends friends = friendsList.get(i);
-            friendsData.setFriendsEmail(friends.getFriend_email());
-            friendsData.setFriendFirstName(friends.getFriend_first_name());
-            if (Integer.parseInt(friends.getStatus()) == 1) {
-                friendsData.setStatus("remove");
-            } else if (Integer.parseInt(friends.getRequester_id()) == Integer.parseInt(friends.getFriend_id())) {
-                friendsData.setStatus("accept request");
-            } else if (Integer.parseInt(friends.getRequester_id()) != Integer.parseInt(friends.getFriend_id())) {
-                friendsData.setStatus("request sent");
+        emailTextView.setVisibility(View.GONE);
+        if (friendsList.size() <= 0) {
+            emailTextView.setVisibility(View.VISIBLE);
+            emailTextView.setText("Click on search icon to add friend");
+        } else {
+            for (int i = 0; i < friendsList.size(); i++) {
+                FriendsData friendsData = new FriendsData();
+                Friends friends = friendsList.get(i);
+                friendsData.setFriendsEmail(friends.getFriend_email());
+                friendsData.setFriendFirstName(friends.getFriend_first_name());
+                if (Integer.parseInt(friends.getStatus()) == 1) {
+                    friendsData.setStatus("Remove");
+                } else if (Integer.parseInt(friends.getRequester_id()) == Integer.parseInt(friends.getFriend_id())) {
+                    friendsData.setStatus("Sccept request");
+                } else if (Integer.parseInt(friends.getRequester_id()) != Integer.parseInt(friends.getFriend_id())) {
+                    friendsData.setStatus("request sent");
+                }
+                friendsDataList.add(friendsData);
             }
-            friendsDataList.add(friendsData);
+            sortFriendsData(friendsDataList);
         }
-        sortFriendsData(friendsDataList);
     }
 
     private void sortFriendsData(ArrayList<FriendsData> friendsList) {
@@ -179,16 +188,20 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.friends_activity_add_btn:
-                if (validateEmail()) {
-                    if (MyApplication.getInstance().sharedPreferencesData.getEmail().equals(emailTextView.getText().toString())) {
-                        MyApplication.getInstance().showToast("Can't add yourself");
-                    } else if (FriendsTableOperations.getInstance().getFriendWithEmail(emailTextView.getText().toString()).size() <= 0) {
-                        new FriendsDataMapper().sendRequest(sendRequestListener, emailTextView.getText().toString());
-                    } else {
-                        MyApplication.getInstance().showToast("User Already added");
-                    }
-                }
+                addfriend();
                 break;
+        }
+    }
+
+    private void addfriend(){
+        if (validateEmail()) {
+            if (MyApplication.getInstance().sharedPreferencesData.getEmail().equals(emailTextView.getText().toString())) {
+                MyApplication.getInstance().showToast("Can't add yourself");
+            } else if (FriendsTableOperations.getInstance().getFriendWithEmail(emailTextView.getText().toString()).size() <= 0) {
+                new FriendsDataMapper().sendRequest(sendRequestListener, emailTextView.getText().toString());
+            } else {
+                MyApplication.getInstance().showToast("User Already added");
+            }
         }
     }
 
@@ -212,13 +225,14 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    public void onItemClick(View view, int position) {
-        FriendsData friendsData = friendsDataList.get(position);
+    public void onItemClick(View view, int position,FriendsData friendsData) {
         if (friendsData.getStatus().equals("accept request")) {
             List<Friends> friendData = FriendsTableOperations.getInstance().getFriendWithEmail(friendsData.getFriendsEmail());
             int friendRequestId = friendData.get(0).getFriend_request_id();
             int friendId = Integer.parseInt(friendData.get(0).getFriend_id());
             new FriendsDataMapper().acceptFriendRequest(onRequestAcceptedListener, friendRequestId, friendId);
+        } else if (friendsData.getStatus().equals("request sent")) {
+            MyApplication.getInstance().showToast("Friend didn't accepted your request");
         } else {
             if (view.getId() == R.id.friends_recyclerView_status_textView && friendsData.getStatus().equals("remove")) {
                 MyApplication.getInstance().showToast("Remove friend");

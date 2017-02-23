@@ -48,7 +48,7 @@ public class SetFriendsMarkers {
                     Double longitude = Double.parseDouble(locationList.get(i).getLongitude());
 
                     LatLng latLng = new LatLng(latitude, longitude);
-                    Bitmap bitmapInflated = BitMapMerging.getInstance().inflateViewGetBitmap(locationList.get(i).getEmail());
+                    Bitmap bitmapInflated = BitMapMerging.getInstance().inflateViewGetBitmap(locationList.get(i).getFriend_first_name());
                     Bitmap bitmapIcon = BitMapMerging.getInstance().mergeBitmap(bitmapInflated, BitmapFactory.decodeResource(MyApplication.getCurrentActivityContext().getResources(), R.drawable.map_marker_blue));
                     BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bitmapIcon);
                     googleMap.addMarker(new MarkerOptions().position(latLng).draggable(false)
@@ -60,6 +60,8 @@ public class SetFriendsMarkers {
                 }
             }
             googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 48));
+        }else {
+            MyApplication.getInstance().showToast("You have no friends..Please add friends");
         }
         MyApplication.getInstance().hideProgressDialog();
     }

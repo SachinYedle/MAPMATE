@@ -2,6 +2,7 @@ package com.example.admin1.locationsharing.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -19,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.app.MyApplication;
 import com.example.admin1.locationsharing.db.dao.Friends;
@@ -26,6 +29,7 @@ import com.example.admin1.locationsharing.db.operations.FriendsTableOperations;
 import com.example.admin1.locationsharing.interfaces.ItemClickListener;
 import com.example.admin1.locationsharing.mappers.FriendsDataMapper;
 import com.example.admin1.locationsharing.pojo.FriendsData;
+import com.example.admin1.locationsharing.utils.BitMapMerging;
 import com.example.admin1.locationsharing.utils.CustomLog;
 import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 
@@ -55,8 +59,19 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<FriendsRecy
         return viewHolder;
     }
 
+    private Bitmap getProfileBitmap(String name){
+        ColorGenerator generator = ColorGenerator.MATERIAL;
+        int color = generator.getRandomColor();
+        CustomLog.i("Color","color:"+color);
+        String nameFirstLetter = name.charAt(0) + "".toUpperCase();
+        TextDrawable drawable = TextDrawable.builder()
+                .buildRect(nameFirstLetter, color);
+        return BitMapMerging.getInstance().drawableToBitmap(drawable);
+    }
+
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        holder.profileImageView.setImageBitmap(getProfileBitmap(friendsArrayList.get(position).getFriendFirstName()));
         holder.nameTextView.setText(friendsArrayList.get(position).getFriendFirstName());
         holder.emailTextView.setText(highlightText(friendsArrayList.get(position).getFriendsEmail()));
         holder.statusTextView.setText(friendsArrayList.get(position).getStatus());
@@ -107,18 +122,20 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<FriendsRecy
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private TextView emailTextView, statusTextView,nameTextView;
+        private ImageView profileImageView;
         public ViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             emailTextView = (TextView) itemView.findViewById(R.id.friends_recyclerView_email_textView);
             statusTextView = (TextView) itemView.findViewById(R.id.friends_recyclerView_status_textView);
             nameTextView = (TextView) itemView.findViewById(R.id.friends_recyclerView_name_textView);
+            profileImageView = (ImageView)itemView.findViewById(R.id.friends_profile_imageView);
             statusTextView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            itemClickListener.onItemClick(view, getAdapterPosition());
+            itemClickListener.onItemClick(view, getAdapterPosition(), friendsArrayList.get(getAdapterPosition()));
         }
     }
 }
