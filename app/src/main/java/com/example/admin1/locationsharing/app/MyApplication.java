@@ -150,18 +150,10 @@ public class MyApplication extends Application {
         return retrofit.create(LocationDataService.class);
     }
     public boolean isConnectedToInterNet() {
-        ConnectivityManager connectivity = (ConnectivityManager) getCurrentActivityContext()
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivity != null) {
-            NetworkInfo[] info = connectivity.getAllNetworkInfo();
-            if (info != null)
-                for (int i = 0; i < info.length; i++) {
-                    if (info[i].getState() == NetworkInfo.State.CONNECTED) {
-                        return true;
-                    }
-                }
-        }
-        return false;
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
     public static Context getCurrentActivityContext() {
         if (context == null) {

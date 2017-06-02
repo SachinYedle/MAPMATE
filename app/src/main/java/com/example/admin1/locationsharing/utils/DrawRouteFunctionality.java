@@ -48,8 +48,6 @@ public class DrawRouteFunctionality {
         setRouteVisible(true);
         MenuItem item = menu.findItem(R.id.map_menu_item_my_location);
         item.setVisible(false);
-        item = menu.findItem(R.id.map_menu_item_refresh);
-        item.setVisible(false);
         googleMap.setOnInfoWindowClickListener(null);
         ArrayList<LatLng> points = new ArrayList<LatLng>();
         PolylineOptions lineOptions = new PolylineOptions();
@@ -62,10 +60,10 @@ public class DrawRouteFunctionality {
             double lng = Double.parseDouble(locations.get(i).getLongitude());
             LatLng position = new LatLng(lat, lng);
             CustomLog.i("Data", lat + " " + lng + " " + locations.get(i).getEmail());
-            googleMap.addMarker(new MarkerOptions()
+            /*googleMap.addMarker(new MarkerOptions()
                     .position(position)
-                    .title(TimeInAgoFormat.getInstance().timeInAgoFormat(locations.get(0).getTime()))
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.small_blue_marker)));
+                    .title(TimeInAgoFormat.getInstance().timeInAgoFormat(locations.get(0).getTime())));
+                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.small_blue_marker)));*/
             builder.include(position);
             points.add(position);
         }

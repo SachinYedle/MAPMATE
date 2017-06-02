@@ -55,8 +55,7 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<FriendsRecy
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = ((Activity) context).getLayoutInflater();
         View view = inflater.inflate(R.layout.friends_recycleview_layout, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view);
-        return viewHolder;
+        return new ViewHolder(view);
     }
 
     private Bitmap getProfileBitmap(String name){
@@ -78,6 +77,18 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<FriendsRecy
         if(friendsArrayList.get(position).getStatus().equals("add")){
             holder.statusTextView.setVisibility(View.GONE);
         }
+    }
+
+    // Clean all elements of the recycler
+    public void clear() {
+        friendsArrayList.clear();
+        notifyDataSetChanged();
+    }
+
+    // Add a list of items
+    public void addAll(ArrayList<FriendsData> friendsArrayList) {
+        this.friendsArrayList = friendsArrayList;
+        notifyDataSetChanged();
     }
 
     public void setFilter(ArrayList<FriendsData> friendsList, String searchText) {
@@ -126,10 +137,10 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<FriendsRecy
         public ViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
-            emailTextView = (TextView) itemView.findViewById(R.id.friends_recyclerView_email_textView);
-            statusTextView = (TextView) itemView.findViewById(R.id.friends_recyclerView_status_textView);
-            nameTextView = (TextView) itemView.findViewById(R.id.friends_recyclerView_name_textView);
-            profileImageView = (ImageView)itemView.findViewById(R.id.friends_profile_imageView);
+            emailTextView = (TextView) itemView.findViewById(R.id.friends_recycler_item_email_textView);
+            statusTextView = (TextView) itemView.findViewById(R.id.friends_recycler_item_status_textView);
+            nameTextView = (TextView) itemView.findViewById(R.id.friends_recycler_item_name_textView);
+            profileImageView = (ImageView)itemView.findViewById(R.id.friends_recycler_item_profile_imageView);
             statusTextView.setOnClickListener(this);
         }
 

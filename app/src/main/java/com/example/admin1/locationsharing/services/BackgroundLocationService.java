@@ -6,6 +6,7 @@ package com.example.admin1.locationsharing.services;
 
 import android.Manifest;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -14,10 +15,16 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+
+import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.app.MyApplication;
+import com.example.admin1.locationsharing.interfaces.PositiveClick;
 import com.example.admin1.locationsharing.mappers.UploadLocationsDataMapper;
 import com.example.admin1.locationsharing.responses.LocationSendingResponse;
+import com.example.admin1.locationsharing.retrofitservices.LocationDataService;
 import com.example.admin1.locationsharing.utils.CustomLog;
+import com.example.admin1.locationsharing.utils.Navigator;
+import com.example.admin1.locationsharing.utils.SharedPreferencesData;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -25,6 +32,11 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import static com.example.admin1.locationsharing.utils.Constants.LOCATION_INTERVAL;
 
 /**
@@ -32,12 +44,13 @@ import static com.example.admin1.locationsharing.utils.Constants.LOCATION_INTERV
  *
  * @author cblack
  */
-public class BackgroundLocationService extends Service implements LocationListener,
-        OnConnectionFailedListener, ConnectionCallbacks {
+public class BackgroundLocationService extends Service implements LocationListener, ConnectionCallbacks {
     private static final String TAG = "LocationService";
     private LocationRequest locationRequest;
     private Location oldLocation = null;
     private GoogleApiClient googleApiClient;
+    private SharedPreferencesData sharedPreferencesData;
+
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -54,6 +67,7 @@ public class BackgroundLocationService extends Service implements LocationListen
     @Override
     public void onCreate() {
         CustomLog.e(TAG, "onCreate");
+        sharedPreferencesData = new SharedPreferencesData();
         buildGoogleApiClient();
         googleApiClient.connect();
     }
@@ -66,7 +80,6 @@ public class BackgroundLocationService extends Service implements LocationListen
         CustomLog.i(TAG, "Building GoogleApiClient");
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
         createLocationRequest();
@@ -103,22 +116,10 @@ public class BackgroundLocationService extends Service implements LocationListen
     public void onLocationChanged(Location location) {
         CustomLog.e(TAG, "onLocationChanged: " + location.getLatitude() + " " + location.getLongitude() + " " + location.getAccuracy());
         UploadLocationsDataMapper uploadLocationsDataMapper = new UploadLocationsDataMapper(MyApplication.getCurrentActivityContext());
-        uploadLocationsDataMapper.sendUserLocation(onTaskCompletedListener, "" + location.getLatitude(), "" + location.getLongitude(), location.getAccuracy() + "");
+        uploadLocationsDataMapper.sendUserLocation("" + location.getLatitude(), "" + location.getLongitude(), location.getAccuracy() + "");
         oldLocation = location;
     }
 
-
-    private UploadLocationsDataMapper.OnTaskCompletedListener onTaskCompletedListener = new UploadLocationsDataMapper.OnTaskCompletedListener() {
-        @Override
-        public void onTaskCompleted(LocationSendingResponse locationSendingResponse) {
-            CustomLog.i(TAG, "FriendLocation updated");
-        }
-
-        @Override
-        public void onTaskFailed(String response) {
-            CustomLog.i(TAG, "FriendLocation sending error" + response);
-        }
-    };
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         CustomLog.i(TAG, "onConnected");
@@ -130,8 +131,44 @@ public class BackgroundLocationService extends Service implements LocationListen
         googleApiClient.connect();
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        CustomLog.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + connectionResult.getErrorCode());
+
+    public class UploadLocationsDataMapper {
+        private Context context;
+
+        public UploadLocationsDataMapper(Context context) {
+            this.context = context;
+        }
+
+        public void sendUserLocation( String lat, String lon, String radius) {
+
+            String token = sharedPreferencesData.getUserToken();
+
+            if (MyApplication.getInstance().isConnectedToInterNet()) {
+                LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(token);
+                Call<LocationSendingResponse> call = locationDataService.sendUserLocation(lat, lon, radius);
+                call.enqueue(locationSendingResponseCallback);
+            }
+        }
+
+        private Callback<LocationSendingResponse> locationSendingResponseCallback = new
+                Callback<LocationSendingResponse>() {
+
+                    @Override
+                    public void onResponse(Call<LocationSendingResponse> call,
+                                           Response<LocationSendingResponse>
+                                                   response) {
+                        if(response.isSuccessful()){
+                            CustomLog.d("LocationService","Updated");
+                        }else {
+                            CustomLog.d("LocationService","NotUpdated");
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<LocationSendingResponse> call, Throwable t) {
+                        CustomLog.d("LocationService","NotUpdated");
+                    }
+                };
     }
 }

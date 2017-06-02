@@ -15,6 +15,7 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.example.admin1.locationsharing.R;
 import com.example.admin1.locationsharing.app.MyApplication;
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by admin1 on 20/2/17.
@@ -41,7 +42,8 @@ public class BitMapMerging {
         View view = ((Activity) MyApplication.getCurrentActivityContext()).getLayoutInflater().inflate(R.layout.map_activity_marker_layout, null);
         ImageView image = (ImageView) view.findViewById(R.id.map_marker_imageView);
         image.setImageBitmap(drawableToBitmap(drawable));
-        //Picasso.with(this).load("https://lh4.googleusercontent.com/-aOkut36hUIQ/AAAAAAAAAAI/AAAAAAAAAAA/ADPlhfLcuV2NVxv1FHD_O8y11siX5_5tFQ/s96-c/photo.jpg").into(image);
+        //Picasso.with(MyApplication.getCurrentActivityContext()).load("https://lh4.googleusercontent.com/-aOkut36hUIQ/AAAAAAAAAAI/AAAAAAAAAAA/ADPlhfLcuV2NVxv1FHD_O8y11siX5_5tFQ/s96-c/photo.jpg").into(image);
+        //image.setImageBitmap(profile);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) MyApplication.getCurrentActivityContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         view.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));

@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "24.0.3"
+    buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId "com.example.admin1.locationsharing"
         minSdkVersion 15
@@ -50,5 +50,6 @@ dependencies {
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
+
 }
 

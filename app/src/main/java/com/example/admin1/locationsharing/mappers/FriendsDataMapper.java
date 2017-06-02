@@ -56,12 +56,14 @@ public class FriendsDataMapper {
         context = MyApplication.getCurrentActivityContext();
     }
 
-    public void getFriends(OnTaskCompletedListener onTaskCompletedListener) {
+    public void getFriends(OnTaskCompletedListener onTaskCompletedListener, boolean isRefreshing) {
         String token = MyApplication.getInstance().sharedPreferencesData.getUserToken();
         if (MyApplication.getInstance().isConnectedToInterNet()) {
             this.onTaskCompletedListener = onTaskCompletedListener;
             LocationDataService locationDataService = MyApplication.getInstance().getLocationDataService(token);
-            MyApplication.getInstance().showProgressDialog("Loading friends data", "please wait");
+            if(!isRefreshing){
+                MyApplication.getInstance().showProgressDialog(context.getString(R.string.loading_data), context.getString(R.string.please_wait));
+            }
             Call<FriendsServiceResponse> call = locationDataService.getFriends();
             call.enqueue(getFriendsServiceResponseCallback);
         } else {

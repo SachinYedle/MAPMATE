@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">KnowWhere</string>
     <string name="facebook_app_id">585924418263922</string>
-    <string name="server_client_id"> 685313191706-5j316bgf6kenhkena2vb8kkagrvfvigp.apps.googleusercontent.com </string>
+    <string name="request_id_token">441095881058-adjl4bl21uab4hemtra3r65uc486d3nv.apps.googleusercontent.com</string>
 
     <string name="btn_logout_from_google">Sign out</string>
     <string name="loading">Loading</string>
@@ -9,8 +9,11 @@
     <string name="ok">OK</string>
     <string name="yes">YES</string>
     <string name="no">NO</string>
+    <string name="ago">ago</string>
+    <string name="now">now</string>
     <string name="enable_gps">GPS Settings</string>
     <string name="cancel">Cancel</string>
+    <string name="something_went_wrong">Something went Wrong... Please try again</string>
     <string name="enable_gps_message">GPS is disabled in your device. Would you like to enable it?</string>
     <string name="enable_gps_header">Enable GPS</string>
     <string name="getting_friends_location">Getting Your Friends Location</string>
@@ -35,7 +38,28 @@
 
     <string name="plus_sign">\u002B</string>
     <string name="minus_sign">\u2212</string>
+    <string name="erroe">Error</string>
 
+    <string name="press_once_again_to_exit">Press once again to exit!</string>
+    <!--Main Activity-->
+
+    <!--Map Activity-->
+    <string name="please_grant_location_permissions">Please grant Location permissions</string>
+    
+    <!--Friends Activity-->
+    <string name="friends">Friends</string>
+    <string name="click_on_search_icon">Click on search icon to add friend</string>
+    <string name="stop">Stop</string>
+    <string name="accept_request">Accept request</string>
+    <string name="request_sent">Request sent</string>
+    <string name="cant_add_yourself">Can\'t add yourself</string>
+    <string name="user_already_added">User Already added</string>
+    <string name="email_required">Email Required</string>
+    <string name="email_invalid">Email invalid</string>
+    <string name="friend_didnt_accepted_request">Friend didn\'t accepted your request</string>
+    <string name="remove_friend">Remove Friend</string>
+    <string name="email">email</string>
+    <string name="accepted">Accepted</string>
 
 
 

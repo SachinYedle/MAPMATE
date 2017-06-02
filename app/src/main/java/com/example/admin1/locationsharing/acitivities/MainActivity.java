@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setUpGoogleLoginOption() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("441095881058-adjl4bl21uab4hemtra3r65uc486d3nv.apps.googleusercontent.com")
+                .requestIdToken(getString(R.string.request_id_token))
                 .requestEmail()
                 .build();
 
@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             googleSignInButton.setVisibility(View.GONE);
             googleSignOut.setVisibility(View.VISIBLE);
         } else {
-            MyApplication.getInstance().showToast("Something went Wrong Please try again");
+            MyApplication.getInstance().showToast(getString(R.string.something_went_wrong));
             CustomLog.e("Login", "Unsuccesfull");
         }
     }
@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onTaskFailed(String request) {
-            MyApplication.getInstance().showToast("Error :" + request);
+            MyApplication.getInstance().showToast(request);
         }
     };
 
@@ -324,5 +324,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         CustomLog.e("MainActivity", "OnConnectionFailed");
     }
-
 }

@@ -34,7 +34,7 @@ public class SetFriendsMarkers {
         return instance;
     }
 
-    public void setFriendsLocationMarkers(GoogleMap googleMap, Menu menu) {
+    public void setFriendsLocationMarkers(GoogleMap googleMap, Menu menu, boolean isFirstTime) {
         googleMap.clear();
         DrawRouteFunctionality.getInstance().setRouteVisible(false);
         MenuItem item = menu.findItem(R.id.map_menu_item_my_location);
@@ -59,7 +59,10 @@ public class SetFriendsMarkers {
 
                 }
             }
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 48));
+            if(isFirstTime) {
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 48));
+            }
+
         }else {
             MyApplication.getInstance().showToast("You have no friends..Please add friends");
         }
