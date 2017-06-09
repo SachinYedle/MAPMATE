@@ -36,6 +36,12 @@
 
     </LinearLayout>
 
+    <Switch
+        android:id="@+id/friends_recycler_item_share_location_switch"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <TextView
         android:id="@+id/friends_recycler_item_status_textView"
         style="@style/medium_text_textview"

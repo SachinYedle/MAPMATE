@@ -1,15 +1,22 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
 
 android {
+    useLibrary 'org.apache.http.legacy'
     compileSdkVersion 25
     buildToolsVersion '25.0.0'
     defaultConfig {
-        applicationId "com.example.admin1.locationsharing"
+        applicationId "com.riktam.mapmate.locationsharing"
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 2
         versionName "1.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -35,14 +42,15 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.android.support:appcompat-v7:25.2.0'
     testCompile 'junit:junit:4.12'
-    compile 'com.google.android.gms:play-services-auth:10.0.1'
-    compile 'com.google.android.gms:play-services-maps:10.0.1'
-    compile 'com.google.android.gms:play-services-location:10.0.1'
+    compile 'com.google.android.gms:play-services-auth:11.0.0'
+    compile 'com.google.android.gms:play-services-maps:11.0.0'
+    compile 'com.google.android.gms:play-services-location:11.0.0'
     compile 'com.squareup.retrofit2:retrofit:2.0.1'
     compile 'com.squareup.retrofit2:converter-gson:2.0.1'
     compile 'com.squareup.okhttp3:okhttp:3.0.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
     compile 'com.jakewharton.retrofit:retrofit1-okhttp3-client:1.0.2'
     compile 'de.greenrobot:greendao:2.1.0'
     compile 'com.android.support:design:25.0.1'
@@ -50,6 +58,31 @@ dependencies {
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.7@aar') {
+        transitive = true;
+    }
+    compile ('com.google.api-client:google-api-client-android:1.22.0',{
+        exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+    })
 
+    compile('com.google.oauth-client:google-oauth-client-jetty:1.22.0', {
+        exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+    })
+
+
+
+
+
+    compile ('com.google.api-client:google-api-client:1.22.0', {
+        exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+    })
+
+    compile ('com.google.apis:google-api-services-people:v1-rev4-1.22.0', {
+        exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+    })
+    compile ('com.google.gdata:core:1.47.1'){
+        exclude group: 'com.google.guava'
+    }
+    compile 'com.android.support:multidex:1.0.1'
 }
 
