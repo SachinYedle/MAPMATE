@@ -11,6 +11,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -59,6 +60,8 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.util.List;
 
+import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
+
 public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerClickListener, GoogleMap.OnMapLoadedCallback, OnMapReadyCallback,
         GoogleMap.OnInfoWindowClickListener {
 
@@ -66,15 +69,13 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
     private SupportMapFragment mapFragment;
     private GoogleMap googleMap;
     private static long back_pressed;
-    private static final int MENU_REFRESH = 1;
-    protected MenuItem refreshItem = null;
     private static final String BROADCAST_ACTION = "android.location.PROVIDERS_CHANGED";
     private static final int REQUEST_CHECK_SETTINGS = 0x1;
-    private Menu menu;
-    private final static int INTERVAL = 1000 * 60; //2 minutes
+    private final static int INTERVAL = 1000 * 60; //1 minutes
     private boolean isFirsTime = true;
-    private boolean isZoomLevelset = false;
-    Handler mHandler = new Handler();
+    private SmoothProgressBar mapProgressBar;
+    private Handler mHandler;
+    private FloatingActionButton floatingActionButton;
 
 
     @Override
@@ -83,10 +84,10 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
         setContentView(R.layout.activity_map);
         MyApplication.getInstance().setCurrentActivityContext(MapActivity.this);
 
+        mHandler = new Handler();
         initializeVariables();
-        getLocationAndSetZoomLevel();
 
-        new FriendsDataMapper().getFriends(onGetFriendsDataListener,true);
+        new FriendsDataMapper().getFriends(onGetFriendsDataListener, true);
 
         if (ActivityCompat.checkSelfPermission(MyApplication.getCurrentActivityContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             getMyLocation();
@@ -97,24 +98,28 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
 
     }
 
-    private void drawRoute(String email) {
+    public void drawRoute(String email) {
         stopRepeatingTask();
-        if (refreshItem != null) {
-            refreshItem.setVisible(false);
-        }
         DrawRouteFunctionality.getInstance().setRouteVisible(true);
-        DownloadLocationsDataMapper dataMapper = new DownloadLocationsDataMapper(MyApplication.getCurrentActivityContext());
-        dataMapper.getLocations(onTaskCompletedListener, FriendsTableOperations.getInstance().getFriendId(email));
+        if (email.equalsIgnoreCase(MyApplication.getInstance().sharedPreferencesData.getEmail())) {
+            DownloadLocationsDataMapper dataMapper = new DownloadLocationsDataMapper(MyApplication.getCurrentActivityContext());
+            dataMapper.getLocations(onTaskCompletedListener, "" + MyApplication.getInstance().sharedPreferencesData.getId());
+        } else {
+            DownloadLocationsDataMapper dataMapper = new DownloadLocationsDataMapper(MyApplication.getCurrentActivityContext());
+            dataMapper.getLocations(onTaskCompletedListener, FriendsTableOperations.getInstance().getFriendId(email));
+        }
     }
 
     public void initializeVariables() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getString(R.string.app_name));
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         MyApplication.getInstance().showProgressDialog(getString(R.string.loading_data), getString(R.string.please_wait));
         setDrawerLayout(MyApplication.getCurrentActivityContext());
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        floatingActionButton = (FloatingActionButton)findViewById(R.id.map_add_friend_floatingActionButton);
+        mapProgressBar = (SmoothProgressBar) findViewById(R.id.map_progressBar);
 
         DrawerFragment fragment = new DrawerFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -125,43 +130,6 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
 
     }
 
-    private void getLocationAndSetZoomLevel(){
-        LocationManager mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            //Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            LocationListener locationListener = new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
-                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                    LatLng position = new LatLng(location.getLatitude(),location.getLongitude());
-                    builder.include(position);
-                    if(googleMap !=null && !isZoomLevelset && !DrawRouteFunctionality.getInstance().isRouteVisible()) {
-                        isZoomLevelset = true;
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 48));
-                        googleMap.animateCamera(CameraUpdateFactory.zoomTo(10), 200, null);
-                    }
-                }
-
-                @Override
-                public void onStatusChanged(String s, int i, Bundle bundle) {
-
-                }
-
-                @Override
-                public void onProviderEnabled(String s) {
-
-                }
-
-                @Override
-                public void onProviderDisabled(String s) {
-
-                }
-            };
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-        }
-
-    }
     public void getMyLocation() {
         mapFragment.getMapAsync(this);
     }
@@ -170,30 +138,15 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.map_toolbar_menu, menu);
-        menu.add(Menu.NONE, MENU_REFRESH, Menu.NONE, "Refresh data")
-                .setIcon(R.drawable.ic_action_refresh)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        setRefreshItem(menu.findItem(MENU_REFRESH));
-        this.menu = menu;
         return super.onCreateOptionsMenu(menu);
     }
 
-    protected void setRefreshItem(MenuItem item) {
-        refreshItem = item;
-    }
-
     protected void stopRefresh() {
-        if (refreshItem != null) {
-            refreshItem.setVisible(false);
-            refreshItem.setActionView(null);
-        }
+        mapProgressBar.setVisibility(View.GONE);
     }
 
     protected void startRefresh() {
-        if (refreshItem != null) {
-            refreshItem.setVisible(true);
-            refreshItem.setActionView(R.layout.indeterminate_progress_action);
-        }
+        mapProgressBar.setVisibility(View.VISIBLE);
     }
 
     void startRepeatingTask() {
@@ -221,15 +174,6 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
                 Navigator.getInstance().navigateToFriendsActivity();
                 finish();
                 break;
-            case R.id.map_menu_item_my_location:
-                drawRoute(MyApplication.getInstance().sharedPreferencesData.getEmail());
-//                DrawRouteFunctionality.getInstance().setRouteVisible(true);
-//                DownloadLocationsDataMapper dataMapper = new DownloadLocationsDataMapper(MyApplication.getCurrentActivityContext());
-//                dataMapper.getLocations(onTaskCompletedListener, MyApplication.getInstance().sharedPreferencesData.getId() + "");
-                break;
-//            case R.id.map_menu_item_refresh:
-//                new FriendsDataMapper().getFriends(onGetFriendsDataListener,false);
-//                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -286,7 +230,7 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
             String email = MyApplication.getInstance().sharedPreferencesData.getSelectedUserEmail();
             CustomLog.i("Map Activity", "Download Locations" + userLocationsResponse.getSuccess() + ":" + email);
             googleMap.setOnInfoWindowClickListener(null);
-            DrawRouteFunctionality.getInstance().drawRouteOfSelectedUser(email, googleMap, menu);
+            DrawRouteFunctionality.getInstance().drawRouteOfSelectedUser(email, googleMap);
         }
 
         @Override
@@ -309,7 +253,7 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
 
     private void setFriendsMarker() {
         googleMap.setOnInfoWindowClickListener(this);
-        SetFriendsMarkers.getInstance().setFriendsLocationMarkers(googleMap, menu, isFirsTime);
+        SetFriendsMarkers.getInstance().setFriendsLocationMarkers(googleMap, isFirsTime);
         isFirsTime = false;
     }
 
@@ -355,10 +299,12 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
 
     @Override
     public void onBackPressed() {
-        if (DrawRouteFunctionality.getInstance().isRouteVisible()) {
+        if(isDrawerOpen()){
+            closeDrawer();
+        }else if (DrawRouteFunctionality.getInstance().isRouteVisible()) {
             setFriendsMarker();
-        }else if (back_pressed + 2000 > System.currentTimeMillis()) {
-            super.onBackPressed();
+        } else if (back_pressed + 2000 > System.currentTimeMillis()) {
+            finish();
         } else {
             MyApplication.getInstance().showToast(getResources().getString(R.string.press_once_again_to_exit));
             back_pressed = System.currentTimeMillis();
@@ -375,7 +321,7 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
         if (bundle != null) {
             String email = MyApplication.getInstance().sharedPreferencesData.getSelectedUserEmail();
             googleMap.setOnInfoWindowClickListener(null);
-            DrawRouteFunctionality.getInstance().drawRouteOfSelectedUser(email, googleMap, menu);
+            DrawRouteFunctionality.getInstance().drawRouteOfSelectedUser(email, googleMap);
         } else {
             /** get friends data */
             DrawRouteFunctionality.getInstance().setRouteVisible(false);
@@ -395,6 +341,7 @@ public class MapActivity extends DrawerActivity implements GoogleMap.OnMarkerCli
             MyApplication.getInstance().showToast(response);
         }
     };
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;

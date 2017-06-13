@@ -2,7 +2,9 @@
     <string name="app_name">Map Mate</string>
     <string name="facebook_app_id">585924418263922</string>
 
-    <string name="request_id_token">441095881058-adjl4bl21uab4hemtra3r65uc486d3nv.apps.googleusercontent.com</string>
+    <!--<string name="server_client_id">441095881058-adjl4bl21uab4hemtra3r65uc486d3nv.apps.googleusercontent.com</string>-->
+
+    <string name="server_client_id">441095881058-re4rnam4h9bpqhd9lsd7mdtgiofpll6h.apps.googleusercontent.com</string>
     <string name="btn_logout_from_google">Sign out</string>
     <string name="loading">Loading</string>
     <string name="alert">Alert</string>
@@ -42,10 +44,13 @@
 
     <string name="press_once_again_to_exit">Press once again to exit!</string>
     <!--Main Activity-->
+    <string name="authenticated">Authenticated</string>
+    <string name="getting_google_contacts">Getting Google Contacts ...</string>
+
 
     <!--Map Activity-->
     <string name="please_grant_location_permissions">Please grant Location permissions</string>
-    
+
     <!--Friends Activity-->
     <string name="friends">Friends</string>
     <string name="click_on_search_icon">Click on search icon to add friend</string>
@@ -67,6 +72,8 @@
     <string name="status_updated">status updated</string>
     <string name="friend_stopped_sharing">friend stopped sharing location</string>
     <string name="no_friends_shring_location_with_you">No friends sharing location with you</string>
+    <string name="logout">Logout</string>
+    <string name="search_or_add_friend">Search or Add friend</string>
 
 
 </resources>

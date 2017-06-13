@@ -8,13 +8,23 @@ public class Contact {
     private int id;
     private String name;
     private String email;
+    private String photoUrl;
 
     public Contact(){}
 
-    public Contact(String name, String email) {
+    public Contact(String name, String email, String photoUrl) {
         super();
         this.name = name;
         this.email = email;
+        this.photoUrl = photoUrl;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 
     public int getId() {

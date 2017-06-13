@@ -25,7 +25,6 @@ import java.util.List;
 
 public class DrawRouteFunctionality {
     private boolean isRouteVisible;
-    private static final int MENU_REFRESH = 1;
     private static DrawRouteFunctionality instance;
 
     public void setRouteVisible(boolean routeVisible) {
@@ -43,14 +42,11 @@ public class DrawRouteFunctionality {
         return instance;
     }
 
-    public void drawRouteOfSelectedUser(String email, GoogleMap googleMap, Menu menu) {
+    public void drawRouteOfSelectedUser(String email, GoogleMap googleMap) {
         MyApplication.getInstance().hideProgressDialog();
         MyApplication.getInstance().showProgressDialog("Drawing path", "please wait...");
         googleMap.clear();
         setRouteVisible(true);
-        MenuItem item = menu.findItem(R.id.map_menu_item_my_location);
-        item.setVisible(false);
-        item = menu.findItem(MENU_REFRESH).setVisible(false);
         googleMap.setOnInfoWindowClickListener(null);
         ArrayList<LatLng> points = new ArrayList<LatLng>();
         PolylineOptions lineOptions = new PolylineOptions();

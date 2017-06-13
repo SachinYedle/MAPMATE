@@ -79,6 +79,9 @@ public class DrawerActivity extends AppCompatActivity {
 
     public void closeDrawer() {mDrawerLayout.closeDrawer(GravityCompat.START);}
 
+    public boolean isDrawerOpen(){
+        return mDrawerLayout.isDrawerOpen(GravityCompat.START);
+    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {

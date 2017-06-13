@@ -24,6 +24,7 @@ public class SharedPreferencesData {
     private final String SELECTED_USER_EMAIL = "selectedUserEmail";
     private final String FIRST_NAME = "firstName";
     private final String LAST_NAME = "lastName";
+    private final String PROFILE_PIC = "profilePic";
     private final String ID = "id";
 
     public void setId(int id) {
@@ -72,6 +73,15 @@ public class SharedPreferencesData {
 
     public String getEmail() {
         return sharedPreferences.getString(EMAIL, "");
+    }
+
+    public void setProfilePic(String profilePic) {
+        editor.putString(PROFILE_PIC, profilePic);
+        editor.commit();
+    }
+
+    public String getProfilePic() {
+        return sharedPreferences.getString(PROFILE_PIC, "");
     }
 
     public String getUserToken() {

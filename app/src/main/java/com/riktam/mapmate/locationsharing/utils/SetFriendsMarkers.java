@@ -36,13 +36,9 @@ public class SetFriendsMarkers {
         return instance;
     }
 
-    public void setFriendsLocationMarkers(final GoogleMap googleMap, Menu menu, boolean isFirstTime) {
+    public void setFriendsLocationMarkers(final GoogleMap googleMap, boolean isFirstTime) {
         googleMap.clear();
         DrawRouteFunctionality.getInstance().setRouteVisible(false);
-        MenuItem item = menu.findItem(R.id.map_menu_item_my_location);
-        if(item != null){
-            item.setVisible(true);
-        }
         boolean isPointsAddedInBuilder = false;
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         final List<UserLastKnownLocation> locationList = UserLastknownLocationOperations.getInstance().getUserLastKnownLocation();
@@ -82,22 +78,14 @@ public class SetFriendsMarkers {
                     Picasso.with(MyApplication.getCurrentActivityContext())
                             .load(locationList.get(i).getFriend_profile())
                             .into(target);
-                    //Bitmap bitmapInflated = BitMapMerging.getInstance().inflateViewGetBitmap(locationList.get(i).getFriend_first_name());
-
-//                    Bitmap bitmapIcon = BitMapMerging.getInstance().mergeBitmap(bitmapInflated, BitmapFactory.decodeResource(MyApplication.getCurrentActivityContext().getResources(), R.drawable.map_marker_blue));
-//                    BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bitmapIcon);
-//                    googleMap.addMarker(new MarkerOptions().position(latLng).draggable(false)
-//                            .title(locationList.get(i).getEmail())
-//                            .icon(icon)
-//                            .snippet(locationList.get(i).getFriend_first_name()).visible(true));
                     isPointsAddedInBuilder = true;
                     builder.include(latLng);
 
                 }
             }
-//            if(isFirstTime && isPointsAddedInBuilder) {
-//                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 48));
-//            }
+            if(isFirstTime && isPointsAddedInBuilder) {
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 48));
+            }
             if(!isPointsAddedInBuilder){
                 MyApplication.getInstance().showToast(MyApplication.getCurrentActivityContext().getString(R.string.no_friends_shring_location_with_you));
             }

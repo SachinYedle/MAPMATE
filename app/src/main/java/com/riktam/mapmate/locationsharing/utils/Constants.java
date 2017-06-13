@@ -23,7 +23,7 @@ public class Constants {
     public static String OAUTH_URL = "https://accounts.google.com/o/oauth2/auth";
     public static String OAUTH_SCOPE = "https://www.googleapis.com/auth/contacts.readonly";
 
-    public static final String CONTACTS_URL = "https://www.google.com/m8/feeds/contacts/default/full";
+    public static final String CONTACTS_URL = "https://www.google.com/m8/feeds/contacts/default/full?max-results=3000&popular=true";
     public static final int MAX_NB_CONTACTS = 1000;
     public static final String APP = "Map Mate";
 }

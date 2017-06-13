@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.riktam.mapmate.locationsharing.R;
@@ -34,6 +35,8 @@ import com.riktam.mapmate.locationsharing.utils.DrawRouteFunctionality;
 import com.riktam.mapmate.locationsharing.utils.Navigator;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class FriendsActivity extends AppCompatActivity implements View.OnClickListener, ItemClickListener {
@@ -100,11 +103,17 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         getMenuInflater().inflate(R.menu.friends_activity_menu, menu);
         final MenuItem myActionMenuItem = menu.findItem(R.id.friends_menu_item_action_search);
         final SearchView searchView = (SearchView) myActionMenuItem.getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchView.setQueryHint(getString(R.string.search_or_add_friend));
+
+        /*searchView.setIconifiedByDefault(true);
+        searchView.setFocusable(true);
+        searchView.setIconified(false);
+        searchView.requestFocusFromTouch();*/
+
+        ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text)).setHintTextColor(getResources().getColor(R.color.white));        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (!searchView.isIconified()) {
@@ -147,8 +156,9 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
         query = query.toLowerCase();
         ArrayList<FriendsData> filteredFriendsList = new ArrayList<>();
         for (int i = 0; i < friendsDataList.size(); i++) {
-            final String text = friendsDataList.get(i).getFriendsEmail().toLowerCase();
-            if (text.contains(query)) {
+            final String email = friendsDataList.get(i).getFriendsEmail().toLowerCase();
+            final String name = friendsDataList.get(i).getFriendFirstName().toLowerCase();
+            if (email.contains(query) || name.contains(query)) {
                 filteredFriendsList.add(friendsDataList.get(i));
             }
         }
@@ -207,13 +217,28 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
                 friends.add(friendsList.get(i));
             }
         }
+
         friendsDataList = new ArrayList<FriendsData>();
-        friendsDataList.addAll(requested);
-        friendsDataList.addAll(accept);
-        friendsDataList.addAll(friends);
+
+        friendsDataList.addAll(sortData(requested));
+        friendsDataList.addAll(sortData(accept));
+        friendsDataList.addAll(sortData(friends));
         MyApplication.getInstance().hideProgressDialog();
     }
 
+    private ArrayList<FriendsData> sortData(ArrayList<FriendsData> friendsData){
+        Collections.sort(friendsData,friendNameComparator);
+        return friendsData;
+    }
+
+    private Comparator<? super FriendsData> friendNameComparator = new
+            Comparator<FriendsData>() {
+
+                @Override
+                public int compare(FriendsData lhs, FriendsData rhs) {
+                    return lhs.getFriendFirstName().compareTo(rhs.getFriendFirstName());
+                }
+            };
     private void setListenersToViews() {
         addFriendsTextView.setOnClickListener(this);
     }

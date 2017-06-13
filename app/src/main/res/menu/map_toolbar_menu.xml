@@ -5,9 +5,4 @@
         android:icon="@drawable/ic_action_friends"
         android:title="@string/friends_location"
         app:showAsAction="ifRoom"/>
-    <item android:id="@+id/map_menu_item_my_location"
-        android:icon="@drawable/ic_action_my_location"
-        android:title="@string/my_route"
-        app:showAsAction="collapseActionView"/>
-
 </menu>

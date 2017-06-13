@@ -15,8 +15,6 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.riktam.mapmate.locationsharing.R;
 import com.riktam.mapmate.locationsharing.app.MyApplication;
 import com.riktam.mapmate.locationsharing.interfaces.ItemClickListener;
@@ -50,25 +48,12 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<FriendsRecy
         return new ViewHolder(view);
     }
 
-    private Bitmap getProfileBitmap(String name){
-        ColorGenerator generator = ColorGenerator.MATERIAL;
-        int color = generator.getRandomColor();
-        CustomLog.i("Color","color:"+color);
-        String nameFirstLetter = name.charAt(0) + "".toUpperCase();
-        TextDrawable drawable = TextDrawable.builder()
-                .buildRect(nameFirstLetter, color);
-        return BitMapMerging.getInstance().drawableToBitmap(drawable);
-    }
-
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if(friendsArrayList.get(position).getFriendProfileUrl() != null){
             Picasso.with(MyApplication.getCurrentActivityContext()).load(friendsArrayList.get(position).getFriendProfileUrl()).into(holder.profileImageView);
-        }else {
-            holder.profileImageView.setImageBitmap(getProfileBitmap(friendsArrayList.get(position).getFriendFirstName()));
         }
-
-        holder.nameTextView.setText(friendsArrayList.get(position).getFriendFirstName());
+        holder.nameTextView.setText(highlightText(friendsArrayList.get(position).getFriendFirstName()));
         holder.emailTextView.setText(highlightText(friendsArrayList.get(position).getFriendsEmail()));
         if(friendsArrayList.get(position).getStatus().equalsIgnoreCase(context.getString(R.string.start)) || friendsArrayList.get(position).getStatus().equalsIgnoreCase(context.getString(R.string.stop))){
             holder.shareLocationSwitch.setVisibility(View.VISIBLE);

@@ -1,24 +1,41 @@
 package com.riktam.mapmate.locationsharing.acitivities;
 
 import android.Manifest;
-import android.accounts.Account;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
+
 import com.google.android.gms.common.api.Scope;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.gdata.client.contacts.ContactsService;
+import com.google.gdata.data.Link;
+import com.google.gdata.data.contacts.ContactEntry;
+import com.google.gdata.data.contacts.ContactFeed;
+import com.google.gdata.data.extensions.Email;
+import com.google.gdata.data.extensions.Name;
 import com.riktam.mapmate.locationsharing.R;
 import com.riktam.mapmate.locationsharing.interfaces.PositiveClick;
 import com.riktam.mapmate.locationsharing.app.MyApplication;
 import com.riktam.mapmate.locationsharing.mappers.UserDataMapper;
+import com.riktam.mapmate.locationsharing.pojo.Contact;
 import com.riktam.mapmate.locationsharing.responses.UserAuthentication;
 import com.riktam.mapmate.locationsharing.services.BackgroundLocationService;
+import com.riktam.mapmate.locationsharing.utils.Constants;
 import com.riktam.mapmate.locationsharing.utils.CustomLog;
 
 import com.riktam.mapmate.locationsharing.utils.Navigator;
@@ -33,6 +50,16 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.crashlytics.android.Crashlytics;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.fabric.sdk.android.Fabric;
 
 
@@ -43,11 +70,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button googleSignOut;
     private GoogleApiClient googleApiClient;
     private final int REQUSTED_CODE = 99;
-    private final int REQUEST_AUTHORIZATION = 1002;
-    private final int RC_REAUTHORIZE = 100;
-    private Account mAuthorizedAccount;
     private String authCode;
-    private static String GOOGLE_CALENDAR_API_SCOPE = "";
+    private String accessToken;
+    private String client_id;
+    private String client_secret;
+    private String access_token_url;
+
+    public MainActivity() throws IOException {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,8 +152,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setUpGoogleLoginOption() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.request_id_token))
-                .requestServerAuthCode(getString(R.string.request_id_token))
+                .requestIdToken(getString(R.string.server_client_id))
+                .requestServerAuthCode(getString(R.string.server_client_id))
                 .requestScopes(new Scope("https://www.google.com/m8/feeds"))
                 .requestEmail()
                 .build();
@@ -149,17 +179,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
                 handleGoogleSignInResult(result);
-
             }
         }
     }
 
     private void handleGoogleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
+
             GoogleSignInAccount acct = result.getSignInAccount();
-            mAuthorizedAccount = acct.getAccount();
             authCode = acct.getServerAuthCode();
 
+            new GetAccessToken(this).execute();
+
+            CustomLog.d("Auth code", "" + authCode);
             String fullName = acct.getDisplayName();
             String token = acct.getIdToken();
 
@@ -170,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             CustomLog.d("MainActivity", "id: " + acct.getId());
             MyApplication.getInstance().sharedPreferencesData.setFirstName(fullName);
             MyApplication.getInstance().sharedPreferencesData.setEmail(email);
+            MyApplication.getInstance().sharedPreferencesData.setProfilePic(personPhoto.toString());
 
             CustomLog.i("Main Activity", "Token: " + acct.getIdToken());
 
@@ -183,8 +216,174 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public String loadJSONFromAsset() {
+        String json = null;
+        try {
+            InputStream is = getAssets().open("client_secret.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
+    }
+
+    private void readJsonFromAssets() {
+        try {
+
+            JSONObject main = new JSONObject(loadJSONFromAsset());
+            JSONObject web = main.getJSONObject("web");
+            client_id = web.getString("client_id");
+            client_secret = web.getString("client_secret");
+            access_token_url = "https://www.googleapis.com/oauth2/v4/token";
+
+
+        } catch (JSONException e) {
+            CustomLog.e("Json parse exception", " " + e.getLocalizedMessage());
+        }
+    }
+
+    private class GetAccessToken extends
+            AsyncTask<String, String, GoogleTokenResponse> {
+
+        private ProgressDialog pDialog;
+        private Context context;
+
+        GoogleTokenResponse tokenResponse = null;
+
+        public GetAccessToken(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected GoogleTokenResponse doInBackground(String... args) {
+            try {
+                readJsonFromAssets();
+                tokenResponse = new GoogleAuthorizationCodeTokenRequest(
+                        new NetHttpTransport(),
+                        JacksonFactory.getDefaultInstance(),
+                        access_token_url, client_id, client_secret, authCode, "")
+                        // Specify the same redirect URI that you use with your web
+                        // app. If you don't have a web version of your app, you can
+                        // specify an empty string.
+                        .execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return tokenResponse;
+        }
+
+        @Override
+        protected void onPostExecute(GoogleTokenResponse googleContacts) {
+            accessToken = googleContacts.getAccessToken();
+            new GetGoogleContacts(MainActivity.this).execute(accessToken);
+            CustomLog.d("Token", googleContacts.getAccessToken());
+        }
+
+    }
+
+    private class GetGoogleContacts extends
+            AsyncTask<String, String, List<ContactEntry>> {
+
+        private Context context;
+
+        public GetGoogleContacts(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            MyApplication.getInstance().showProgressDialog(getString(R.string.authenticated), getString(R.string.getting_google_contacts));
+        }
+
+        @Override
+        protected List<ContactEntry> doInBackground(String... args) {
+            String accessToken = args[0];
+            ContactsService contactsService = new ContactsService(
+                    Constants.APP);
+            contactsService.setHeader("Authorization", "Bearer " + accessToken);
+            contactsService.setHeader("GData-Version", "3.0");
+            List<ContactEntry> contactEntries = null;
+            try {
+                URL feedUrl = new URL(Constants.CONTACTS_URL);
+                ContactFeed resultFeed = contactsService.getFeed(feedUrl,
+                        ContactFeed.class);
+                contactEntries = resultFeed.getEntries();
+            } catch (Exception e) {
+                MyApplication.getInstance().hideProgressDialog();
+            }
+            return contactEntries;
+        }
+
+        @Override
+        protected void onPostExecute(List<ContactEntry> googleContacts) {
+            if (null != googleContacts && googleContacts.size() > 0) {
+                List<Contact> contacts = new ArrayList<Contact>();
+
+                for (ContactEntry contactEntry : googleContacts) {
+                    String name = "";
+                    String email = "";
+
+                    if (contactEntry.hasName()) {
+                        Name tmpName = contactEntry.getName();
+                        if (tmpName.hasFullName()) {
+                            name = tmpName.getFullName().getValue();
+                        } else {
+                            if (tmpName.hasGivenName()) {
+                                name = tmpName.getGivenName().getValue();
+                                if (tmpName.getGivenName().hasYomi()) {
+                                    name += " ("
+                                            + tmpName.getGivenName().getYomi()
+                                            + ")";
+                                }
+                                if (tmpName.hasFamilyName()) {
+                                    name += tmpName.getFamilyName().getValue();
+                                    if (tmpName.getFamilyName().hasYomi()) {
+                                        name += " ("
+                                                + tmpName.getFamilyName()
+                                                .getYomi() + ")";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    List<Email> emails = contactEntry.getEmailAddresses();
+                    if (null != emails && emails.size() > 0) {
+                        Email tempEmail = (Email) emails.get(0);
+                        email = tempEmail.getAddress();
+                    }
+                    Link photoLink = contactEntry.getContactPhotoLink();
+                    String photoLinkHref = photoLink.getHref();
+                    //System.out.println("Photo Link: " + photoLinkHref);
+
+                    Contact contact = new Contact(name, email,photoLinkHref);
+                    CustomLog.d("Contact", "Name: " + contact.getName() + " Email: " + contact.getEmail()+"Photo: "+ photoLinkHref);
+                    contacts.add(contact);
+                }
+
+            } else {
+                Log.e("Contacts error", "No Contact Found.");
+                Toast.makeText(context, "No Contact Found.", Toast.LENGTH_SHORT)
+                        .show();
+            }
+            MyApplication.getInstance().hideProgressDialog();
+        }
+
+    }
+
     private UserDataMapper.OnLoginListener onLoginListener = new UserDataMapper.OnLoginListener() {
-                @Override
+        @Override
         public void onTaskCompleted(UserAuthentication userAuthenticationResponse) {
             callToBackgroundLocationService();
             Navigator.getInstance().navigateToMapActivity();
@@ -196,6 +395,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             MyApplication.getInstance().showToast(request);
         }
     };
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {

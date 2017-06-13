@@ -6,7 +6,6 @@ repositories {
 }
 
 android {
-    useLibrary 'org.apache.http.legacy'
     compileSdkVersion 25
     buildToolsVersion '25.0.0'
     defaultConfig {
@@ -42,7 +41,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.2.0'
+    compile 'com.android.support:appcompat-v7:25.0.1'
     testCompile 'junit:junit:4.12'
     compile 'com.google.android.gms:play-services-auth:11.0.0'
     compile 'com.google.android.gms:play-services-maps:11.0.0'
@@ -55,9 +54,9 @@ dependencies {
     compile 'de.greenrobot:greendao:2.1.0'
     compile 'com.android.support:design:25.0.1'
     compile 'com.android.support:recyclerview-v7:25.0.1'
-    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.7@aar') {
         transitive = true;
     }
@@ -65,21 +64,6 @@ dependencies {
         exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
     })
 
-    compile('com.google.oauth-client:google-oauth-client-jetty:1.22.0', {
-        exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
-    })
-
-
-
-
-
-    compile ('com.google.api-client:google-api-client:1.22.0', {
-        exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
-    })
-
-    compile ('com.google.apis:google-api-services-people:v1-rev4-1.22.0', {
-        exclude module: 'httpclient' exclude group: 'org.apache.httpcomponents' exclude group: 'org.apache.httpcomponents', module: 'httpclient'
-    })
     compile ('com.google.gdata:core:1.47.1'){
         exclude group: 'com.google.guava'
     }
