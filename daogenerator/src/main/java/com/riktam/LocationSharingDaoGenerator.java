@@ -1,5 +1,7 @@
 package com.riktam;
 
+import java.util.Scanner;
+
 import de.greenrobot.daogenerator.DaoGenerator;
 import de.greenrobot.daogenerator.Entity;
 import de.greenrobot.daogenerator.Schema;
@@ -10,9 +12,11 @@ public class LocationSharingDaoGenerator {
         addFriendsTable(schema);
         addUserLastKnownLocationTable(schema);
         addUserLocationsTable(schema);
+        addGmailFriendsTable(schema);
         new DaoGenerator().generateAll(schema, "./app/src/main/java");
     }
-    private static void addFriendsTable(Schema schema){
+
+    private static void addFriendsTable(Schema schema) {
         Entity entity = schema.addEntity("Friends");
         entity.addIdProperty().primaryKey().autoincrement();
         entity.addStringProperty("friend_email");
@@ -25,7 +29,7 @@ public class LocationSharingDaoGenerator {
         entity.addIntProperty("sharing");
     }
 
-    private static void addUserLocationsTable(Schema schema){
+    private static void addUserLocationsTable(Schema schema) {
         Entity entity = schema.addEntity("UserLocations");
         entity.addIdProperty().primaryKey().autoincrement();
         entity.addStringProperty("email");
@@ -35,7 +39,8 @@ public class LocationSharingDaoGenerator {
         entity.addStringProperty("time");
         entity.addIntProperty("sharing");
     }
-    private static void addUserLastKnownLocationTable(Schema schema){
+
+    private static void addUserLastKnownLocationTable(Schema schema) {
         Entity entity = schema.addEntity("UserLastKnownLocation");
         entity.addIdProperty().primaryKey().autoincrement();
         entity.addStringProperty("friend_first_name");
@@ -46,6 +51,14 @@ public class LocationSharingDaoGenerator {
         entity.addStringProperty("longitude");
         entity.addStringProperty("time");
         entity.addStringProperty("friend_profile");
+    }
+
+    private static void addGmailFriendsTable(Schema schema) {
+        Entity entity = schema.addEntity("UserGmailFriends");
+        entity.addIdProperty().primaryKey().autoincrement();
+        entity.addStringProperty("name");
+        entity.addStringProperty("email");
+        entity.addStringProperty("profilePicUrl");
     }
 }
 

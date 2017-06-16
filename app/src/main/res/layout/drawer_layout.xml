@@ -8,19 +8,24 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.4"
-        android:background="@drawable/navigation_drawer_header"
+        android:background="@color/colorPrimaryDark"
         android:padding="@dimen/drawer_header_padding">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/drawer_item_user_profile_imageView"
             android:layout_width="@dimen/profile_image_size"
             android:layout_height="@dimen/profile_image_size"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/margin_xxlarge"
             android:layout_above="@+id/drawer_item_username_textView" />
 
         <TextView
             android:id="@+id/drawer_item_username_textView"
             style="@style/medium_text_textview"
             android:layout_width="match_parent"
+            android:textSize="@dimen/text_size_large"
+            android:gravity="center_horizontal"
+            android:layout_centerHorizontal="true"
             android:layout_above="@+id/drawer_item_email_textView"
             android:textColor="@android:color/white" />
 
@@ -28,6 +33,8 @@
             android:id="@+id/drawer_item_email_textView"
             style="@style/medium_text_textview"
             android:layout_width="match_parent"
+            android:gravity="center_horizontal"
+            android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
             android:paddingBottom="@dimen/padding_large"
             android:textColor="@android:color/white"
@@ -44,22 +51,81 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/my_route"
+            android:textSize="@dimen/text_size_medium"
             android:gravity="center_vertical"
             android:drawablePadding="@dimen/padding_xlarge"
-            android:padding="@dimen/padding_xlarge"
+            android:padding="@dimen/padding_large"
             android:drawableStart="@drawable/ic_action_my_location"
             android:drawableLeft="@drawable/ic_action_my_location"
             android:textStyle="bold" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/black"/>
+        <TextView
+            android:id="@+id/drawer_item_friends_location_textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/locate_friend"
+            android:gravity="center_vertical"
+            android:drawablePadding="@dimen/padding_xlarge"
+            android:padding="@dimen/padding_large"
+            android:textSize="@dimen/text_size_medium"
+            android:drawableStart="@drawable/ic_action_friends_location"
+            android:drawableLeft="@drawable/ic_action_friends_location"
+            android:textStyle="bold" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/black"/>
+        <TextView
+            android:id="@+id/drawer_item_friends_textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/friends"
+            android:textSize="@dimen/text_size_medium"
+            android:gravity="center_vertical"
+            android:drawablePadding="@dimen/padding_xlarge"
+            android:padding="@dimen/padding_large"
+            android:drawableStart="@drawable/ic_action_friends"
+            android:drawableLeft="@drawable/ic_action_friends"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/black"/>
+        <TextView
+            android:id="@+id/drawer_item_add_friends_textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_friend"
+            android:textSize="@dimen/text_size_medium"
+            android:gravity="center_vertical"
+            android:drawablePadding="@dimen/padding_xlarge"
+            android:padding="@dimen/padding_large"
+            android:drawableStart="@drawable/ic_action_add_friend"
+            android:drawableLeft="@drawable/ic_action_add_friend"
+            android:textStyle="bold" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/black"/>
         <TextView
             android:id="@+id/drawer_item_logout_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/logout"
+            android:textSize="@dimen/text_size_medium"
             android:gravity="center_vertical"
             android:drawablePadding="@dimen/padding_xlarge"
-            android:padding="@dimen/padding_xlarge"
+            android:padding="@dimen/padding_large"
             android:drawableStart="@drawable/ic_action_logout"
             android:drawableLeft="@drawable/ic_action_logout"
             android:textStyle="bold" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/black"/>
     </LinearLayout>
 </LinearLayout>

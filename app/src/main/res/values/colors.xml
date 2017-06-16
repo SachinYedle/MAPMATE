@@ -2,11 +2,12 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#000000</color>
     <color name="black">#111111</color>
     <color name="phone_text_color">#9f9f9f</color>
     <color name="red">#ff0000</color>
     <color name="white">#FFF</color>
+    <color name="grey">#808080</color>
 
     <color name="gplus_color_1">#3e802f</color>
     <color name="gplus_color_2">#f4b400</color>

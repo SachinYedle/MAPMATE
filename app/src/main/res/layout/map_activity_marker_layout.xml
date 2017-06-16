@@ -14,9 +14,9 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/map_marker_imageView"
-        android:layout_width="20dp"
-        android:layout_marginLeft="6dp"
-        android:layout_marginStart="6dp"
-        android:layout_marginTop="2dp"
-        android:layout_height="20dp" />
+        android:layout_width="40dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="4dp"
+        android:layout_height="40dp" />
 </RelativeLayout>

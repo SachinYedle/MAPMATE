@@ -10,6 +10,15 @@ public class FriendsData {
     private String status;
     private int sharing;
     private String friendProfileUrl;
+    private String friendsDisplayName;
+
+    public String getFriendsDisplayName() {
+        return friendsDisplayName;
+    }
+
+    public void setFriendsDisplayName(String friendsDisplayName) {
+        this.friendsDisplayName = friendsDisplayName;
+    }
 
     public String getFriendProfileUrl() {
         return friendProfileUrl;

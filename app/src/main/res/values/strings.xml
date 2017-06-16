@@ -24,7 +24,7 @@
     <string name="transition_name_photo">transition:PHOTO</string>
     <string name="transition_name_phone">transition:PHONE</string>
     <string name="add">Add</string>
-    <string name="my_route">My Route</string>
+    <string name="my_route">My Location</string>
     <string name="friends_location">Friends Location</string>
     <string name="done">Done</string>
     <string name="refresh">Refresh</string>
@@ -74,6 +74,18 @@
     <string name="no_friends_shring_location_with_you">No friends sharing location with you</string>
     <string name="logout">Logout</string>
     <string name="search_or_add_friend">Search or Add friend</string>
-
-
+    <string name="other_friends">Your Google Friends</string>
+    <string name="send">Send</string>
+    <string name="send_request">Send Request</string>
+    <string name="send_request_to_friend">Send Request to friend to see location</string>
+    <string name="send_invite">Invite Friend</string>
+    <string name="invite">Invite</string>
+    <string name="send_invitation">Your friend not using this App. Send invitation.</string>
+    <string name="invitation_sent">Invitation by Mail sent Successfully</string>
+    <string name="invitation_failed">Invitation sending failed</string>
+    <string name="invitation_sent_by_mail">Invitation sent by mail. Dou you want to tell more about the app?</string>
+    <string name="invitation_sent_by_mail_failed">Invitation by mail failed. Dou you want to send message.</string>
+    <string name="switch_info_text">Turn on/off switch to start/stop sharing your location</string>
+    <string name="add_friend">Add Friend</string>
+    <string name="locate_friend">Locate Friend</string>
 </resources>

@@ -2,6 +2,7 @@ package com.riktam.mapmate.locationsharing.interfaces;
 
 import android.view.View;
 
+import com.riktam.mapmate.locationsharing.db.dao.UserGmailFriends;
 import com.riktam.mapmate.locationsharing.pojo.FriendsData;
 
 /**

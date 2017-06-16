@@ -1,8 +1,6 @@
 package com.riktam.mapmate.locationsharing.utils;
 
 import android.graphics.Color;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.riktam.mapmate.locationsharing.R;
 import com.riktam.mapmate.locationsharing.app.MyApplication;
@@ -58,10 +56,10 @@ public class DrawRouteFunctionality {
             double lng = Double.parseDouble(locations.get(i).getLongitude());
             LatLng position = new LatLng(lat, lng);
             CustomLog.i("Data", lat + " " + lng + " " + locations.get(i).getEmail());
-            /*googleMap.addMarker(new MarkerOptions()
+            googleMap.addMarker(new MarkerOptions()
                     .position(position)
-                    .title(TimeInAgoFormat.getInstance().timeInAgoFormat(locations.get(0).getTime())));
-                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.small_blue_marker)));*/
+                    .title(TimeInAgoFormat.getInstance().timeInAgoFormat(locations.get(i).getTime()))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.small_blue_dot)));
             builder.include(position);
             points.add(position);
         }

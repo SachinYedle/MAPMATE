@@ -66,7 +66,7 @@ public class MyApplication extends Application {
             File sd = Environment.getExternalStorageDirectory();
             File data = Environment.getDataDirectory();
             if (sd.canWrite()) {
-                String currentDBPath = "//data//com.example.admin1.locationsharing//databases//" +
+                String currentDBPath = "//data//com.riktam.mapmate.locationsharing//databases//" +
                         Constants.DB_NAME;
                 String backupDBPath = "location_sharing";
                 File currentDB = new File(data, currentDBPath);

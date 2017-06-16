@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.riktam.mapmate.locationsharing.R;
 import com.riktam.mapmate.locationsharing.app.MyApplication;
@@ -69,6 +70,7 @@ public class DrawerActivity extends AppCompatActivity {
         public void onDrawerClosed(View drawerView) {
             //calling onPrepareOptionsMenu() to show action bar icons
             invalidateOptionsMenu();
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         }
 
         @Override
@@ -77,9 +79,11 @@ public class DrawerActivity extends AppCompatActivity {
         }
     };
 
-    public void closeDrawer() {mDrawerLayout.closeDrawer(GravityCompat.START);}
+    public void closeDrawer() {
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+    }
 
-    public boolean isDrawerOpen(){
+    public boolean isDrawerOpen() {
         return mDrawerLayout.isDrawerOpen(GravityCompat.START);
     }
 

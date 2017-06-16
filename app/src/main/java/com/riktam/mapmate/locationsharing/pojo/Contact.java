@@ -10,7 +10,8 @@ public class Contact {
     private String email;
     private String photoUrl;
 
-    public Contact(){}
+    public Contact() {
+    }
 
     public Contact(String name, String email, String photoUrl) {
         super();
@@ -30,26 +31,30 @@ public class Contact {
     public int getId() {
         return id;
     }
+
     public void setId(int id) {
         this.id = id;
     }
+
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
 
     @Override
     public String toString() {
-//return "Contact [id=" + id + ", name=" + name + ", email=" + email + "]";
-        return name;
+        return "Contact [id=" + id + ", name=" + name + ", email=" + email + ", name=" + name + "]";
     }
 
 }

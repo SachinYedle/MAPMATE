@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">20dp</dimen>
+    <dimen name="activity_vertical_margin">20dp</dimen>
+    <dimen name="button_text_size">19sp</dimen>
+    <dimen name="font_size">22sp</dimen>
+    <dimen name="profile_image_size">94dp</dimen>
+    <dimen name="grid_column_width">100dp</dimen>
+
+    <!--navigation drawer-->
+    <dimen name="drawer_header_height">304dp</dimen>
+    <dimen name="drawer_header_padding">20.8dp</dimen>
+    <dimen name="drawer_item_height">49dp</dimen>
+    <dimen name="drawer_width">254dp</dimen>
+    <dimen name="image_dimension">54dp</dimen>
+
+
+    <!-- Text Sizes-->
+    <dimen name="text_size_x_small">13sp</dimen>
+    <dimen name="text_size_small">14sp</dimen>
+    <dimen name="text_size_medium">16sp</dimen>
+    <dimen name="text_size_large">18sp</dimen>
+    <dimen name="text_size_xlarge">22sp</dimen>
+    <dimen name="text_size_xxlarge">29sp</dimen>
+
+    <!-- Padding Sizes-->
+    <dimen name="padding_x_small">5dp</dimen>
+    <dimen name="padding_small">6dp</dimen>
+    <dimen name="padding_medium">9dp</dimen>
+    <dimen name="padding_large">14dp</dimen>
+    <dimen name="padding_xlarge">24dp</dimen>
+    <dimen name="padding_xxlarge">34dp</dimen>
+
+    <!-- Margin Sizes-->
+    <dimen name="margin_x_small">5dp</dimen>
+    <dimen name="margin_small">6dp</dimen>
+    <dimen name="margin_medium">9dp</dimen>
+    <dimen name="margin_large">14dp</dimen>
+    <dimen name="margin_xlarge">24dp</dimen>
+    <dimen name="margin_xxlarge">34dp</dimen>
+
+</resources>

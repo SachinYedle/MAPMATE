@@ -59,5 +59,11 @@ public class Navigator {
         Intent intent = new Intent(MyApplication.getCurrentActivityContext(),FriendsActivity.class);
         MyApplication.getCurrentActivityContext().startActivity(intent);
     }
+
+    public void navigateToFriendsActivity(String addfriend){
+        Intent intent = new Intent(MyApplication.getCurrentActivityContext(),FriendsActivity.class);
+        intent.putExtra("addFriend",addfriend);
+        MyApplication.getCurrentActivityContext().startActivity(intent);
+    }
 }
 

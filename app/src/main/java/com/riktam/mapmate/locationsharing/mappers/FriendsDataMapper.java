@@ -137,20 +137,18 @@ public class FriendsDataMapper {
     }
 
     public void acceptFriendRequest(OnRequestAcceptedListener onRequestAcceptedListener, int friendRequestId, int friendId) {
-        String token = MyApplication.getInstance().sharedPreferencesData.getUserToken();
         if (MyApplication.getInstance().isConnectedToInterNet()) {
             this.onRequestAcceptedListener = onRequestAcceptedListener;
-
+            MyApplication.getInstance().showProgressDialog(context.getString(R.string.loading_data), context.getString(R.string.please_wait));
             Call<FriendRequestAcceptResponse> call = MyApplication.getInstance().retrofitApiServices.acceptRequest(friendRequestId, friendId);
             call.enqueue(acceptRequestCallback);
         }
     }
 
     public void sendRequest(OnRequestSentListener onRequestSentListener, String email) {
-        String token = MyApplication.getInstance().sharedPreferencesData.getUserToken();
         if (MyApplication.getInstance().isConnectedToInterNet()) {
             this.onRequestSentListener = onRequestSentListener;
-            Call<FriendRequestResponse> call = MyApplication.getInstance().retrofitApiServices.sendRequest(email);
+            MyApplication.getInstance().showProgressDialog(context.getString(R.string.loading_data), context.getString(R.string.please_wait));            Call<FriendRequestResponse> call = MyApplication.getInstance().retrofitApiServices.sendRequest(email);
             call.enqueue(sendRequestCallback);
         }
     }

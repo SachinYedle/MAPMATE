@@ -1,11 +1,13 @@
 package com.riktam.mapmate.locationsharing.retrofitservices;
 
+import com.riktam.mapmate.locationsharing.responses.CheckIfregisteredResponse;
 import com.riktam.mapmate.locationsharing.responses.FriendRequestAcceptResponse;
 import com.riktam.mapmate.locationsharing.responses.FriendRequestResponse;
 import com.riktam.mapmate.locationsharing.responses.FriendsServiceResponse;
 import com.riktam.mapmate.locationsharing.responses.LocationSendingResponse;
 import com.riktam.mapmate.locationsharing.responses.LocationSharedFriends;
 import com.riktam.mapmate.locationsharing.responses.LocationSharedFriendsResponse;
+import com.riktam.mapmate.locationsharing.responses.MailInviteResponse;
 import com.riktam.mapmate.locationsharing.responses.SharingStatusResponse;
 import com.riktam.mapmate.locationsharing.responses.UserAuthentication;
 import com.riktam.mapmate.locationsharing.responses.UserLocationsResponse;
@@ -57,4 +59,9 @@ public interface RetrofitApiServices {
     Call<SharingStatusResponse> sendSharingStatus(@Field("sharing") int sharing,
                                                   @Field("friend_id") int friendId);
 
+    @GET("know_where/api/v1/check_register")
+    Call<CheckIfregisteredResponse> checkIfRegistered(@Query("friend_email") String email);
+
+    @GET("know_where/api/v1/invite_mail")
+    Call<MailInviteResponse> inviteFriend(@Query("friend_email") String email);
 }

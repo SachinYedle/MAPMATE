@@ -29,6 +29,9 @@ import com.google.gdata.data.contacts.ContactFeed;
 import com.google.gdata.data.extensions.Email;
 import com.google.gdata.data.extensions.Name;
 import com.riktam.mapmate.locationsharing.R;
+import com.riktam.mapmate.locationsharing.db.dao.UserGmailFriends;
+import com.riktam.mapmate.locationsharing.db.operations.GmailFriendsOperations;
+import com.riktam.mapmate.locationsharing.db.operations.UserLocationsOperations;
 import com.riktam.mapmate.locationsharing.interfaces.PositiveClick;
 import com.riktam.mapmate.locationsharing.app.MyApplication;
 import com.riktam.mapmate.locationsharing.mappers.UserDataMapper;
@@ -75,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String client_id;
     private String client_secret;
     private String access_token_url;
+    private String token;
+    private String googleId;
 
     public MainActivity() throws IOException {
     }
@@ -193,8 +198,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             CustomLog.d("Auth code", "" + authCode);
             String fullName = acct.getDisplayName();
-            String token = acct.getIdToken();
-
+            token = acct.getIdToken();
+            googleId = acct.getId();
             String email = acct.getEmail();
 
             Uri personPhoto = acct.getPhotoUrl();
@@ -206,8 +211,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             CustomLog.i("Main Activity", "Token: " + acct.getIdToken());
 
-            new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(onLoginListener, token, acct.getId());
-
             googleSignInButton.setVisibility(View.GONE);
             googleSignOut.setVisibility(View.VISIBLE);
         } else {
@@ -216,6 +219,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private  void login(){
+        new UserDataMapper(MyApplication.getCurrentActivityContext()).getUsersAuthToken(onLoginListener, token, googleId);
+    }
     public String loadJSONFromAsset() {
         String json = null;
         try {
@@ -329,8 +335,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPostExecute(List<ContactEntry> googleContacts) {
             if (null != googleContacts && googleContacts.size() > 0) {
-                List<Contact> contacts = new ArrayList<Contact>();
-
+                GmailFriendsOperations.getInstance().deleteFriendsTableData();
                 for (ContactEntry contactEntry : googleContacts) {
                     String name = "";
                     String email = "";
@@ -364,13 +369,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         email = tempEmail.getAddress();
                     }
                     Link photoLink = contactEntry.getContactPhotoLink();
-                    String photoLinkHref = photoLink.getHref();
+                    String photoLinkHref = null;
                     //System.out.println("Photo Link: " + photoLinkHref);
-
-                    Contact contact = new Contact(name, email,photoLinkHref);
-                    CustomLog.d("Contact", "Name: " + contact.getName() + " Email: " + contact.getEmail()+"Photo: "+ photoLinkHref);
-                    contacts.add(contact);
+                    Contact contact = new Contact(name, email, photoLinkHref);
+                    if (email != "" && name != "" && !MyApplication.getInstance().sharedPreferencesData.getEmail().equalsIgnoreCase(email)) {
+                        insertGmailFriend(contact);
+                    }
+                    CustomLog.d("Contact", "Name: " + contact.getName() + " Email: " + contact.getEmail() + "Photo: " + photoLinkHref);
                 }
+                login();
 
             } else {
                 Log.e("Contacts error", "No Contact Found.");
@@ -380,6 +387,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             MyApplication.getInstance().hideProgressDialog();
         }
 
+    }
+
+    private void insertGmailFriend(Contact contact) {
+        UserGmailFriends friend = new UserGmailFriends();
+        friend.setEmail(contact.getEmail());
+        friend.setName(contact.getName());
+        friend.setProfilePicUrl(contact.getPhotoUrl());
+        GmailFriendsOperations.getInstance().insertFriends(friend);
     }
 
     private UserDataMapper.OnLoginListener onLoginListener = new UserDataMapper.OnLoginListener() {
@@ -423,7 +438,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void signOut() {
-
         if (googleApiClient.isConnected()) {
             revokeAccess();
             Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(
@@ -435,7 +449,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     });
         }
-
     }
 
     private void revokeAccess() {
