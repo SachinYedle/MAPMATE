@@ -81,7 +81,7 @@ public class DrawRouteFunctionality {
         googleMap.setOnInfoWindowClickListener(null);
         googleMap.addMarker(new MarkerOptions()
                 .position(position)
-                .title("End At: " + TimeInAgoFormat.getInstance().timeInAgoFormat(locations.get(0).getTime()))
+                .title("Stopped at: " + TimeInAgoFormat.getInstance().timeInAgoFormat(locations.get(0).getTime()))
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.small_red_marker)));
     }
 }

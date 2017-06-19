@@ -169,18 +169,19 @@ public class MyApplication extends Application {
         Toast.makeText(getCurrentActivityContext(), message, Toast.LENGTH_LONG).show();
     }
 
-    public void showProgressDialog() {
+    public void showProgressDialog(String title) {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
         }
         mProgressDialog = new ProgressDialog(getCurrentActivityContext(), R.style
                 .ProgressDialogStyle);
-        mProgressDialog.setMessage(getString(R.string.loading));
+        mProgressDialog.setMessage(title);
         mProgressDialog.setCancelable(false);
         if (!mProgressDialog.isShowing()) {
             mProgressDialog.show();
         }
     }
+
 
     /**
      * Hides progress bar
@@ -210,6 +211,8 @@ public class MyApplication extends Application {
             mProgressDialog.show();
         }
     }
+
+
 
     public void updateTextInProgressDialog(String text) {
         try {

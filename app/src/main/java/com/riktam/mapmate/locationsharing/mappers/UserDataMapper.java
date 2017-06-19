@@ -36,7 +36,7 @@ public class UserDataMapper {
     public void getUsersAuthToken(OnLoginListener onLoginListener, String accessToken, String googleId){
         this.onLoginListener = onLoginListener;
         if (MyApplication.getInstance().isConnectedToInterNet()){
-            MyApplication.getInstance().showProgressDialog("Please wait","Logging in...");
+            MyApplication.getInstance().showProgressDialog(context.getString(R.string.please_wait),context.getString(R.string.logging_in));
             Call<UserAuthentication> call = MyApplication.getInstance().retrofitApiServices.getUserAuthToken(accessToken, googleId);
             call.enqueue(userAuthToken);
         }else {

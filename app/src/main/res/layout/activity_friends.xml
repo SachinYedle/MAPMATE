@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <TextView
+                    <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
                         android:id="@+id/friends_recycler_header_item_google_friends"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -50,7 +50,7 @@
                         android:layout_margin="@dimen/margin_large"
                         android:text="@string/other_friends"
                         android:textSize="@dimen/text_size_large"
-                        android:textStyle="bold" />
+                        app:textStyle="1"/>
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -62,7 +62,7 @@
                             android:layout_height="wrap_content"
                             android:padding="@dimen/padding_medium" />
 
-                        <TextView
+                        <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
                             android:id="@+id/friends_recycler_header_item_switch_info_textView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -73,8 +73,7 @@
                             android:padding="@dimen/padding_medium"
                             android:text="@string/switch_info_text"
                             android:textColor="@color/white"
-                            android:textSize="@dimen/text_size_small"
-                            android:textStyle="bold" />
+                            android:textSize="@dimen/text_size_small" />
                     </RelativeLayout>
                 </LinearLayout>
             </android.support.v4.widget.SwipeRefreshLayout>
@@ -85,7 +84,7 @@
                 android:orientation="horizontal"
                 android:padding="@dimen/padding_large">
 
-                <TextView
+                <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
                     android:id="@+id/friends_activity_email_editText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -94,7 +93,7 @@
                     android:textSize="@dimen/text_size_large"
                     android:visibility="gone" />
 
-                <TextView
+                <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
                     android:id="@+id/friends_activity_add_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

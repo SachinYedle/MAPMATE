@@ -310,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            MyApplication.getInstance().showProgressDialog(getString(R.string.authenticated), getString(R.string.getting_google_contacts));
+            MyApplication.getInstance().showProgressDialog(getString(R.string.loading_google_contacts));
         }
 
         @Override

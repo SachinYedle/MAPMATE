@@ -11,9 +11,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 
 import com.riktam.mapmate.locationsharing.R;
 import com.riktam.mapmate.locationsharing.app.MyApplication;
+import com.riktam.mapmate.locationsharing.utils.CustomLog;
 
 public class DrawerActivity extends AppCompatActivity {
 
@@ -63,14 +65,13 @@ public class DrawerActivity extends AppCompatActivity {
 
         @Override
         public void onDrawerOpened(View drawerView) {
-
+            hideSoftKeyboard();
         }
 
         @Override
         public void onDrawerClosed(View drawerView) {
             //calling onPrepareOptionsMenu() to show action bar icons
-            invalidateOptionsMenu();
-            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+            //invalidateOptionsMenu();
         }
 
         @Override
@@ -78,6 +79,17 @@ public class DrawerActivity extends AppCompatActivity {
 
         }
     };
+
+    /**
+     * hide the software keyboard
+     */
+    protected void hideSoftKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context
+                .INPUT_METHOD_SERVICE);
+        if (imm.isActive() && getCurrentFocus() != null && getCurrentFocus().getWindowToken() != null) {
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
 
     public void closeDrawer() {
         mDrawerLayout.closeDrawer(GravityCompat.START);

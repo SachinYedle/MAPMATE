@@ -73,6 +73,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
         setContentView(R.layout.activity_friends);
         MyApplication.getInstance().setCurrentActivityContext(FriendsActivity.this);
         initializeViews();
+        setUpToolbar();
         setListenersToViews();
         getGmailFriends();
         getFriendsData();
@@ -88,14 +89,6 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
         addFriendsTextView = (TextView) findViewById(R.id.friends_activity_add_btn);
         googleFriendsHeaderTextView = (TextView) findViewById(R.id.friends_recycler_header_item_google_friends);
         switchInfoTextView = (TextView) findViewById(R.id.friends_recycler_header_item_switch_info_textView);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setOnClickListener(this);
-        getSupportActionBar().setTitle(getResources().getString(R.string.friends));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setDrawerLayout(MyApplication.getCurrentActivityContext());
-
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.friends_swipeContainer);
 
         DrawerFragment fragment = new DrawerFragment();
@@ -105,6 +98,15 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
         fragmentTransaction.commit();
 
         hideSwithInfoTextView();
+    }
+
+    private void setUpToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setOnClickListener(this);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setDrawerLayout(MyApplication.getCurrentActivityContext());
+        getSupportActionBar().setTitle(getString(R.string.friends));
     }
 
     private void hideSwithInfoTextView() {
@@ -285,7 +287,6 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
                 friendsData.setFriendFirstName(friends.getFriend_first_name());
                 friendsData.setSharing(friends.getSharing());
                 friendsData.setFriendProfileUrl(friends.getFriend_profile_url());
-                ;
                 if (Integer.parseInt(friends.getStatus()) == 1 && friends.getSharing() == 1) {
                     friendsData.setStatus(getString(R.string.stop));
                 } else if (Integer.parseInt(friends.getStatus()) == 1 && friends.getSharing() == 0) {
@@ -427,6 +428,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
 
     @Override
     public void onItemClick(View view, int position, FriendsData friendsData) {
+        hideSoftKeyboard();
         if (friendsData.getFriendProfileUrl() == null && friendsData.getStatus() == null) {
             this.friend = friendsData;
             String email = friend.getFriendsEmail();
@@ -480,7 +482,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
             };
 
             MyApplication.getInstance().showAlertWithPositiveNegativeButton(getString(R.string
-                    .send_invite), "Your Google Friend " + friend.getFriendFirstName() + " Not using this App. Invite here.", getString(R.string.cancel), getString(R.string
+                    .send_invite), "Your Google friend " + friend.getFriendFirstName() + " is not using the App.", getString(R.string.cancel), getString(R.string
                     .invite), positiveClick);
         }
     };
@@ -494,16 +496,16 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
                 public void onClick() {
                     Intent inviteIntent = new Intent();
                     inviteIntent.setAction(Intent.ACTION_SEND);
-                    String textMessage = "Hi " + friend.getFriendFirstName() + ", \n" + MyApplication.getInstance().sharedPreferencesData.getEmail() + " invited you to mapmate.";
+                    String textMessage = "Hi " + friend.getFriendFirstName() + ", \n" + MyApplication.getInstance().sharedPreferencesData.getEmail() + " invited you to " + getString(R.string.app_name);
                     inviteIntent.putExtra(Intent.EXTRA_TEXT, textMessage);
                     inviteIntent.setType("text/plain");
-                    startActivity(Intent.createChooser(inviteIntent, "Invite To MapMate"));
+                    startActivity(Intent.createChooser(inviteIntent, "Invite to " + getString(R.string.app_name)));
                 }
             };
 
             MyApplication.getInstance().showAlertWithPositiveNegativeButton(getString(R.string
-                    .send_invite), getString(R.string.invitation_sent_by_mail), getString(R.string.yes), getString(R.string
-                    .no), positiveClick);
+                            .send_invite), getString(R.string.invitation_sent_by_mail),
+                    getString(R.string.no), getString(R.string.yes), positiveClick);
         }
 
         @Override
@@ -517,7 +519,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
                     String textMessage = "Hi " + friend.getFriendFirstName() + ", \n" + MyApplication.getInstance().sharedPreferencesData.getEmail() + " invited you to mapmate.";
                     inviteIntent.putExtra(Intent.EXTRA_TEXT, textMessage);
                     inviteIntent.setType("text/plain");
-                    startActivity(Intent.createChooser(inviteIntent, "Invite To MapMate"));
+                    startActivity(Intent.createChooser(inviteIntent, "Invite to " + getString(R.string.app_name)));
                 }
             };
 
@@ -639,7 +641,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
         if (isDrawerOpen()) {
             closeDrawer();
         } else {
-            super.onBackPressed();
+//            super.onBackPressed();
             Navigator.getInstance().navigateToMapActivity();
             finish();
         }

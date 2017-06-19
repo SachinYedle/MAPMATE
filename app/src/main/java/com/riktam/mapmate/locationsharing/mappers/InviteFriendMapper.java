@@ -33,7 +33,7 @@ public class InviteFriendMapper {
     public void inviteFriend(OnInviteListener onInviteListener, String email) {
         if (MyApplication.getInstance().isConnectedToInterNet()) {
             this.onInviteListener = onInviteListener;
-            MyApplication.getInstance().showProgressDialog(context.getString(R.string.loading_data), context.getString(R.string.please_wait));
+            MyApplication.getInstance().showProgressDialog(context.getString(R.string.please_wait));
             Call<MailInviteResponse> call = MyApplication.getInstance().retrofitApiServices.inviteFriend(email);
             call.enqueue(checkIfRegisteredCallback);
         }

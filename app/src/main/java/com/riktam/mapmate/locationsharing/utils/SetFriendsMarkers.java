@@ -1,22 +1,15 @@
 package com.riktam.mapmate.locationsharing.utils;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.gms.maps.model.Marker;
 import com.riktam.mapmate.locationsharing.R;
-import com.riktam.mapmate.locationsharing.acitivities.MainActivity;
-import com.riktam.mapmate.locationsharing.acitivities.MapActivity;
 import com.riktam.mapmate.locationsharing.app.MyApplication;
 import com.riktam.mapmate.locationsharing.db.dao.UserLastKnownLocation;
 import com.riktam.mapmate.locationsharing.db.operations.UserLastknownLocationOperations;
@@ -27,7 +20,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.riktam.mapmate.locationsharing.mappers.LocationSharedFriendsMapper;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -108,10 +100,10 @@ public class SetFriendsMarkers {
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 30));
             }
             if (!isPointsAddedInBuilder) {
-                MyApplication.getInstance().showToast(MyApplication.getCurrentActivityContext().getString(R.string.no_friends_shring_location_with_you));
+                MyApplication.getInstance().showToast(MyApplication.getCurrentActivityContext().getString(R.string.no_friend_is_sharing_location_with_you));
             }
         } else {
-            MyApplication.getInstance().showToast(MyApplication.getCurrentActivityContext().getString(R.string.no_friends_shring_location_with_you));
+            MyApplication.getInstance().showToast(MyApplication.getCurrentActivityContext().getString(R.string.no_friend_is_sharing_location_with_you));
         }
 //        if (isFirstTime) {
 //            setFriendsLocationMarkers(googleMap,false);

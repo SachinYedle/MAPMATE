@@ -2,16 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
-    <TextView
+    <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
         android:id="@+id/friends_recycler_header_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_large"
         android:textSize="@dimen/text_size_large"
         android:text="@string/other_friends"
-        android:textStyle="bold" />
+        app:textStyle="1"/>
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="0.5dp"

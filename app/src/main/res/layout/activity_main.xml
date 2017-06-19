@@ -14,7 +14,7 @@
         android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-    <Button
+    <com.riktam.mapmate.locationsharing.customviews.CustomFontButton
         android:id="@+id/btn_sign_out"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

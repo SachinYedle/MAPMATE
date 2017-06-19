@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="150dp"
-    android:layout_height="100dp"
-    android:gravity="center"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:padding="@dimen/padding_medium"
     android:orientation="horizontal">
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="0.7"
         android:layout_gravity="center_vertical"
         android:orientation="vertical">
 
-        <TextView
+        <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
             android:id="@+id/user_id"
             android:layout_width="match_parent"
             style="@style/medium_text_textview"
             android:gravity="center"/>
 
-        <TextView
+        <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
             android:layout_width="match_parent"
             android:id="@+id/user_phone"
             style="@style/medium_text_textview"
@@ -25,9 +25,8 @@
 
     </LinearLayout>
     <ImageView
-        android:layout_width="0dp"
-        android:layout_weight="0.3"
-        android:layout_gravity="end"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:layout_gravity="end|center_vertical"
         android:src="@drawable/ic_action_arrow"/>
 </LinearLayout>

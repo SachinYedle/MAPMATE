@@ -3,6 +3,7 @@ package com.riktam.mapmate.locationsharing.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -149,7 +150,7 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             int index = name.toLowerCase().indexOf(searchText.toLowerCase());
             while (index > -1) {
                 stringBuilder = new SpannableStringBuilder(name);
-                ForegroundColorSpan fcs = new ForegroundColorSpan(Color.rgb(0, 0, 255));
+                ForegroundColorSpan fcs = new ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary));
 
                 stringBuilder.setSpan(fcs, index, index + searchText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 index = name.toLowerCase().indexOf(searchText.toLowerCase(), index + 1);

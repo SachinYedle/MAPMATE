@@ -34,7 +34,7 @@ public class CheckIfUserRegisteredMapper {
     public void checkIfRegistered(OnTaskCompletedListener onTaskCompletedListener, String email) {
         if (MyApplication.getInstance().isConnectedToInterNet()) {
             this.onTaskCompletedListener = onTaskCompletedListener;
-            MyApplication.getInstance().showProgressDialog(context.getString(R.string.loading_data), context.getString(R.string.please_wait));
+            MyApplication.getInstance().showProgressDialog(context.getString(R.string.please_wait));
             Call<CheckIfregisteredResponse> call = MyApplication.getInstance().retrofitApiServices.checkIfRegistered(email);
             call.enqueue(checkIfRegisteredCallback);
         }

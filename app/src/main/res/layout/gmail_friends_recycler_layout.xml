@@ -26,14 +26,14 @@
             android:paddingLeft="@dimen/padding_large"
             android:paddingStart="@dimen/padding_large">
 
-            <TextView
+            <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
                 android:id="@+id/gmail_friends_recycler_item_name_textView"
                 style="@style/medium_text_textview"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textSize="@dimen/text_size_large"/>
 
-            <TextView
+            <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
                 android:id="@+id/gmail_friends_recycler_item_email_textView"
                 style="@style/medium_text_textview"
                 android:ellipsize="end"

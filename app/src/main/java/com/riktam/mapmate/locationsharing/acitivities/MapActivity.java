@@ -86,7 +86,7 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
         setContentView(R.layout.activity_map);
         MyApplication.getInstance().setCurrentActivityContext(MapActivity.this);
         initializeVariables();
-
+        setUpToolbar();
         mHandler = new Handler();
 
         new FriendsDataMapper().getFriends(onGetFriendsDataListener, true);
@@ -97,6 +97,17 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
             finish();
             MyApplication.getInstance().showToast(getString(R.string.please_grant_location_permissions));
         }
+    }
+
+
+    private void setUpToolbar(){
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setDrawerLayout(MyApplication.getCurrentActivityContext());
+        toolbar.setOnClickListener(this);
+        getSupportActionBar().setTitle(getString(R.string.app_name));
+
     }
 
     public void drawRoute(String email) {
@@ -115,12 +126,7 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
     }
 
     public void initializeVariables() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(getString(R.string.app_name));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         MyApplication.getInstance().showProgressDialog(getString(R.string.loading_data), getString(R.string.please_wait));
-        setDrawerLayout(MyApplication.getCurrentActivityContext());
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         floatingActionButton = (FloatingActionButton) findViewById(R.id.map_add_friend_floatingActionButton);
         floatingActionButton.setOnClickListener(this);
@@ -309,6 +315,7 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
         if (isDrawerOpen()) {
             closeDrawer();
         } else if (DrawRouteFunctionality.getInstance().isRouteVisible()) {
+            getSupportActionBar().setTitle(getString(R.string.app_name));
             setFriendsMarker();
         } else if (back_pressed + 2000 > System.currentTimeMillis()) {
             finish();

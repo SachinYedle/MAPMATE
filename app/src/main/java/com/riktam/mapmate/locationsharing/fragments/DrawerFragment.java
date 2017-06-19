@@ -23,7 +23,7 @@ import com.squareup.picasso.Picasso;
 
 public class DrawerFragment extends Fragment implements View.OnClickListener {
     private TextView usernametextView, emailTextView, myRouteTextView,
-            logoutTextView, friendsLocationTextView, friendsTextView, addFriendTextView;
+            logoutTextView, friendsLocationTextView, friendsTextView;
     private ImageView profileImageView;
 
     @Nullable
@@ -47,13 +47,11 @@ public class DrawerFragment extends Fragment implements View.OnClickListener {
         logoutTextView = (TextView) view.findViewById(R.id.drawer_item_logout_textView);
         friendsLocationTextView = (TextView) view.findViewById(R.id.drawer_item_friends_location_textView);
         friendsTextView = (TextView) view.findViewById(R.id.drawer_item_friends_textView);
-        addFriendTextView = (TextView) view.findViewById(R.id.drawer_item_add_friends_textView);
 
         myRouteTextView.setOnClickListener(this);
         logoutTextView.setOnClickListener(this);
         friendsLocationTextView.setOnClickListener(this);
         friendsTextView.setOnClickListener(this);
-        addFriendTextView.setOnClickListener(this);
     }
 
     private void setValuesToViews() {
@@ -85,10 +83,6 @@ public class DrawerFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.drawer_item_friends_location_textView:
                 Navigator.getInstance().navigateToMapActivity();
-                getActivity().finish();
-                break;
-            case R.id.drawer_item_add_friends_textView:
-                Navigator.getInstance().navigateToFriendsActivity("addFriend");
                 getActivity().finish();
                 break;
         }
