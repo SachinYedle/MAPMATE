@@ -64,7 +64,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
     private FriendsData friend;
     private ArrayList<FriendsData> friendsRecyclerItems;
     public int googleFriendsStartingPos;
-    private DividerItemDecoration dividerItemDecoration;
+    private SearchView searchView;
 
 
     @Override
@@ -97,7 +97,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
         fragmentTransaction.addToBackStack("DrawerLayout");
         fragmentTransaction.commit();
 
-        hideSwithInfoTextView();
+        //hideSwithInfoTextView();
     }
 
     private void setUpToolbar() {
@@ -109,18 +109,22 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
         getSupportActionBar().setTitle(getString(R.string.friends));
     }
 
-    private void hideSwithInfoTextView() {
-        Timer t = new Timer(false);
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        switchInfoTextView.setVisibility(View.GONE);
-                    }
-                });
-            }
-        }, 5000);
+    public void hideSwitchInfoTextView() {
+//        Timer t = new Timer(false);
+//        t.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                runOnUiThread(new Runnable() {
+//                    public void run() {
+        switchInfoTextView.setVisibility(View.GONE);
+//                    }
+//                });
+//            }
+//        }, 5000);
+    }
+
+    public void showSwitchInfoTextView(){
+        switchInfoTextView.setVisibility(View.VISIBLE);
     }
 
     private void getGmailFriends() {
@@ -178,7 +182,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.friends_activity_menu, menu);
         final MenuItem myActionMenuItem = menu.findItem(R.id.friends_menu_item_action_search);
-        final SearchView searchView = (SearchView) myActionMenuItem.getActionView();
+        searchView = (SearchView) myActionMenuItem.getActionView();
         searchView.setQueryHint(getString(R.string.search_or_add_friend));
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -187,7 +191,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
             searchView.setIconified(false);
             searchView.requestFocusFromTouch();
         }
-        ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text)).setHintTextColor(getResources().getColor(R.color.white));
+        ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text)).setHintTextColor(getResources().getColor(R.color.grey));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -319,10 +323,9 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
         }
 
         friendsDataList = new ArrayList<FriendsData>();
-
-        friendsDataList.addAll(sortData(requested));
         friendsDataList.addAll(sortData(accept));
         friendsDataList.addAll(sortData(friends));
+        friendsDataList.addAll(sortData(requested));
         makeActualList(friendsDataList, sortData(gmailFriends));
         MyApplication.getInstance().hideProgressDialog();
     }
@@ -378,6 +381,10 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
         //friendsRecyclerView.addItemDecoration(dividerItemDecoration);
         friendsRecyclerView.setHasFixedSize(true);
         friendsRecyclerView.setLayoutManager(verticalLayoutManager);
+
+        if(friendsDataList.size() <= 0){
+            switchInfoTextView.setVisibility(View.GONE);
+        }
         friendsRecyclerViewAdapter = new FriendsRecyclerViewAdapter(friendsRecyclerItems);
         friendsRecyclerViewAdapter.setItemClickListener(this);
         friendsRecyclerView.setAdapter(friendsRecyclerViewAdapter);
@@ -400,7 +407,17 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
             if (MyApplication.getInstance().sharedPreferencesData.getEmail().equals(emailTextView.getText().toString())) {
                 MyApplication.getInstance().showToast(getString(R.string.cant_add_yourself));
             } else if (FriendsTableOperations.getInstance().getFriendWithEmail(emailTextView.getText().toString()).size() <= 0) {
-                new FriendsDataMapper().sendRequest(sendRequestListener, emailTextView.getText().toString());
+                PositiveClick positiveClick = new PositiveClick() {
+                    @Override
+                    public void onClick() {
+                        new FriendsDataMapper().sendRequest(sendRequestListener, emailTextView.getText().toString());
+                    }
+                };
+                MyApplication.getInstance().showAlertWithPositiveNegativeButton(getString(R.string
+                        .send_request), "After sending request you will be able to see your friends real time location and vice-versa", getString(R.string.cancel), getString(R.string
+                        .send), positiveClick);
+
+
             } else {
                 MyApplication.getInstance().showToast(getString(R.string.user_already_added));
             }
@@ -443,11 +460,11 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
                 MyApplication.getInstance().showToast(getString(R.string.friend_didnt_accepted_request));
             } else {
                 if (view.getId() == R.id.friends_recycler_item_share_location_switch && friendsData.getStatus().equals(getResources().getString(R.string.stop))) {
-                    //MyApplication.getInstance().showToast(getString(R.string.sharing_stopped));
+                    MyApplication.getInstance().showToast(getString(R.string.sharing_stopped) +" "+ friendsData.getFriendFirstName());
                     new LocationSharingStatusMapper(this).updateLocationSharingStatus(onStatusUpdatedListener, Constants.STOP_SHARING, Integer.parseInt(friendData.get(0).getFriend_id()));
                 }
                 if (view.getId() == R.id.friends_recycler_item_share_location_switch && friendsData.getStatus().equals(getResources().getString(R.string.start))) {
-                    //MyApplication.getInstance().showToast(getString(R.string.sharing_started));
+                    MyApplication.getInstance().showToast(getString(R.string.sharing_started) +" "+ friendsData.getFriendFirstName());
                     new LocationSharingStatusMapper(this).updateLocationSharingStatus(onStatusUpdatedListener, Constants.START_SHARING, Integer.parseInt(friendData.get(0).getFriend_id()));
                 } else if (view.getId() == R.id.friends_recycler_item_email_textView || view.getId() == R.id.friends_recycler_item_name_textView || view.getId() == R.id.friends_recycler_item_profile_imageView) {
                     drawRoute(friendsData.getFriendsEmail());
@@ -468,7 +485,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
                 }
             };
             MyApplication.getInstance().showAlertWithPositiveNegativeButton(getString(R.string
-                    .send_request), "Send request to " + friend.getFriendFirstName() + " to see his/her real time location.", getString(R.string.cancel), getString(R.string
+                    .send_request), "Send request to " + friend.getFriendFirstName() + " to see his/her real time location and to share your location with him", getString(R.string.cancel), getString(R.string
                     .send), positiveClick);
         }
 
@@ -510,7 +527,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
 
         @Override
         public void onTaskFailed(String response) {
-            MyApplication.getInstance().showToast(getString(R.string.invitation_failed));
+            //MyApplication.getInstance().showToast(getString(R.string.invitation_failed));
             PositiveClick positiveClick = new PositiveClick() {
                 @Override
                 public void onClick() {
@@ -530,7 +547,6 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
     };
 
     private void drawRoute(String email) {
-        DrawRouteFunctionality.getInstance().setRouteVisible(true);
         MyApplication.getInstance().sharedPreferencesData.setSelectedUserEmail(email);
         DownloadLocationsDataMapper dataMapper = new DownloadLocationsDataMapper(MyApplication.getCurrentActivityContext());
         dataMapper.getLocations(onGetLocationListener, FriendsTableOperations.getInstance().getFriendId(email));
@@ -540,7 +556,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
         @Override
         public void onTaskCompleted(UserLocationsResponse userLocationsResponse) {
             if (userLocationsResponse.getSuccess().equalsIgnoreCase("true")) {
-                Navigator.getInstance().navigateToMapActivity(MyApplication.getInstance().sharedPreferencesData.getSelectedUserEmail());
+                Navigator.getInstance().navigateToFriendsRouteActivity(MyApplication.getInstance().sharedPreferencesData.getSelectedUserEmail());
                 finish();
             } else {
                 MyApplication.getInstance().showToast(userLocationsResponse.getMessage());
@@ -624,7 +640,9 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
             if (friendRequestResponse.isSuccess()) {
                 MyApplication.getInstance().showToast(getString(R.string.request_sent));
                 isRefreshing = true;
+                ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text)).setText("");
                 new FriendsDataMapper().getFriends(onGetFriendsDataListener, isRefreshing);
+
             } else if (!friendRequestResponse.isSuccess()) {
                 MyApplication.getInstance().showToast("" + friendRequestResponse.getData());
             }

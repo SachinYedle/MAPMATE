@@ -4,6 +4,7 @@ import android.graphics.Color;
 
 import com.riktam.mapmate.locationsharing.R;
 import com.riktam.mapmate.locationsharing.app.MyApplication;
+import com.riktam.mapmate.locationsharing.db.dao.UserLastKnownLocation;
 import com.riktam.mapmate.locationsharing.db.dao.UserLocations;
 import com.riktam.mapmate.locationsharing.db.operations.UserLocationsOperations;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -22,16 +23,8 @@ import java.util.List;
  */
 
 public class DrawRouteFunctionality {
-    private boolean isRouteVisible;
+
     private static DrawRouteFunctionality instance;
-
-    public void setRouteVisible(boolean routeVisible) {
-        isRouteVisible = routeVisible;
-    }
-
-    public boolean isRouteVisible() {
-        return isRouteVisible;
-    }
 
     public static DrawRouteFunctionality getInstance() {
         if (instance == null) {
@@ -44,21 +37,22 @@ public class DrawRouteFunctionality {
         MyApplication.getInstance().hideProgressDialog();
         MyApplication.getInstance().showProgressDialog("Drawing path", "please wait...");
         googleMap.clear();
-        setRouteVisible(true);
         googleMap.setOnInfoWindowClickListener(null);
         ArrayList<LatLng> points = new ArrayList<LatLng>();
         PolylineOptions lineOptions = new PolylineOptions();
-        List<UserLocations> locations = UserLocationsOperations.getInstance()
-                .getUserLocations(email);
+        List<UserLocations> locations = UserLocationsOperations.getInstance().getUserLocations(email);
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (int i = 0; i < locations.size(); i++) {
             double lat = Double.parseDouble(locations.get(i).getLatitude());
             double lng = Double.parseDouble(locations.get(i).getLongitude());
             LatLng position = new LatLng(lat, lng);
             CustomLog.i("Data", lat + " " + lng + " " + locations.get(i).getEmail());
+            String title = "Updated: "+TimeInAgoFormat.getInstance().timeInAgoFormat(locations.get(i).getUpdated_time());
+            String snippet = "Duration: "+ TimeInAgoFormat.getInstance().getTimeDifference(locations.get(i).getCreated_time(),locations.get(i).getUpdated_time());
             googleMap.addMarker(new MarkerOptions()
                     .position(position)
-                    .title(TimeInAgoFormat.getInstance().timeInAgoFormat(locations.get(i).getTime()))
+                    .title(title)
+                    .snippet(snippet)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.small_blue_dot)));
             builder.include(position);
             points.add(position);
@@ -78,10 +72,13 @@ public class DrawRouteFunctionality {
         double lat = Double.parseDouble(locations.get(0).getLatitude());
         double lng = Double.parseDouble(locations.get(0).getLongitude());
         LatLng position = new LatLng(lat, lng);
+        String titile = "Stopped : " + TimeInAgoFormat.getInstance().timeInAgoFormat(locations.get(0).getUpdated_time());
+        String snippet = "Duration: "+ TimeInAgoFormat.getInstance().getTimeDifference(locations.get(0).getCreated_time(),locations.get(0).getUpdated_time());
         googleMap.setOnInfoWindowClickListener(null);
         googleMap.addMarker(new MarkerOptions()
                 .position(position)
-                .title("Stopped at: " + TimeInAgoFormat.getInstance().timeInAgoFormat(locations.get(0).getTime()))
+                .title(titile)
+                .snippet(snippet)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.small_red_marker)));
     }
 }

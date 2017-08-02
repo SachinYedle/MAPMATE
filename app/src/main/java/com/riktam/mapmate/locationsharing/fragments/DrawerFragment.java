@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.riktam.mapmate.locationsharing.R;
 import com.riktam.mapmate.locationsharing.acitivities.FriendsActivity;
+import com.riktam.mapmate.locationsharing.acitivities.FriendsRouteActivity;
 import com.riktam.mapmate.locationsharing.acitivities.MapActivity;
 import com.riktam.mapmate.locationsharing.app.MyApplication;
 import com.riktam.mapmate.locationsharing.utils.Navigator;
@@ -66,12 +67,14 @@ public class DrawerFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         if (getActivity() instanceof MapActivity) {
             ((MapActivity) getActivity()).closeDrawer();
-        } else {
+        } else if(getActivity() instanceof FriendsActivity) {
             ((FriendsActivity) getActivity()).closeDrawer();
+        } else {
+            ((FriendsRouteActivity  ) getActivity()).closeDrawer();
         }
         switch (view.getId()) {
             case R.id.drawer_item_my_route_textView:
-                Navigator.getInstance().navigateToMapActivity(MyApplication.getInstance().sharedPreferencesData.getEmail());
+                Navigator.getInstance().navigateToFriendsRouteActivity(MyApplication.getInstance().sharedPreferencesData.getEmail());
                 getActivity().finish();
                 break;
             case R.id.drawer_item_logout_textView:

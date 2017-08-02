@@ -38,8 +38,8 @@ import static com.riktam.mapmate.locationsharing.utils.Constants.LOCATION_INTERV
  */
 public class BackgroundLocationService extends Service implements LocationListener, ConnectionCallbacks {
     private static final String TAG = "LocationService";
-    private LocationRequest locationRequest;
     private Location oldLocation = null;
+    private LocationRequest locationRequest;
     private GoogleApiClient googleApiClient;
     private SharedPreferencesData sharedPreferencesData;
 

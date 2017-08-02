@@ -10,7 +10,11 @@ import com.google.gson.annotations.SerializedName;
 public class UserLocationData {
     @SerializedName("created_at")
     @Expose
-    private String time;
+    private String createdTime;
+
+    @SerializedName("updated_at")
+    @Expose
+    private String updatedTime;
 
 
     @SerializedName("friend_id")
@@ -41,6 +45,22 @@ public class UserLocationData {
     @Expose
     private int sharing;
 
+    public String getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(String createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public String getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public void setUpdatedTime(String updatedTime) {
+        this.updatedTime = updatedTime;
+    }
+
     public int getSharing() {
         return sharing;
     }
@@ -49,9 +69,6 @@ public class UserLocationData {
         this.sharing = sharing;
     }
 
-    public void setTime(String time) {
-        this.time = time;
-    }
 
     public void setRadius(String radius) {
         this.radius = radius;
@@ -77,9 +94,6 @@ public class UserLocationData {
         return lat;
     }
 
-    public String getTime() {
-        return time;
-    }
 
     public String getFriendId() {
         return friendId;

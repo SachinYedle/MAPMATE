@@ -11,7 +11,8 @@ public class UserLocations {
     private String latitude;
     private String longitude;
     private String radius;
-    private String time;
+    private String created_time;
+    private String updated_time;
     private Integer sharing;
 
     public UserLocations() {
@@ -21,13 +22,14 @@ public class UserLocations {
         this.id = id;
     }
 
-    public UserLocations(Long id, String email, String latitude, String longitude, String radius, String time, Integer sharing) {
+    public UserLocations(Long id, String email, String latitude, String longitude, String radius, String created_time, String updated_time, Integer sharing) {
         this.id = id;
         this.email = email;
         this.latitude = latitude;
         this.longitude = longitude;
         this.radius = radius;
-        this.time = time;
+        this.created_time = created_time;
+        this.updated_time = updated_time;
         this.sharing = sharing;
     }
 
@@ -71,12 +73,20 @@ public class UserLocations {
         this.radius = radius;
     }
 
-    public String getTime() {
-        return time;
+    public String getCreated_time() {
+        return created_time;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setCreated_time(String created_time) {
+        this.created_time = created_time;
+    }
+
+    public String getUpdated_time() {
+        return updated_time;
+    }
+
+    public void setUpdated_time(String updated_time) {
+        this.updated_time = updated_time;
     }
 
     public Integer getSharing() {

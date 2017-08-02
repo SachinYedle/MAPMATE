@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.4"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/colorPrimary"
         android:padding="@dimen/drawer_header_padding">
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -48,22 +48,7 @@
         android:layout_height="0dp"
         android:layout_weight="0.6"
         android:orientation="vertical">
-        <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
-            android:id="@+id/drawer_item_my_route_textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/my_route"
-            android:textSize="@dimen/text_size_medium"
-            android:gravity="center_vertical"
-            android:drawablePadding="@dimen/padding_xlarge"
-            android:padding="@dimen/padding_large"
-            android:drawableStart="@drawable/ic_action_my_location"
-            android:drawableLeft="@drawable/ic_action_my_location"
-            app:textStyle="1"/>
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/black"/>
+
         <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
             android:id="@+id/drawer_item_friends_location_textView"
             android:layout_width="match_parent"
@@ -80,6 +65,24 @@
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
             android:background="@color/black"/>
+
+        <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
+            android:id="@+id/drawer_item_my_route_textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/my_route"
+            android:textSize="@dimen/text_size_medium"
+            android:gravity="center_vertical"
+            android:drawablePadding="@dimen/padding_xlarge"
+            android:padding="@dimen/padding_large"
+            android:drawableStart="@drawable/ic_action_my_location"
+            android:drawableLeft="@drawable/ic_action_my_location"
+            app:textStyle="1"/>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/black"/>
+
         <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
             android:id="@+id/drawer_item_friends_textView"
             android:layout_width="match_parent"

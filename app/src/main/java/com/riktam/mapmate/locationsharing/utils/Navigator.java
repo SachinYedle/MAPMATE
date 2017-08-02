@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.provider.Settings;
 
 import com.riktam.mapmate.locationsharing.acitivities.FriendsActivity;
+import com.riktam.mapmate.locationsharing.acitivities.FriendsRouteActivity;
 import com.riktam.mapmate.locationsharing.acitivities.MainActivity;
 import com.riktam.mapmate.locationsharing.acitivities.MapActivity;
 import com.riktam.mapmate.locationsharing.app.MyApplication;
@@ -38,12 +39,11 @@ public class Navigator {
         MyApplication.getCurrentActivityContext().startActivity(intent);
     }
 
-    public void navigateToMapActivity(String email){
-        Intent intent = new Intent(MyApplication.getCurrentActivityContext(), MapActivity.class);
+    public void navigateToFriendsRouteActivity(String email){
+        Intent intent = new Intent(MyApplication.getCurrentActivityContext(), FriendsRouteActivity.class);
         intent.putExtra("email", email);
         MyApplication.getCurrentActivityContext().startActivity(intent);
     }
-
 
     public void navgateToSettingsToStartGPS(){
         Intent callGPSSettingIntent = new Intent(

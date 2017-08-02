@@ -13,7 +13,7 @@
     <dimen name="drawer_header_padding">20.8dp</dimen>
     <dimen name="drawer_item_height">49dp</dimen>
     <dimen name="drawer_width">254dp</dimen>
-    <dimen name="image_dimension">54dp</dimen>
+    <dimen name="image_dimension">49dp</dimen>
 
 
     <!-- Text Sizes-->

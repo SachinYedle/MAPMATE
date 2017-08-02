@@ -28,8 +28,9 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
         public final static Property Latitude = new Property(2, String.class, "latitude", false, "LATITUDE");
         public final static Property Longitude = new Property(3, String.class, "longitude", false, "LONGITUDE");
         public final static Property Radius = new Property(4, String.class, "radius", false, "RADIUS");
-        public final static Property Time = new Property(5, String.class, "time", false, "TIME");
-        public final static Property Sharing = new Property(6, Integer.class, "sharing", false, "SHARING");
+        public final static Property Created_time = new Property(5, String.class, "created_time", false, "CREATED_TIME");
+        public final static Property Updated_time = new Property(6, String.class, "updated_time", false, "UPDATED_TIME");
+        public final static Property Sharing = new Property(7, Integer.class, "sharing", false, "SHARING");
     };
 
 
@@ -50,8 +51,9 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
                 "\"LATITUDE\" TEXT," + // 2: latitude
                 "\"LONGITUDE\" TEXT," + // 3: longitude
                 "\"RADIUS\" TEXT," + // 4: radius
-                "\"TIME\" TEXT," + // 5: time
-                "\"SHARING\" INTEGER);"); // 6: sharing
+                "\"CREATED_TIME\" TEXT," + // 5: created_time
+                "\"UPDATED_TIME\" TEXT," + // 6: updated_time
+                "\"SHARING\" INTEGER);"); // 7: sharing
     }
 
     /** Drops the underlying database table. */
@@ -90,14 +92,19 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
             stmt.bindString(5, radius);
         }
  
-        String time = entity.getTime();
-        if (time != null) {
-            stmt.bindString(6, time);
+        String created_time = entity.getCreated_time();
+        if (created_time != null) {
+            stmt.bindString(6, created_time);
+        }
+ 
+        String updated_time = entity.getUpdated_time();
+        if (updated_time != null) {
+            stmt.bindString(7, updated_time);
         }
  
         Integer sharing = entity.getSharing();
         if (sharing != null) {
-            stmt.bindLong(7, sharing);
+            stmt.bindLong(8, sharing);
         }
     }
 
@@ -116,8 +123,9 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // latitude
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // longitude
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // radius
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // time
-            cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6) // sharing
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // created_time
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // updated_time
+            cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7) // sharing
         );
         return entity;
     }
@@ -130,8 +138,9 @@ public class UserLocationsDao extends AbstractDao<UserLocations, Long> {
         entity.setLatitude(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setLongitude(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setRadius(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setTime(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setSharing(cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6));
+        entity.setCreated_time(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setUpdated_time(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setSharing(cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7));
      }
     
     /** @inheritdoc */

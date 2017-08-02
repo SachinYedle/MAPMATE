@@ -56,7 +56,7 @@
     <string name="click_on_search_icon">Click on search icon to add friend</string>
     <string name="stop">Stop</string>
     <string name="accept_request">Accept request</string>
-    <string name="request_sent">Request sent</string>
+    <string name="request_sent">Requested</string>
     <string name="cant_add_yourself">Can\'t add yourself</string>
     <string name="user_already_added">User Already added</string>
     <string name="email_required">Email Required</string>
@@ -66,8 +66,8 @@
     <string name="email">email</string>
     <string name="accepted">Accepted</string>
     <string name="start">start</string>
-    <string name="sharing_stopped">Sharing stopped</string>
-    <string name="sharing_started">Sharing started</string>
+    <string name="sharing_stopped">Stopped sharing location with </string>
+    <string name="sharing_started">Started sharing location with </string>
     <string name="status_update_failed">Status update failed</string>
     <string name="status_updated">status updated</string>
     <string name="friend_stopped_sharing">friend stopped sharing location</string>

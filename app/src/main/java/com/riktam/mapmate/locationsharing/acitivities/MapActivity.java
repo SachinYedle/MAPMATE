@@ -11,6 +11,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
@@ -40,6 +41,7 @@ import com.riktam.mapmate.locationsharing.pojo.FriendsData;
 import com.riktam.mapmate.locationsharing.responses.FriendsServiceResponse;
 import com.riktam.mapmate.locationsharing.responses.LocationSharedFriendsResponse;
 import com.riktam.mapmate.locationsharing.responses.UserLocationsResponse;
+import com.riktam.mapmate.locationsharing.services.BackgroundLocationService;
 import com.riktam.mapmate.locationsharing.utils.Constants;
 import com.riktam.mapmate.locationsharing.utils.CustomLog;
 import com.riktam.mapmate.locationsharing.utils.DrawRouteFunctionality;
@@ -61,14 +63,18 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
+import static com.riktam.mapmate.locationsharing.utils.Constants.LOCATION_INTERVAL;
+
 public class MapActivity extends DrawerActivity implements View.OnClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapLoadedCallback, OnMapReadyCallback,
-        GoogleMap.OnInfoWindowClickListener {
+        GoogleMap.OnInfoWindowClickListener, GoogleApiClient.ConnectionCallbacks, com.google.android.gms.location.LocationListener {
 
     private GoogleApiClient googleApiClient;
+    private LocationRequest locationRequest;
     private SupportMapFragment mapFragment;
     private GoogleMap googleMap;
     private static long back_pressed;
@@ -79,6 +85,9 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
     private SmoothProgressBar mapProgressBar;
     private Handler mHandler;
     private FloatingActionButton floatingActionButton;
+    private Double latitude;
+    private Double longitude;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,29 +109,13 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
     }
 
 
-    private void setUpToolbar(){
+    private void setUpToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setDrawerLayout(MyApplication.getCurrentActivityContext());
-        toolbar.setOnClickListener(this);
         getSupportActionBar().setTitle(getString(R.string.app_name));
 
-    }
-
-    public void drawRoute(String email) {
-        stopRepeatingTask();
-        DrawRouteFunctionality.getInstance().setRouteVisible(true);
-        if (email.equalsIgnoreCase(MyApplication.getInstance().sharedPreferencesData.getEmail())) {
-            DownloadLocationsDataMapper dataMapper = new DownloadLocationsDataMapper(MyApplication.getCurrentActivityContext());
-            dataMapper.getLocations(onTaskCompletedListener, "" + MyApplication.getInstance().sharedPreferencesData.getId());
-            getSupportActionBar().setTitle(MyApplication.getInstance().sharedPreferencesData.getFirstName());
-        } else {
-            DownloadLocationsDataMapper dataMapper = new DownloadLocationsDataMapper(MyApplication.getCurrentActivityContext());
-            Friends friends = FriendsTableOperations.getInstance().getFriendWithEmail(email).get(0);
-            dataMapper.getLocations(onTaskCompletedListener, friends.getFriend_id());
-            getSupportActionBar().setTitle(friends.getFriend_first_name());
-        }
     }
 
     public void initializeVariables() {
@@ -146,8 +139,8 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-       /* MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.map_toolbar_menu, menu);*/
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.map_toolbar_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -180,16 +173,16 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
         new LocationSharedFriendsMapper().getLocationSharedFriends(onGetSharedLocationFriends, true);
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case R.id.map_menu_item_add:
-//                Navigator.getInstance().navigateToFriendsActivity();
-//                finish();
-//                break;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.map_menu_item_search:
+                Navigator.getInstance().navigateToFriendsActivity("addFriend");
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 
     FriendsDataMapper.OnTaskCompletedListener onGetFriendsDataListener = new FriendsDataMapper.OnTaskCompletedListener() {
@@ -214,9 +207,7 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
     protected void onResume() {
         super.onResume();
         MyApplication.getInstance().setCurrentActivityContext(MapActivity.this);
-        if (!DrawRouteFunctionality.getInstance().isRouteVisible()) {
-            startRepeatingTask();
-        }
+        startRepeatingTask();
         registerReceiver(gpsLocationReceiver, new IntentFilter(BROADCAST_ACTION));//Register broadcast receiver to check the status of GPS
     }
 
@@ -232,25 +223,27 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
 
     public void buildGoogleApiClient() {
         googleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
                 .addApi(LocationServices.API)
                 .build();
         googleApiClient.connect();
+
+        createLocationRequest();
     }
 
-    private DownloadLocationsDataMapper.OnTaskCompletedListener onTaskCompletedListener = new DownloadLocationsDataMapper.OnTaskCompletedListener() {
-        @Override
-        public void onTaskCompleted(UserLocationsResponse userLocationsResponse) {
-            String email = MyApplication.getInstance().sharedPreferencesData.getSelectedUserEmail();
-            CustomLog.i("Map Activity", "Download Locations" + userLocationsResponse.getSuccess() + ":" + email);
-            googleMap.setOnInfoWindowClickListener(null);
-            DrawRouteFunctionality.getInstance().drawRouteOfSelectedUser(email, googleMap);
-        }
+    protected void createLocationRequest() {
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(LOCATION_INTERVAL);
+        locationRequest.setFastestInterval(LOCATION_INTERVAL / 2);
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+    }
 
-        @Override
-        public void onTaskFailed(String response) {
-            MyApplication.getInstance().showToast(response);
+    protected void startLocationUpdates() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         }
-    };
+    }
 
     public void getUserLocations(Marker marker) {
         String email = null;
@@ -258,10 +251,9 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
             String[] tokenArrray = marker.getTitle().split(" ");
             email = tokenArrray[tokenArrray.length - 1];
         }
-        DrawRouteFunctionality.getInstance().setRouteVisible(true);
         MyApplication.getInstance().sharedPreferencesData.setSelectedUserEmail(email);
-        CustomLog.d("Marker id", "Email:" + email);
-        drawRoute(email);
+        Navigator.getInstance().navigateToFriendsRouteActivity(email);
+        finish();
     }
 
     private void setFriendsMarker() {
@@ -288,22 +280,18 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
 
             @Override
             public View getInfoContents(Marker marker) {
-                if (DrawRouteFunctionality.getInstance().isRouteVisible()) {
-                    return null;
+                View view = getLayoutInflater().inflate(R.layout.map_marker_info_window, null);
+                TextView userId = (TextView) view.findViewById(R.id.user_id);
+                TextView userPhone = (TextView) view.findViewById(R.id.user_phone);
+                if (userData.size() > 0) {
+                    userId.setText(userData.get(0).getFriend_first_name());
+                    String dateString = userData.get(0).getLast_known_time();
+                    userPhone.setText(TimeInAgoFormat.getInstance().timeInAgoFormat(dateString));
                 } else {
-                    View view = getLayoutInflater().inflate(R.layout.map_marker_info_window, null);
-                    TextView userId = (TextView) view.findViewById(R.id.user_id);
-                    TextView userPhone = (TextView) view.findViewById(R.id.user_phone);
-                    if (userData.size() > 0) {
-                        userId.setText(userData.get(0).getFriend_first_name());
-                        String dateString = userData.get(0).getLast_known_time();
-                        userPhone.setText(TimeInAgoFormat.getInstance().timeInAgoFormat(dateString));
-                    } else {
-                        userId.setText(MyApplication.getInstance().sharedPreferencesData.getFirstName());
-                        userPhone.setText(MyApplication.getInstance().sharedPreferencesData.getEmail());
-                    }
-                    return view;
+                    userId.setText(MyApplication.getInstance().sharedPreferencesData.getFirstName());
+                    userPhone.setText(MyApplication.getInstance().sharedPreferencesData.getEmail());
                 }
+                return view;
             }
         };
         googleMap.setInfoWindowAdapter(infoWindowAdapter);
@@ -314,9 +302,6 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
     public void onBackPressed() {
         if (isDrawerOpen()) {
             closeDrawer();
-        } else if (DrawRouteFunctionality.getInstance().isRouteVisible()) {
-            getSupportActionBar().setTitle(getString(R.string.app_name));
-            setFriendsMarker();
         } else if (back_pressed + 2000 > System.currentTimeMillis()) {
             finish();
         } else {
@@ -327,20 +312,12 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
 
     @Override
     public void onMapLoaded() {
+        buildGoogleApiClient();
         MyApplication.getInstance().hideProgressDialog();
         googleMap.setOnMarkerClickListener(this);
         googleMap.setOnInfoWindowClickListener(this);
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            String email = bundle.getString("email");
-            MyApplication.getInstance().sharedPreferencesData.setSelectedUserEmail(email);
-            drawRoute(email);
-        } else {
-            /** get friends data */
-            DrawRouteFunctionality.getInstance().setRouteVisible(false);
-            new LocationSharedFriendsMapper().getLocationSharedFriends(onGetSharedLocationFriends, true);
 
-        }
+        new LocationSharedFriendsMapper().getLocationSharedFriends(onGetSharedLocationFriends, true);
     }
 
     LocationSharedFriendsMapper.OnTaskCompletedListener onGetSharedLocationFriends = new LocationSharedFriendsMapper.OnTaskCompletedListener() {
@@ -378,7 +355,6 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
             if (intent.getAction().matches(BROADCAST_ACTION)) {
                 LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
                 if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) || locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -391,6 +367,7 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
         }
     };
 
+
     /* Show FriendLocation Access Dialog */
     private void showLocationSettingDialog() {
         LocationRequest locationRequest = LocationRequest.create();
@@ -399,41 +376,51 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
         locationRequest.setFastestInterval(Constants.LOCATION_INTERVAL);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest);
-        builder.setAlwaysShow(true); //this is the key ingredient to show dialog always when GPS is off
+        //builder.setAlwaysShow(true); //this is the key ingredient to show dialog always when GPS is off
 
-        PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-            @Override
-            public void onResult(LocationSettingsResult result) {
-                final Status status = result.getStatus();
-                final LocationSettingsStates state = result.getLocationSettingsStates();
-                switch (status.getStatusCode()) {
-                    case LocationSettingsStatusCodes.SUCCESS:
-                        // All location settings are satisfied. The client can initialize location
-                        // requests here.
-                        break;
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        // FriendLocation settings are not satisfied. But could be fixed by showing the user
-                        // a dialog.
-                        try {
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            status.startResolutionForResult(MapActivity.this, REQUEST_CHECK_SETTINGS);
-                        } catch (IntentSender.SendIntentException e) {
-                            e.printStackTrace();
-                            // Ignore the error.
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        // FriendLocation settings are not satisfied. However, we have no way to fix the
-                        // settings so we won't show the dialog.
-                        break;
-                }
-            }
-        });
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi
+                .checkLocationSettings(googleApiClient, builder.build());
+        result.setResultCallback(locationRequestCallback);
     }
 
+    private ResultCallback<LocationSettingsResult> locationRequestCallback = new
+            ResultCallback<LocationSettingsResult>() {
+
+                @Override
+                public void onResult(LocationSettingsResult result) {
+                    final Status status = result.getStatus();
+                    final LocationSettingsStates state = result.getLocationSettingsStates();
+                    switch (status.getStatusCode()) {
+                        case LocationSettingsStatusCodes.SUCCESS:
+                            // All location settings are satisfied. The client can initialize location
+                            // requests here.
+                            callToBackgroundLocationService();
+                            break;
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            // FriendLocation settings are not satisfied. But could be fixed by showing the user
+                            // a dialog.
+                            try {
+                                // Show the dialog by calling startResolutionForResult(),
+                                // and check the result in onActivityResult().
+                                status.startResolutionForResult(MapActivity.this, REQUEST_CHECK_SETTINGS);
+                            } catch (IntentSender.SendIntentException e) {
+                                e.printStackTrace();
+                                // Ignore the error.
+                            }
+                            break;
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                            // FriendLocation settings are not satisfied. However, we have no way to fix the
+                            // settings so we won't show the dialog.
+                            break;
+                    }
+                }
+            };
+
+    public void callToBackgroundLocationService() {
+        if (ActivityCompat.checkSelfPermission(MyApplication.getCurrentActivityContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            startService(new Intent(this, BackgroundLocationService.class));
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -475,4 +462,75 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
                 break;
         }
     }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        showLocationSettingDialog();
+        startLocationUpdates();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+
+        setMapZoomLevel();
+    }
+
+    private void setMapZoomLevel() {
+        List<UserLastKnownLocation> locationList = UserLastknownLocationOperations
+                .getInstance().getUserLastKnownLocation();
+        ArrayList<LatLng> locations = getUsersInsideTheRadius(locationList);
+
+        if (locationList.size() > locations.size() && locations.size() > 0) {
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            for (int i = 0; i < locations.size(); i++) {
+                builder.include(locations.get(i));
+            }
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 30));
+        }
+    }
+
+    private ArrayList<LatLng> getUsersInsideTheRadius(List<UserLastKnownLocation> locationList) {
+
+        ArrayList<LatLng> locations = new ArrayList<>();
+
+        for (int i = 0; i < locationList.size(); i++) {
+            if(((locationList.get(i).getLatitude() != null && !locationList.get(i).getLatitude().equalsIgnoreCase(""))
+                    && (locationList.get(i).getLongitude() != null && !locationList.get(i).getLongitude().equalsIgnoreCase("")))) {
+
+                Double latitude2 = Double.parseDouble(locationList.get(i).getLatitude());
+                Double longitude2 = Double.parseDouble(locationList.get(i).getLongitude());
+                if (distance(latitude, longitude, latitude2, longitude2) < 25) {
+                    locations.add(new LatLng(latitude2, longitude2));
+                }
+            }
+        }
+        return locations;
+    }
+
+    private double distance(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2))
+                + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        dist = dist * 1.609344; // for KM
+        return (dist);
+    }
+
+    private static double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private static double rad2deg(double rad) {
+        return (rad * 180 / Math.PI);
+    }
+
 }

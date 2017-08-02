@@ -37,7 +37,7 @@ public class TimeInAgoFormat {
         return parseDate(currentDate, previousDate);
     }
 
-    public String parseDate(Date currentDate, Date createDate) {
+    private String parseDate(Date currentDate, Date createDate) {
 
         String result = "just now";
         long difference = Math.abs(currentDate.getTime() - createDate.getTime());
@@ -96,4 +96,79 @@ public class TimeInAgoFormat {
         }
         return result;
     }
+
+    public String getTimeDifference(String createdDate, String updatedDate) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
+        Date previousDate = null;
+        Date currentDate = null;
+        try {
+            previousDate = formatter.parse(createdDate);
+            currentDate = formatter.parse(updatedDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return parseAndGetDiff(currentDate, previousDate);
+    }
+
+    private String parseAndGetDiff(Date currentDate, Date createDate) {
+
+        String result = "few secs";
+        long difference = Math.abs(currentDate.getTime() - createDate.getTime());
+
+        long secondsInMilli = 1000;
+        long minutesInMilli = secondsInMilli * 60;
+        long hoursInMilli = minutesInMilli * 60;
+        long daysInMilli = hoursInMilli * 24;
+
+        long elapsedDays = difference / daysInMilli;
+        difference = difference % daysInMilli;
+
+        long elapsedHours = difference / hoursInMilli;
+        difference = difference % hoursInMilli;
+
+        long elapsedMinutes = difference / minutesInMilli;
+        difference = difference % minutesInMilli;
+
+        long elapsedSeconds = difference / secondsInMilli;
+
+        if (elapsedDays == 0) {
+            if (elapsedHours == 0) {
+                if (elapsedMinutes == 0) {
+                    if (elapsedSeconds < 0) {
+                        return "0" + " secs ";
+                    } else {
+                        if (elapsedDays > 0 && elapsedSeconds < 59) {
+                            return "few secs";
+                        }
+                    }
+                } else {
+                    return String.valueOf(elapsedMinutes) + " minutes";
+                }
+            } else {
+                return String.valueOf(elapsedHours) + " hours";
+            }
+        } else {
+            if (elapsedDays <= 29) {
+                return String.valueOf(elapsedDays) + " days";
+            }
+            if (elapsedDays > 29 && elapsedDays <= 58) {
+                return "1 Month";
+            }
+            if (elapsedDays > 58 && elapsedDays <= 360) {
+                return String.valueOf(elapsedDays / 29) + " Months";
+            }
+            if (elapsedDays > 360 && elapsedDays <= 720) {
+                return "1 year";
+            }
+            if (elapsedDays > 720) {
+                SimpleDateFormat formatterYear = new SimpleDateFormat("dd-MMM-yy hh:mm:ss");
+                Calendar calendarYear = Calendar.getInstance();
+                calendarYear.setTimeInMillis(createDate.getTime());
+                return formatterYear.format(calendarYear.getTime()) + "";
+            }
+        }
+        return result;
+    }
+
 }

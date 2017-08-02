@@ -55,25 +55,26 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-
-                        <android.support.v7.widget.RecyclerView
-                            android:id="@+id/friends_recyclerView"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="@dimen/padding_medium" />
-
                         <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
                             android:id="@+id/friends_recycler_header_item_switch_info_textView"
+                            app:textStyle="1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"
-                            android:layout_marginTop="@dimen/margin_large"
+                            android:layout_marginTop="@dimen/margin_small"
                             android:background="@drawable/switch_info_textview_drawable"
                             android:gravity="center_horizontal"
                             android:padding="@dimen/padding_medium"
                             android:text="@string/switch_info_text"
-                            android:textColor="@color/white"
+                            android:textColor="@color/black"
                             android:textSize="@dimen/text_size_small" />
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/friends_recyclerView"
+                            android:layout_below="@+id/friends_recycler_header_item_switch_info_textView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/padding_medium" />
                     </RelativeLayout>
                 </LinearLayout>
             </android.support.v4.widget.SwipeRefreshLayout>

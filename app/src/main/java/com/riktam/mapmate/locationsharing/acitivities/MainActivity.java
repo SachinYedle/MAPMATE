@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Scope;
@@ -69,8 +70,7 @@ import io.fabric.sdk.android.Fabric;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int RC_SIGN_IN = 9001;
-    private SignInButton googleSignInButton;
-    private Button googleSignOut;
+    private ImageView googleSignInButton;
     private GoogleApiClient googleApiClient;
     private final int REQUSTED_CODE = 99;
     private String authCode;
@@ -145,14 +145,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void initializeVariables() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        googleSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
-        googleSignInButton.setSize(SignInButton.SIZE_STANDARD);
-        googleSignOut = (Button) findViewById(R.id.btn_sign_out);
+        googleSignInButton = (ImageView) findViewById(R.id.sign_in_button);
+       // googleSignOut = (Button) findViewById(R.id.btn_sign_out);
     }
 
     public void setUpListeners() {
         googleSignInButton.setOnClickListener(this);
-        googleSignOut.setOnClickListener(this);
+        //googleSignOut.setOnClickListener(this);
     }
 
     public void setUpGoogleLoginOption() {
@@ -211,8 +210,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             CustomLog.i("Main Activity", "Token: " + acct.getIdToken());
 
-            googleSignInButton.setVisibility(View.GONE);
-            googleSignOut.setVisibility(View.VISIBLE);
+            //googleSignInButton.setVisibility(View.GONE);
+            //googleSignOut.setVisibility(View.VISIBLE);
         } else {
             MyApplication.getInstance().showToast(getString(R.string.something_went_wrong));
             CustomLog.e("Login", "Unsuccesfull");
@@ -246,7 +245,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             client_id = web.getString("client_id");
             client_secret = web.getString("client_secret");
             access_token_url = "https://www.googleapis.com/oauth2/v4/token";
-
 
         } catch (JSONException e) {
             CustomLog.e("Json parse exception", " " + e.getLocalizedMessage());
@@ -381,6 +379,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             } else {
                 Log.e("Contacts error", "No Contact Found.");
+                login();
                 Toast.makeText(context, "No Contact Found.", Toast.LENGTH_SHORT)
                         .show();
             }
@@ -430,9 +429,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             .enable_data), positiveClick);
                 }
                 break;
-            case R.id.btn_sign_out:
-                signOut();
-                break;
+//            case R.id.btn_sign_out:
+//                signOut();
+//                break;
 
         }
     }
@@ -445,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         @Override
                         public void onResult(Status status) {
                             googleSignInButton.setVisibility(View.VISIBLE);
-                            googleSignOut.setVisibility(View.GONE);
+                            //googleSignOut.setVisibility(View.GONE);
                         }
                     });
         }

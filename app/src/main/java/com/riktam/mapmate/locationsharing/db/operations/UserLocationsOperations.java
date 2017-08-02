@@ -29,10 +29,10 @@ public class UserLocationsOperations {
         UserLocations userLocations = new UserLocations();
         userLocations.setLongitude(userLocationData.getLon());
         userLocations.setLatitude(userLocationData.getLat());
-        userLocations.setTime(userLocationData.getTime());
+        userLocations.setCreated_time(userLocationData.getCreatedTime());
         userLocations.setRadius(userLocationData.getRadius());
         userLocations.setEmail(MyApplication.getInstance().sharedPreferencesData.getSelectedUserEmail());
-        userLocations.setTime(userLocationData.getTime());
+        userLocations.setUpdated_time(userLocationData.getUpdatedTime());
         userLocations.setSharing(userLocationData.getSharing());
         userLocationsDao.insert(userLocations);
     }

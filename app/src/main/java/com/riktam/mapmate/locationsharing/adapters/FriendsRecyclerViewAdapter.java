@@ -11,6 +11,7 @@ import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -68,6 +69,7 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         if (getItemViewType(position) == VIEW_TYPE_FRIENDS) {
             if (((FriendsActivity) context).googleFriendsHeaderTextView.getVisibility() == View.VISIBLE) {
                 ((FriendsActivity) context).googleFriendsHeaderTextView.setVisibility(View.GONE);
+                ((FriendsActivity)context).showSwitchInfoTextView();
             }
             if (friendsArrayList.get(position).getFriendProfileUrl() != null) {
                 Picasso.with(MyApplication.getCurrentActivityContext()).load(friendsArrayList.get(position).getFriendProfileUrl()).into(((FriendViewHolder) holder).profileImageView);
@@ -76,21 +78,22 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             ((FriendViewHolder) holder).emailTextView.setText(highlightText(friendsArrayList.get(position).getFriendsEmail()));
             if (friendsArrayList.get(position).getStatus().equalsIgnoreCase(context.getString(R.string.start)) || friendsArrayList.get(position).getStatus().equalsIgnoreCase(context.getString(R.string.stop))) {
                 ((FriendViewHolder) holder).shareLocationSwitch.setVisibility(View.VISIBLE);
-                ((FriendViewHolder) holder).statusTextView.setVisibility(View.GONE);
+                ((FriendViewHolder) holder).statusButton.setVisibility(View.GONE);
                 ((FriendViewHolder) holder).shareLocationSwitch.setChecked(friendsArrayList.get(position).getStatus().equalsIgnoreCase(context.getString(R.string.stop)));
             } else {
-                ((FriendViewHolder) holder).statusTextView.setVisibility(View.VISIBLE);
+                ((FriendViewHolder) holder).statusButton.setVisibility(View.VISIBLE);
                 ((FriendViewHolder) holder).shareLocationSwitch.setVisibility(View.GONE);
-                ((FriendViewHolder) holder).statusTextView.setText(friendsArrayList.get(position).getStatus());
+                ((FriendViewHolder) holder).statusButton.setText(friendsArrayList.get(position).getStatus());
             }
             if (friendsArrayList.get(position).getStatus().equals("add")) {
-                ((FriendViewHolder) holder).statusTextView.setVisibility(View.GONE);
+                ((FriendViewHolder) holder).statusButton.setVisibility(View.GONE);
             }
         } else if (getItemViewType(position) == VIEW_TYPE_HEADER) {
             //((HeaderViewHolder) holder).headerTextView.setText(friendsArrayList.get(position).getFriendFirstName());
         } else if (getItemViewType(position) == VIEW_TYPE_GOOGLE_FRIENDS) {
             if (position >= (10 + ((FriendsActivity) context).googleFriendsStartingPos) && ((FriendsActivity) context).googleFriendsHeaderTextView.getVisibility() == View.GONE) {
                 ((FriendsActivity) context).googleFriendsHeaderTextView.setVisibility(View.VISIBLE);
+                ((FriendsActivity)context).hideSwitchInfoTextView();
             }
             ((GoogleFriendViewHolder) holder).nameTextView.setText(highlightText(friendsArrayList.get(position).getFriendFirstName()));
             ((GoogleFriendViewHolder) holder).emailTextView.setText(highlightText(friendsArrayList.get(position).getFriendsEmail()));
@@ -150,7 +153,7 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             int index = name.toLowerCase().indexOf(searchText.toLowerCase());
             while (index > -1) {
                 stringBuilder = new SpannableStringBuilder(name);
-                ForegroundColorSpan fcs = new ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary));
+                ForegroundColorSpan fcs = new ForegroundColorSpan(ContextCompat.getColor(context,R.color.blue));
 
                 stringBuilder.setSpan(fcs, index, index + searchText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 index = name.toLowerCase().indexOf(searchText.toLowerCase(), index + 1);
@@ -163,7 +166,8 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     }
 
     public class FriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView emailTextView, statusTextView, nameTextView;
+        private TextView emailTextView, nameTextView;
+        private Button statusButton;
         private ImageView profileImageView;
         private Switch shareLocationSwitch;
 
@@ -174,12 +178,12 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             shareLocationSwitch.setOnClickListener(this);
             emailTextView = (TextView) itemView.findViewById(R.id.friends_recycler_item_email_textView);
             emailTextView.setOnClickListener(this);
-            statusTextView = (TextView) itemView.findViewById(R.id.friends_recycler_item_status_textView);
+            statusButton = (Button) itemView.findViewById(R.id.friends_recycler_item_status_button);
             nameTextView = (TextView) itemView.findViewById(R.id.friends_recycler_item_name_textView);
             nameTextView.setOnClickListener(this);
             profileImageView = (ImageView) itemView.findViewById(R.id.friends_recycler_item_profile_imageView);
             profileImageView.setOnClickListener(this);
-            statusTextView.setOnClickListener(this);
+            statusButton.setOnClickListener(this);
         }
 
         @Override
@@ -191,11 +195,14 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     public class GoogleFriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView emailTextView, nameTextView;
         private ImageView profileImageView;
+        private Button inviteButton;
 
         public GoogleFriendViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             emailTextView = (TextView) itemView.findViewById(R.id.gmail_friends_recycler_item_email_textView);
+            inviteButton = (Button)itemView.findViewById(R.id.gmail_friends_recycler_item_invite_button);
+            inviteButton.setOnClickListener(this);
             nameTextView = (TextView) itemView.findViewById(R.id.gmail_friends_recycler_item_name_textView);
             profileImageView = (ImageView) itemView.findViewById(R.id.gmail_friends_recycler_item_profile_imageView);
         }

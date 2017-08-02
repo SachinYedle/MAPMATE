@@ -4,7 +4,7 @@
                 <item name="windowNoTitle">true</item>
                 <item name="windowActionBar">false</item>
                 <item name="colorPrimary">@color/colorPrimary</item>
-                <item name="colorPrimaryDark">@color/colorPrimary</item>
+                <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
                 <item name="colorAccent">@color/white</item>
                 <item name="android:statusBarColor">@color/colorPrimaryDark</item>
                 <item name="android:textColor">@color/white</item>

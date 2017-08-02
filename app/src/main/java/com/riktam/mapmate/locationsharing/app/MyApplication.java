@@ -166,7 +166,7 @@ public class MyApplication extends Application {
     }
 
     public void showToast(String message) {
-        Toast.makeText(getCurrentActivityContext(), message, Toast.LENGTH_LONG).show();
+        Toast.makeText(getCurrentActivityContext(), message, Toast.LENGTH_SHORT).show();
     }
 
     public void showProgressDialog(String title) {

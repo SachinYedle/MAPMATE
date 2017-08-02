@@ -36,7 +36,8 @@ public class LocationSharingDaoGenerator {
         entity.addStringProperty("latitude");
         entity.addStringProperty("longitude");
         entity.addStringProperty("radius");
-        entity.addStringProperty("time");
+        entity.addStringProperty("created_time");
+        entity.addStringProperty("updated_time");
         entity.addIntProperty("sharing");
     }
 

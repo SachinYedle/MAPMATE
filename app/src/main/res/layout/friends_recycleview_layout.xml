@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <LinearLayout
@@ -19,7 +20,7 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:orientation="vertical"
@@ -48,11 +49,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone" />
-        <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
-            android:id="@+id/friends_recycler_item_status_textView"
-            style="@style/medium_text_textview"
-            android:layout_weight="0"
-            android:textColor="@color/red" />
+        <com.riktam.mapmate.locationsharing.customviews.CustomFontButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            app:textStyle="1"
+            android:id="@+id/friends_recycler_item_status_button"
+            android:textColor="@color/white"
+            android:layout_weight="0" />
+
     </LinearLayout>
 
     <ImageView
