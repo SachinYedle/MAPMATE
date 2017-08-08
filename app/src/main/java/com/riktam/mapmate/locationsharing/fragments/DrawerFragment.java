@@ -74,7 +74,7 @@ public class DrawerFragment extends Fragment implements View.OnClickListener {
         }
         switch (view.getId()) {
             case R.id.drawer_item_my_route_textView:
-                Navigator.getInstance().navigateToFriendsRouteActivity(MyApplication.getInstance().sharedPreferencesData.getEmail());
+                Navigator.getInstance().navigateToFriendsRouteActivity(MyApplication.getInstance().sharedPreferencesData.getEmail(), "drawer");
                 getActivity().finish();
                 break;
             case R.id.drawer_item_logout_textView:
@@ -85,8 +85,12 @@ public class DrawerFragment extends Fragment implements View.OnClickListener {
                 getActivity().finish();
                 break;
             case R.id.drawer_item_friends_location_textView:
-                Navigator.getInstance().navigateToMapActivity();
-                getActivity().finish();
+                if(getActivity() instanceof MapActivity){
+                    ((MapActivity) getActivity()).closeDrawer();
+                }else {
+                    Navigator.getInstance().navigateToMapActivity();
+                    getActivity().finish();
+                }
                 break;
         }
     }

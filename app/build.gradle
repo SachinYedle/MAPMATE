@@ -21,7 +21,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField 'String', 'HOST', '"http://testbed2.riktamtech.com"'
+            buildConfigField 'String', 'HOST', '"http://mapmate.riktamtech.com"'
             buildConfigField 'boolean', 'IS_PRODUCTION', 'true'
         }
         debug {

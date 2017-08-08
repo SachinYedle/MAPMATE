@@ -65,6 +65,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
     private ArrayList<FriendsData> friendsRecyclerItems;
     public int googleFriendsStartingPos;
     private SearchView searchView;
+    private int clickedItemPosition;
 
 
     @Override
@@ -161,6 +162,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
                 isRefreshing = true;
+                ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text)).setText("");
                 new FriendsDataMapper().getFriends(onGetFriendsDataListener, isRefreshing);
             }
         });
@@ -186,12 +188,13 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
         searchView.setQueryHint(getString(R.string.search_or_add_friend));
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            searchView.setIconifiedByDefault(true);
+            searchView.setIconifiedByDefault(false);
             searchView.setFocusable(true);
             searchView.setIconified(false);
             searchView.requestFocusFromTouch();
         }
-        ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text)).setHintTextColor(getResources().getColor(R.color.grey));
+        ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text))
+                .setHintTextColor(getResources().getColor(R.color.grey));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -243,9 +246,16 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
             if (friendsDataList.get(i).getFriendsEmail() == null) {
                 filteredFriendsList.add(friendsDataList.get(i));
             } else {
-                final String email = friendsDataList.get(i).getFriendsEmail().toLowerCase();
-                final String name = friendsDataList.get(i).getFriendFirstName().toLowerCase();
-                if (email.contains(query) || name.contains(query)) {
+                String name = "", email = "";
+                if(friendsDataList.get(i).getFriendsEmail()!= null){
+                    email = friendsDataList.get(i).getFriendsEmail().toLowerCase();
+                }
+
+                if(friendsDataList.get(i).getFriendFirstName()!=null){
+                    name = friendsDataList.get(i).getFriendFirstName().toLowerCase();
+                }
+
+                if (!email.equals("") && email.contains(query) || !name.equals("") &&name.contains(query)) {
                     filteredFriendsList.add(friendsDataList.get(i));
                 }
             }
@@ -367,7 +377,9 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
 
                 @Override
                 public int compare(FriendsData lhs, FriendsData rhs) {
-                    return lhs.getFriendFirstName().compareTo(rhs.getFriendFirstName());
+                    if(lhs.getFriendFirstName() != null && rhs.getFriendFirstName()!= null)
+                        return lhs.getFriendFirstName().compareTo(rhs.getFriendFirstName());
+                    else return -1;
                 }
             };
 
@@ -446,8 +458,9 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
     @Override
     public void onItemClick(View view, int position, FriendsData friendsData) {
         hideSoftKeyboard();
+        clickedItemPosition = position;
+        this.friend = friendsData;
         if (friendsData.getFriendProfileUrl() == null && friendsData.getStatus() == null) {
-            this.friend = friendsData;
             String email = friend.getFriendsEmail();
             new CheckIfUserRegisteredMapper().checkIfRegistered(onCheckRegisterListener, email);
         } else {
@@ -459,11 +472,11 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
             } else if (friendsData.getStatus().equals(getString(R.string.request_sent))) {
                 MyApplication.getInstance().showToast(getString(R.string.friend_didnt_accepted_request));
             } else {
-                if (view.getId() == R.id.friends_recycler_item_share_location_switch && friendsData.getStatus().equals(getResources().getString(R.string.stop))) {
+                if (view.getId() == R.id.friends_recycler_item_share_location_switch && friendsData.getStatus().equals(getResources().getString(R.string.start))) {
                     MyApplication.getInstance().showToast(getString(R.string.sharing_stopped) +" "+ friendsData.getFriendFirstName());
                     new LocationSharingStatusMapper(this).updateLocationSharingStatus(onStatusUpdatedListener, Constants.STOP_SHARING, Integer.parseInt(friendData.get(0).getFriend_id()));
                 }
-                if (view.getId() == R.id.friends_recycler_item_share_location_switch && friendsData.getStatus().equals(getResources().getString(R.string.start))) {
+                if (view.getId() == R.id.friends_recycler_item_share_location_switch && friendsData.getStatus().equals(getResources().getString(R.string.stop))) {
                     MyApplication.getInstance().showToast(getString(R.string.sharing_started) +" "+ friendsData.getFriendFirstName());
                     new LocationSharingStatusMapper(this).updateLocationSharingStatus(onStatusUpdatedListener, Constants.START_SHARING, Integer.parseInt(friendData.get(0).getFriend_id()));
                 } else if (view.getId() == R.id.friends_recycler_item_email_textView || view.getId() == R.id.friends_recycler_item_name_textView || view.getId() == R.id.friends_recycler_item_profile_imageView) {
@@ -513,7 +526,8 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
                 public void onClick() {
                     Intent inviteIntent = new Intent();
                     inviteIntent.setAction(Intent.ACTION_SEND);
-                    String textMessage = "Hi " + friend.getFriendFirstName() + ", \n" + MyApplication.getInstance().sharedPreferencesData.getEmail() + " invited you to " + getString(R.string.app_name);
+                    String textMessage = "Hi " + friend.getFriendFirstName() + ", \n" + MyApplication.getInstance().sharedPreferencesData.getEmail()
+                            + " invited you to " + getString(R.string.app_name) +" "+ getString(R.string.app_id);
                     inviteIntent.putExtra(Intent.EXTRA_TEXT, textMessage);
                     inviteIntent.setType("text/plain");
                     startActivity(Intent.createChooser(inviteIntent, "Invite to " + getString(R.string.app_name)));
@@ -533,7 +547,8 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
                 public void onClick() {
                     Intent inviteIntent = new Intent();
                     inviteIntent.setAction(Intent.ACTION_SEND);
-                    String textMessage = "Hi " + friend.getFriendFirstName() + ", \n" + MyApplication.getInstance().sharedPreferencesData.getEmail() + " invited you to mapmate.";
+                    String textMessage = "Hi " + friend.getFriendFirstName() + ", \n" + MyApplication.getInstance().sharedPreferencesData.getEmail()
+                            + " invited you to "+getString(R.string.app_name) + " " +getString(R.string.app_id);
                     inviteIntent.putExtra(Intent.EXTRA_TEXT, textMessage);
                     inviteIntent.setType("text/plain");
                     startActivity(Intent.createChooser(inviteIntent, "Invite to " + getString(R.string.app_name)));
@@ -556,7 +571,7 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
         @Override
         public void onTaskCompleted(UserLocationsResponse userLocationsResponse) {
             if (userLocationsResponse.getSuccess().equalsIgnoreCase("true")) {
-                Navigator.getInstance().navigateToFriendsRouteActivity(MyApplication.getInstance().sharedPreferencesData.getSelectedUserEmail());
+                Navigator.getInstance().navigateToFriendsRouteActivity(MyApplication.getInstance().sharedPreferencesData.getSelectedUserEmail(), "friends");
                 finish();
             } else {
                 MyApplication.getInstance().showToast(userLocationsResponse.getMessage());
@@ -574,10 +589,13 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
         @Override
         public void onTaskCompleted(SharingStatusResponse sharingStatusResponse) {
             if (sharingStatusResponse.isSuccess()) {
-                new FriendsDataMapper().getFriends(onGetFriendsDataListener, true);
+                FriendsTableOperations.getInstance().updateFriend(friend);
+                //new FriendsDataMapper().getFriends(onGetFriendsDataListener, true);
                 //MyApplication.getInstance().showToast(getString(R.string.status_updated));
+                friendsRecyclerViewAdapter.notifyItemChanged(clickedItemPosition);
             } else {
                 MyApplication.getInstance().showToast(getString(R.string.status_update_failed));
+                new FriendsDataMapper().getFriends(onGetFriendsDataListener, true);
             }
         }
 
@@ -610,12 +628,12 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
                 getGmailFriends();
             }
             getFriendsData();
-            if (friendsRecyclerViewAdapter != null) {
-                friendsRecyclerViewAdapter.clear();
-            }
-            if (friendsRecyclerItems != null) {
-                friendsRecyclerItems.clear();
-            }
+//            if (friendsRecyclerViewAdapter != null) {
+//                friendsRecyclerViewAdapter.clear();
+//            }
+//            if (friendsRecyclerItems != null) {
+//                friendsRecyclerItems.clear();
+//            }
             makeActualList(friendsDataList, gmailFriends);
             friendsRecyclerViewAdapter.addAll(friendsRecyclerItems);
             if (isRefreshing) {
@@ -644,6 +662,23 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
                 new FriendsDataMapper().getFriends(onGetFriendsDataListener, isRefreshing);
 
             } else if (!friendRequestResponse.isSuccess()) {
+                if(friendRequestResponse.getData().equalsIgnoreCase("Requested email hasn't registered yet")){
+                    PositiveClick positiveClick = new PositiveClick() {
+                        @Override
+                        public void onClick() {
+                            if(friend!=null){
+                                friend.setFriendFirstName(emailTextView.getText().toString());
+                            }else {
+                                friend = new FriendsData();
+                                friend.setFriendFirstName(emailTextView.getText().toString());
+                            }
+                            ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text)).setText("");
+                            new InviteFriendMapper().inviteFriend(inviteListener, friend.getFriendFirstName());
+                        }
+                    };
+
+                    MyApplication.getInstance().showAlertWithPositiveNegativeButton(getString(R.string.send_invite), "Your friend " + emailTextView.getText().toString() + " is not using the App.", getString(R.string.cancel), getString(R.string.invite), positiveClick);
+                }
                 MyApplication.getInstance().showToast("" + friendRequestResponse.getData());
             }
         }

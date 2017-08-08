@@ -42,12 +42,12 @@
                 android:textColor="@color/grey"
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
-        <com.riktam.mapmate.locationsharing.customviews.CustomFontButton
+        <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
             android:layout_width="wrap_content"
             android:id="@+id/gmail_friends_recycler_item_invite_button"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:text="invite"
+            android:drawableLeft="@drawable/ic_action_add"
+            android:drawableStart="@drawable/ic_action_add"
             app:textStyle="1"
             android:textColor="@color/white"
             android:layout_weight="0" />

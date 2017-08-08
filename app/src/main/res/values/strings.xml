@@ -2,6 +2,7 @@
     <string name="app_name">Map Mate</string>
     <string name="facebook_app_id">585924418263922</string>
 
+    <string name="app_id">https://play.google.com/store/apps/details?id=com.riktam.mapmate.locationsharing</string>
     <!--<string name="server_client_id">441095881058-adjl4bl21uab4hemtra3r65uc486d3nv.apps.googleusercontent.com</string>-->
 
     <string name="server_client_id">441095881058-re4rnam4h9bpqhd9lsd7mdtgiofpll6h.apps.googleusercontent.com</string>
@@ -61,7 +62,7 @@
     <string name="user_already_added">User Already added</string>
     <string name="email_required">Email Required</string>
     <string name="email_invalid">Email invalid</string>
-    <string name="friend_didnt_accepted_request">Friend didn\'t accepted your request</string>
+    <string name="friend_didnt_accepted_request">Request is pending...</string>
     <string name="remove_friend">Remove friend</string>
     <string name="email">email</string>
     <string name="accepted">Accepted</string>
@@ -87,7 +88,8 @@
     <string name="invitation_sent_by_mail_failed">Invitation by mail failed. Do you want to send message?</string>
     <string name="switch_info_text">Toggle switch to start/stop sharing your location</string>
     <string name="add_friend">Add friend</string>
-    <string name="locate_friend">Locate friend</string>
+    <string name="locate_friend">Locate friends</string>
+    <string name="home">Home</string>
     <string name="loading_google_contacts">Loading Google contacts..</string>
     <string name="logging_in">Logging in..</string>
 </resources>

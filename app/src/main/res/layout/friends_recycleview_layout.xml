@@ -48,14 +48,14 @@
             android:id="@+id/friends_recycler_item_share_location_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone" />
-        <com.riktam.mapmate.locationsharing.customviews.CustomFontButton
+            android:visibility="gone"
+            style="@style/Switch"/>
+        <com.riktam.mapmate.locationsharing.customviews.CustomFontTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
             app:textStyle="1"
-            android:id="@+id/friends_recycler_item_status_button"
-            android:textColor="@color/white"
+            android:id="@+id/friends_recycler_item_status_textView"
+            android:textColor="@color/gplus_color_1"
             android:layout_weight="0" />
 
     </LinearLayout>

@@ -53,7 +53,7 @@
             android:id="@+id/drawer_item_friends_location_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/locate_friend"
+            android:text="@string/home"
             android:gravity="center_vertical"
             android:drawablePadding="@dimen/padding_xlarge"
             android:padding="@dimen/padding_large"

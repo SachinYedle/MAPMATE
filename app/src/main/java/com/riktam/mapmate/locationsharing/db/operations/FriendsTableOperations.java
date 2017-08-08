@@ -1,10 +1,12 @@
 package com.riktam.mapmate.locationsharing.db.operations;
 
 
+import com.riktam.mapmate.locationsharing.R;
 import com.riktam.mapmate.locationsharing.app.MyApplication;
 import com.riktam.mapmate.locationsharing.db.dao.DaoSession;
 import com.riktam.mapmate.locationsharing.db.dao.Friends;
 import com.riktam.mapmate.locationsharing.db.dao.FriendsDao;
+import com.riktam.mapmate.locationsharing.pojo.FriendsData;
 
 import java.util.List;
 
@@ -56,5 +58,18 @@ public class FriendsTableOperations {
         DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(MyApplication.getCurrentActivityContext());
         FriendsDao friendsDao = daoSession.getFriendsDao();
         friendsDao.insert(friends);
+    }
+
+    public void updateFriend(FriendsData friends){
+        List<Friends> friends1 =  getFriendWithEmail(friends.getFriendsEmail());
+        Friends friend = friends1.get(0);
+        if(friend.getStatus().equalsIgnoreCase(MyApplication.getCurrentActivityContext().getString(R.string.stop))){
+            friend.setStatus(MyApplication.getCurrentActivityContext().getString(R.string.start));
+        }else {
+            friend.setStatus(MyApplication.getCurrentActivityContext().getString(R.string.stop));
+        }
+        DaoSession daoSession = MyApplication.getInstance().getWritableDaoSession(MyApplication.getCurrentActivityContext());
+        FriendsDao friendsDao = daoSession.getFriendsDao();
+        friendsDao.update(friend);
     }
 }

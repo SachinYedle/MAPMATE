@@ -152,8 +152,21 @@ public class FriendsRouteActivity extends DrawerActivity implements OnMapReadyCa
 
     @Override
     public void onBackPressed() {
-        Navigator.getInstance().navigateToMapActivity();
-        finish();
+        if (isDrawerOpen()) {
+            closeDrawer();
+        }else {
+            Bundle bundle = getIntent().getExtras();
+            if (bundle != null) {
+                String activity = bundle.getString("activity");
+                if(activity != null && activity.equalsIgnoreCase("friends")){
+                    Navigator.getInstance().navigateToFriendsActivity();
+                }else {
+                    Navigator.getInstance().navigateToMapActivity();
+                }
+            }else {
+                Navigator.getInstance().navigateToMapActivity();
+            }
+        }
     }
 
 //    @Override

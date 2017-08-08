@@ -252,7 +252,7 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
             email = tokenArrray[tokenArrray.length - 1];
         }
         MyApplication.getInstance().sharedPreferencesData.setSelectedUserEmail(email);
-        Navigator.getInstance().navigateToFriendsRouteActivity(email);
+        Navigator.getInstance().navigateToFriendsRouteActivity(email, "map");
         finish();
     }
 

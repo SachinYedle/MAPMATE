@@ -39,9 +39,10 @@ public class Navigator {
         MyApplication.getCurrentActivityContext().startActivity(intent);
     }
 
-    public void navigateToFriendsRouteActivity(String email){
+    public void navigateToFriendsRouteActivity(String email, String activity){
         Intent intent = new Intent(MyApplication.getCurrentActivityContext(), FriendsRouteActivity.class);
         intent.putExtra("email", email);
+        intent.putExtra("activity", activity);
         MyApplication.getCurrentActivityContext().startActivity(intent);
     }
 
