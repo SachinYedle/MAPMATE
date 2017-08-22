@@ -242,21 +242,23 @@ public class FriendsActivity extends DrawerActivity implements View.OnClickListe
     private ArrayList<FriendsData> filter(ArrayList<FriendsData> friendsDataList, String query) {
         query = query.toLowerCase();
         ArrayList<FriendsData> filteredFriendsList = new ArrayList<>();
-        for (int i = 0; i < friendsDataList.size(); i++) {
-            if (friendsDataList.get(i).getFriendsEmail() == null) {
-                filteredFriendsList.add(friendsDataList.get(i));
-            } else {
-                String name = "", email = "";
-                if(friendsDataList.get(i).getFriendsEmail()!= null){
-                    email = friendsDataList.get(i).getFriendsEmail().toLowerCase();
-                }
-
-                if(friendsDataList.get(i).getFriendFirstName()!=null){
-                    name = friendsDataList.get(i).getFriendFirstName().toLowerCase();
-                }
-
-                if (!email.equals("") && email.contains(query) || !name.equals("") &&name.contains(query)) {
+        if(friendsDataList !=null) {
+            for (int i = 0; i < friendsDataList.size(); i++) {
+                if (friendsDataList.get(i).getFriendsEmail() == null) {
                     filteredFriendsList.add(friendsDataList.get(i));
+                } else {
+                    String name = "", email = "";
+                    if (friendsDataList.get(i).getFriendsEmail() != null) {
+                        email = friendsDataList.get(i).getFriendsEmail().toLowerCase();
+                    }
+
+                    if (friendsDataList.get(i).getFriendFirstName() != null) {
+                        name = friendsDataList.get(i).getFriendFirstName().toLowerCase();
+                    }
+
+                    if (!email.equals("") && email.contains(query) || !name.equals("") && name.contains(query)) {
+                        filteredFriendsList.add(friendsDataList.get(i));
+                    }
                 }
             }
         }

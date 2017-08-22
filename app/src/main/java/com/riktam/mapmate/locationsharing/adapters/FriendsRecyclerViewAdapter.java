@@ -89,7 +89,7 @@ public class FriendsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 ((FriendViewHolder) holder).statusTextView.setVisibility(View.GONE);
             }
         } else if (getItemViewType(position) == VIEW_TYPE_HEADER) {
-            //((HeaderViewHolder) holder).headerTextView.setText(friendsArrayList.get(position).getFriendFirstName());
+            ((HeaderViewHolder) holder).headerTextView.setVisibility(View.VISIBLE);
         } else if (getItemViewType(position) == VIEW_TYPE_GOOGLE_FRIENDS) {
             if (position >= (10 + ((FriendsActivity) context).googleFriendsStartingPos) && ((FriendsActivity) context).googleFriendsHeaderTextView.getVisibility() == View.GONE) {
                 ((FriendsActivity) context).googleFriendsHeaderTextView.setVisibility(View.VISIBLE);

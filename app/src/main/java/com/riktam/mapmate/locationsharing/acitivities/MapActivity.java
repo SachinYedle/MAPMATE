@@ -432,7 +432,7 @@ public class MapActivity extends DrawerActivity implements View.OnClickListener,
                         CustomLog.e("Settings", "Result OK");
                         break;
                     case RESULT_CANCELED:
-                        finish();
+                        //finish();
                         CustomLog.e("Settings", "Result Cancel");
                         break;
                 }

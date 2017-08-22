@@ -160,11 +160,14 @@ public class FriendsRouteActivity extends DrawerActivity implements OnMapReadyCa
                 String activity = bundle.getString("activity");
                 if(activity != null && activity.equalsIgnoreCase("friends")){
                     Navigator.getInstance().navigateToFriendsActivity();
+                    finish();
                 }else {
                     Navigator.getInstance().navigateToMapActivity();
+                    finish();
                 }
             }else {
                 Navigator.getInstance().navigateToMapActivity();
+                finish();
             }
         }
     }
